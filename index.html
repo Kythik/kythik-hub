@@ -746,5 +746,16 @@ function khToast(msg, type) {
 }
 
 // Init
+  async function khCheckStream() {
+  try {
+    const r = await fetch('/api/twitch');
+    const d = await r.json();
+    const frame = document.getElementById('khTwitchFrame');
+    if (!d.isLive && d.vodId) {
+      frame.src = `https://player.twitch.tv/?video=${d.vodId}&parent=kythik-hub-j6m4.vercel.app&autoplay=true&muted=false`;
+    }
+  } catch(e) { console.log('Stream check failed', e); }
+}
+khCheckStream();
 khFetch();
 </script>
