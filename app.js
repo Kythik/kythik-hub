@@ -68,24 +68,30 @@ function initScrollBehavior() {
   const heroWrap    = document.getElementById('twitchPlayer');
   const floatPlayer = document.getElementById('floatPlayer');
   const floatScreen = document.getElementById('floatScreen');
+  let moveTimeout   = null;
 
   const observer = new IntersectionObserver(entries => {
-    const heroVisible = entries[0].isIntersecting;
-    const iframe      = document.getElementById('heroIframe');
+    const ratio      = entries[0].intersectionRatio;
+    const heroGone   = ratio === 0;
+    const heroFull   = ratio > 0.5;
+    const iframe     = document.getElementById('heroIframe');
     if (!iframe) return;
 
-    if (!heroVisible) {
-      // Move iframe into float player
+    clearTimeout(moveTimeout);
+
+    if (heroGone) {
+      // Hero fully out — move iframe to float immediately
       floatPlayer.classList.add('visible');
       iframe.style.cssText = 'width:100%;height:100%;border:none;display:block;';
       floatScreen.appendChild(iframe);
-    } else {
-      // Move iframe back into hero
+    } else if (heroFull) {
+      // Hero mostly visible — move iframe back to hero
       floatPlayer.classList.remove('visible');
       iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;';
       heroWrap.appendChild(iframe);
     }
-  }, { threshold: 0.1 });
+    // In between — don't move, let scroll settle
+  }, { threshold: [0, 0.1, 0.5, 1.0] });
 
   observer.observe(hero);
 }
