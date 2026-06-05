@@ -323,7 +323,8 @@ button { cursor: pointer; font-family: var(--font-body); }
   border: 1px solid var(--border);
 }
 
-.tag--game {
+.tag--game,
+.tag--channel {
   background: var(--accent-dim);
   color: var(--accent);
   border-color: rgba(245, 166, 35, 0.2);
