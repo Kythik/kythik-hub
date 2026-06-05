@@ -22,7 +22,6 @@ function isImageAttachment(attachment) {
 
 /* ── DISCORD HELPERS ────────────────────── */
 
-// Fetch channel info including available tags
 async function getChannelTags(channelId) {
   const res = await fetch(
     `https://discord.com/api/v10/channels/${channelId}`,
@@ -33,6 +32,29 @@ async function getChannelTags(channelId) {
   const map = {};
   (data.available_tags || []).forEach(t => { map[t.id] = t.name; });
   return map;
+}
+
+async function getGuildId(channelId) {
+  const res = await fetch(
+    `https://discord.com/api/v10/channels/${channelId}`,
+    { headers: { Authorization: `Bot ${DISCORD_TOKEN}` } }
+  );
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.guild_id;
+}
+
+async function getActiveThreads(channelId) {
+  const guildId = await getGuildId(channelId);
+  if (!guildId) return [];
+
+  const res = await fetch(
+    `https://discord.com/api/v10/guilds/${guildId}/threads/active`,
+    { headers: { Authorization: `Bot ${DISCORD_TOKEN}` } }
+  );
+  if (!res.ok) return [];
+  const data = await res.json();
+  return (data.threads || []).filter(t => String(t.parent_id) === String(channelId));
 }
 
 async function getArchivedThreads(channelId) {
@@ -55,16 +77,6 @@ async function getArchivedThreads(channelId) {
   }
 
   return threads;
-}
-
-async function getActiveThreads(channelId) {
-  const res = await fetch(
-    `https://discord.com/api/v10/channels/${channelId}/threads/active`,
-    { headers: { Authorization: `Bot ${DISCORD_TOKEN}` } }
-  );
-  if (!res.ok) return [];
-  const data = await res.json();
-  return (data.threads || []).filter(t => t.parent_id === channelId);
 }
 
 async function getThreadMessages(threadId) {
@@ -156,7 +168,6 @@ async function run() {
   console.log('  Kythik Hub — Backfill Script');
   console.log('═══════════════════════════════════');
 
-  // Fetch tag maps for both channels
   console.log('\nFetching channel tag maps...');
   const [farmsTags, buildsTags] = await Promise.all([
     getChannelTags(FARMS_CHANNEL),
@@ -165,23 +176,28 @@ async function run() {
   console.log(`Farms tags: ${Object.values(farmsTags).join(', ') || 'none'}`);
   console.log(`Builds tags: ${Object.values(buildsTags).join(', ') || 'none'}`);
 
-  const tagMaps = {
-    Farms:  farmsTags,
-    Builds: buildsTags,
-  };
+  const tagMaps = { Farms: farmsTags, Builds: buildsTags };
 
   console.log('\nChecking existing Airtable records...');
   const existingRecords = await getExistingRecords();
   console.log(`Found ${existingRecords.size} existing records.`);
 
-  // Fetch all threads
   console.log('\nFetching Discord threads...');
-  const [active1, archived1] = await Promise.all([getActiveThreads(FARMS_CHANNEL), getArchivedThreads(FARMS_CHANNEL)]);
-  const [active2, archived2] = await Promise.all([getActiveThreads(BUILDS_CHANNEL), getArchivedThreads(BUILDS_CHANNEL)]);
+  const [farmsActive, farmsArchived] = await Promise.all([
+    getActiveThreads(FARMS_CHANNEL),
+    getArchivedThreads(FARMS_CHANNEL),
+  ]);
+  const [buildsActive, buildsArchived] = await Promise.all([
+    getActiveThreads(BUILDS_CHANNEL),
+    getArchivedThreads(BUILDS_CHANNEL),
+  ]);
+
+  console.log(`Farms: ${farmsActive.length} active, ${farmsArchived.length} archived`);
+  console.log(`Builds: ${buildsActive.length} active, ${buildsArchived.length} archived`);
 
   const allThreads = [
-    ...[...active1, ...archived1].map(t => ({ ...t, channelName: 'Farms' })),
-    ...[...active2, ...archived2].map(t => ({ ...t, channelName: 'Builds' })),
+    ...[...farmsActive, ...farmsArchived].map(t => ({ ...t, channelName: 'Farms' })),
+    ...[...buildsActive, ...buildsArchived].map(t => ({ ...t, channelName: 'Builds' })),
   ];
 
   console.log(`Total threads: ${allThreads.length}`);
@@ -196,7 +212,6 @@ async function run() {
     const discordURL = `https://discord.com/channels/${guildId}/${thread.id}`;
     const existing   = existingRecords.get(discordURL);
 
-    // Resolve tag names
     const tagMap = tagMaps[thread.channelName] || {};
     const tags   = (thread.applied_tags || [])
       .map(id => tagMap[id] || null)
@@ -207,7 +222,6 @@ async function run() {
       const { content, author, images, commentCount } = await getThreadMessages(thread.id);
 
       if (existing) {
-        // Patch missing fields on existing records
         const patch = {};
         if (!existing.hasImages && images) patch.ImageURLs = images;
         if (!existing.hasTags && tags)     patch.Tags = tags;
