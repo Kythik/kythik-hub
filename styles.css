@@ -1073,14 +1073,6 @@ button { cursor: pointer; font-family: var(--font-body); }
   overflow: hidden;
   border: 1px solid var(--border);
   background: #000;
-  transition:
-    position 0s,
-    width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-    height 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-    bottom 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-    right 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-    border-radius 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .twitch-player-wrap.floating {

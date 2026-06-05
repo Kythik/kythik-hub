@@ -91,6 +91,14 @@ function initScrollBehavior() {
 
   let floating = false;
 
+  function resumePlayback() {
+    if (window.twitchPlayer) {
+      setTimeout(() => {
+        try { window.twitchPlayer.play(); } catch(e) {}
+      }, 100);
+    }
+  }
+
   const observer = new IntersectionObserver(entries => {
     const heroVisible = entries[0].isIntersecting;
 
@@ -98,10 +106,12 @@ function initScrollBehavior() {
       floating = true;
       playerWrap.classList.add('floating');
       document.body.classList.add('player-floating');
+      resumePlayback();
     } else if (heroVisible && floating) {
       floating = false;
       playerWrap.classList.remove('floating');
       document.body.classList.remove('player-floating');
+      resumePlayback();
     }
   }, { threshold: 0.05 });
 
