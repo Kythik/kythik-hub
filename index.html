@@ -29,7 +29,10 @@
           <div class="live-dot"></div>
           Live on Twitch
         </div>
-        <div class="twitch-wrap" id="twitchPlayer"></div>
+        <!-- twitchPlayerWrap transitions between hero and floating states via CSS -->
+        <div id="twitchPlayerWrap" class="twitch-player-wrap">
+          <div id="twitchPlayerInner" class="twitch-player-inner"></div>
+        </div>
       </div>
 
       <!-- Branding -->
@@ -61,8 +64,7 @@
     </div>
   </section>
 
-  <!-- Float state label — shown when player is floating -->
-  <div class="float-label" id="floatState"></div>
+
 
   <!-- ═══════════════════════════════════════
        STRATEGY DATABASE
