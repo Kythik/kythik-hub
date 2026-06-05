@@ -152,7 +152,7 @@ function renderStrategies(list) {
 
   grid.innerHTML = list.map(s => {
     const initial  = (s.Author || '?')[0].toUpperCase();
-    const dateStr  = s.Created ? new Date(s.Created).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+    const dateStr  = ( s.PostedAt || s.Created) ? new Date(s.PostedAt || s.Created).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
     const tags     = s.Tags ? s.Tags.split(',').map(t => t.trim()).filter(Boolean).map(t => `<span class="tag">${t}</span>`).join('') : '';
     const hasImg   = s.ImageURLs && s.ImageURLs.trim();
     const imgThumb = hasImg ? `<div class="card-thumb"><img src="${s.ImageURLs.split(',')[0].trim()}" alt="Strategy screenshot" loading="lazy" /></div>` : '';
@@ -255,7 +255,7 @@ function handleVote(id, type, e) {
 function openModal(id) {
   const s = allStrategies.find(x => x.id === id);
   if (!s) return;
-  const dateStr = s.Created ? new Date(s.Created).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+  const dateStr = ( s.PostedAt || s.Created) ? new Date(s.PostedAt || s.Created).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
   const tags    = s.Tags ? s.Tags.split(',').map(t => t.trim()).filter(Boolean).map(t => `<span class="tag">${t}</span>`).join('') : '';
   lightboxImages = s.ImageURLs ? s.ImageURLs.split(',').map(u => u.trim()).filter(Boolean) : [];
   const images   = lightboxImages.length
@@ -377,7 +377,7 @@ function renderFeatured() {
   const tags    = s.Tags ? s.Tags.split(',').map(t => t.trim()).filter(Boolean).map(t => `<span class="tag">${t}</span>`).join('') : '';
   const hasImg  = s.ImageURLs && s.ImageURLs.trim();
   const imgHTML = hasImg ? `<div class="feat-img"><img src="${s.ImageURLs.split(',')[0].trim()}" alt="Strategy screenshot" loading="lazy" /></div>` : '';
-  const dateStr = s.Created ? new Date(s.Created).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+  const dateStr = ( s.PostedAt || s.Created) ? new Date(s.PostedAt || s.Created).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
   const v       = getVotes(s.id);
 
   track.innerHTML = `
