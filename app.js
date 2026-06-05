@@ -30,7 +30,6 @@ async function initTwitchPlayer() {
     } else if (data.vodId) {
       src = `${base}&video=${data.vodId}`;
     } else {
-      // Offline, no VOD — fall back to channel embed
       src = `${base}&channel=${CONFIG.TWITCH_CHANNEL}`;
     }
   } catch (err) {
@@ -56,40 +55,24 @@ async function initTwitchPlayer() {
 }
 
 /* ══════════════════════════════════════════
-   AIRTABLE — fetch strategies
+   AIRTABLE — fetch strategies via serverless
 ══════════════════════════════════════════ */
 async function fetchStrategies() {
-  // Skip fetch if config isn't filled in yet
-  if (CONFIG.AIRTABLE_TOKEN.startsWith('PLACEHOLDER')) {
-    renderStrategies([]);
-    document.getElementById('stratCount').textContent = '0 strategies';
-    return;
-  }
-
   try {
-    const url = [
-      `https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE}/${encodeURIComponent(CONFIG.AIRTABLE_TABLE)}`,
-      '?sort[0][field]=Created',
-      '&sort[0][direction]=desc',
-      '&maxRecords=60'
-    ].join('');
-
-    const res  = await fetch(url, {
-      headers: { Authorization: `Bearer ${CONFIG.AIRTABLE_TOKEN}` }
-    });
-
-    if (!res.ok) throw new Error(`Airtable ${res.status}`);
+    const res = await fetch('/api/airtable');
+    if (!res.ok) throw new Error(`API error ${res.status}`);
     const data = await res.json();
+    if (data.error) throw new Error(data.error);
 
-    allStrategies = (data.records || []).map(r => ({ id: r.id, ...r.fields }));
+    allStrategies = data.records || [];
     applyFilters();
 
   } catch (err) {
-    console.error('Airtable fetch failed:', err);
+    console.error('Strategy fetch failed:', err);
     document.getElementById('stratGrid').innerHTML = `
       <div class="state-empty">
         <div class="state-empty__icon">⚠</div>
-        <p>Couldn't load strategies — check Airtable config.</p>
+        <p>Couldn't load strategies. Try refreshing.</p>
       </div>`;
     document.getElementById('stratCount').textContent = '—';
   }
@@ -98,13 +81,14 @@ async function fetchStrategies() {
 /* ── RENDER ─────────────────────────────── */
 function renderStrategies(list) {
   const grid = document.getElementById('stratGrid');
-  document.getElementById('stratCount').textContent = `${list.length} strateg${list.length === 1 ? 'y' : 'ies'}`;
+  document.getElementById('stratCount').textContent =
+    `${list.length} strateg${list.length === 1 ? 'y' : 'ies'}`;
 
   if (!list.length) {
     grid.innerHTML = `
       <div class="state-empty">
         <div class="state-empty__icon">📜</div>
-        <p>No strategies yet — be the first to submit one.</p>
+        <p>No strategies yet — post one in Discord to get things started.</p>
       </div>`;
     return;
   }
@@ -117,19 +101,22 @@ function renderStrategies(list) {
       ? new Date(s.Created).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
       : '';
     const discordBtn = s.DiscordMessageURL
-      ? `<a class="discord-link" href="${s.DiscordMessageURL}" target="_blank" rel="noopener">${discordIcon} Discord</a>`
+      ? `<a class="discord-link" href="${s.DiscordMessageURL}" target="_blank" rel="noopener">${discordIcon} View in Discord</a>`
+      : '';
+    const channelTag = s.Channel
+      ? `<span class="tag tag--channel">${s.Channel}</span>`
       : '';
 
     return `
-      <article class="card" data-game="${s.Game || ''}">
+      <article class="card" data-channel="${s.Channel || ''}">
         <div class="card-top">
           <div class="card-tags">
-            ${s.Game      ? `<span class="tag tag--game">${s.Game}</span>` : ''}
-            ${s.BuildType ? `<span class="tag">${s.BuildType}</span>`      : ''}
+            ${channelTag}
+            ${s.BuildType ? `<span class="tag">${s.BuildType}</span>` : ''}
           </div>
           <span class="card-date">${dateStr}</span>
         </div>
-        <h2 class="card-title">${s.Title || 'Untitled Strategy'}</h2>
+        <h2 class="card-title">${s.Title || 'Untitled'}</h2>
         <p class="card-body">${s.Body || ''}</p>
         <div class="card-foot">
           <div class="author">
@@ -148,12 +135,12 @@ function applyFilters() {
   let filtered = allStrategies;
 
   if (activeFilter !== 'all') {
-    filtered = filtered.filter(s => s.Game === activeFilter);
+    filtered = filtered.filter(s => s.Channel === activeFilter);
   }
 
   if (query) {
     filtered = filtered.filter(s =>
-      [s.Title, s.Body, s.Author, s.BuildType]
+      [s.Title, s.Body, s.Author, s.Channel]
         .some(v => (v || '').toLowerCase().includes(query))
     );
   }
@@ -171,72 +158,6 @@ document.querySelectorAll('.pill').forEach(btn => {
     applyFilters();
   });
 });
-
-/* ══════════════════════════════════════════
-   FORM — submit strategy
-══════════════════════════════════════════ */
-async function submitStrategy() {
-  const author    = document.getElementById('fAuthor').value.trim();
-  const game      = document.getElementById('fGame').value;
-  const title     = document.getElementById('fTitle').value.trim();
-  const body      = document.getElementById('fBody').value.trim();
-  const buildType = document.getElementById('fType').value;
-  const link      = document.getElementById('fLink').value.trim();
-
-  if (!author || !game || !title || !body) {
-    showToast('Fill in all required fields.', 'error');
-    return;
-  }
-
-  if (CONFIG.MAKE_WEBHOOK.startsWith('PLACEHOLDER')) {
-    showToast('Make.com webhook not configured yet.', 'error');
-    return;
-  }
-
-  const btn = document.getElementById('submitBtn');
-  btn.disabled    = true;
-  btn.textContent = 'Sending to Discord...';
-
-  try {
-    const res = await fetch(CONFIG.MAKE_WEBHOOK, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({
-        author, game, title, body, buildType, link,
-        timestamp: new Date().toISOString()
-      })
-    });
-
-    if (res.ok || res.status === 200) {
-      showToast('✓ Submitted! Check Discord — pending approval.', 'success');
-      ['fAuthor', 'fTitle', 'fBody', 'fLink'].forEach(id => {
-        document.getElementById(id).value = '';
-      });
-      ['fGame', 'fType'].forEach(id => {
-        document.getElementById(id).selectedIndex = 0;
-      });
-      setTimeout(fetchStrategies, 4000);
-    } else {
-      throw new Error(`HTTP ${res.status}`);
-    }
-  } catch (err) {
-    console.error('Submit failed:', err);
-    showToast('Something went wrong. Try again.', 'error');
-  }
-
-  btn.disabled    = false;
-  btn.textContent = 'Submit Strategy → Discord';
-}
-
-/* ── TOAST ──────────────────────────────── */
-function showToast(msg, type) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className   = `toast ${type || ''}`;
-  el.classList.add('show');
-  clearTimeout(el._timer);
-  el._timer = setTimeout(() => el.classList.remove('show'), 4500);
-}
 
 /* ── INIT ───────────────────────────────── */
 initTwitchPlayer();
