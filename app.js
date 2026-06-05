@@ -33,19 +33,19 @@ async function initTwitchPlayer() {
   updateLiveUI();
   await loadTwitchAPI();
 
-  const baseOpts = {
-    width:   '100%',
-    height:  '100%',
+  const opts = {
+    width:   220,
+    height:  124,
     autoplay: true,
-    muted:   false,
+    muted:   true,
     parent:  [CONFIG.VERCEL_DOMAIN, 'www.' + CONFIG.VERCEL_DOMAIN],
   };
 
-  if (isLiveStream) baseOpts.channel = CONFIG.TWITCH_CHANNEL;
-  else if (vodId)   baseOpts.video   = vodId;
-  else              baseOpts.channel = CONFIG.TWITCH_CHANNEL;
+  if (isLiveStream) opts.channel = CONFIG.TWITCH_CHANNEL;
+  else if (vodId)   opts.video   = vodId;
+  else              opts.channel = CONFIG.TWITCH_CHANNEL;
 
-  window.twitchPlayer = new Twitch.Player('twitchSmall', baseOpts);
+  window.twitchPlayer = new Twitch.Player('twitchSmall', opts);
 }
 
 function updateLiveUI() {
@@ -74,35 +74,45 @@ function expandPlayer() {
   if (playerExpanded) return;
   playerExpanded = true;
 
-  const overlay = document.getElementById('epOverlay');
-  const large   = document.getElementById('twitchLarge');
+  const overlay  = document.getElementById('epOverlay');
+  const small    = document.getElementById('twitchSmall');
+  const large    = document.getElementById('twitchLarge');
+
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
 
-  // Only create the large player once
-  if (!large.hasChildNodes() && window.Twitch) {
-    const opts = {
-      width:   '100%',
-      height:  '100%',
-      autoplay: true,
-      muted:   false,
-      parent:  [CONFIG.VERCEL_DOMAIN, 'www.' + CONFIG.VERCEL_DOMAIN],
-    };
-    if (isLiveStream) opts.channel = CONFIG.TWITCH_CHANNEL;
-    else if (vodId)   opts.video   = vodId;
-    else              opts.channel = CONFIG.TWITCH_CHANNEL;
-    window.twitchLargePlayer = new Twitch.Player('twitchLarge', opts);
-  } else if (window.twitchLargePlayer) {
-    window.twitchLargePlayer.play();
+  // Move the iframe from small container to large container
+  const iframe = small.querySelector('iframe');
+  if (iframe) {
+    iframe.style.cssText = 'position:absolute;inset:0;width:100%!important;height:100%!important;border:none!important;';
+    large.appendChild(iframe);
+  }
+
+  if (window.twitchPlayer) {
+    try { window.twitchPlayer.setMuted(false); } catch(e) {}
+    setTimeout(() => { try { window.twitchPlayer.play(); } catch(err){} }, 150);
   }
 }
 
 function collapsePlayer(e) {
   if (e && e.target !== document.getElementById('epOverlay') && !e.target.closest('.ep-close')) return;
   playerExpanded = false;
-  document.getElementById('epOverlay').classList.remove('open');
+
+  const overlay = document.getElementById('epOverlay');
+  const small   = document.getElementById('twitchSmall');
+  const large   = document.getElementById('twitchLarge');
+
+  overlay.classList.remove('open');
   document.body.style.overflow = '';
-  if (window.twitchPlayer) setTimeout(() => { try { window.twitchPlayer.play(); } catch(err){} }, 100);
+
+  // Move iframe back to small container
+  const iframe = large.querySelector('iframe');
+  if (iframe) {
+    iframe.style.cssText = 'width:100%!important;height:100%!important;border:none!important;';
+    small.appendChild(iframe);
+  }
+
+  setTimeout(() => { try { if (window.twitchPlayer) window.twitchPlayer.play(); } catch(err){} }, 150);
 }
 
 /* ══════════════════════════════════════════
