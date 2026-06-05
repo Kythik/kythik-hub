@@ -31,6 +31,24 @@
 </head>
 <body>
 
+  <!-- ── HEX BACKGROUND ── -->
+  <svg class="hex-bg" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <pattern id="hexGrid" width="50" height="84" patternUnits="userSpaceOnUse">
+        <!-- Center hex -->
+        <polygon points="25,0 50,14 50,42 25,56 0,42 0,14"
+                 fill="none" stroke="#4A6080" stroke-width="0.8"/>
+        <!-- Staggered row hex — left edge -->
+        <polygon points="0,42 25,56 25,84 0,98 -25,84 -25,56"
+                 fill="none" stroke="#4A6080" stroke-width="0.8"/>
+        <!-- Staggered row hex — right edge -->
+        <polygon points="50,42 75,56 75,84 50,98 25,84 25,56"
+                 fill="none" stroke="#4A6080" stroke-width="0.8"/>
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#hexGrid)"/>
+  </svg>
+
   <!-- ── STICKY HEADER ── -->
   <header class="site-header">
     <div class="header-inner">
