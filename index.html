@@ -14,19 +14,13 @@
   ════════════════════════════════════════ -->
   <section class="stream-section">
     <div class="stream-grid">
-
-      <!-- Player -->
       <div>
         <div id="streamStatus" class="live-pill">
           <div class="live-dot"></div>
           Live on Twitch
         </div>
-        <div class="twitch-wrap" id="twitchPlayer">
-          <!-- Injected by JS after live/VOD check -->
-        </div>
+        <div class="twitch-wrap" id="twitchPlayer"></div>
       </div>
-
-      <!-- Channel info -->
       <div class="channel-info">
         <div class="channel-name">KythikX</div>
         <p class="subtext">
@@ -41,7 +35,6 @@
           Follow on Twitch
         </a>
       </div>
-
     </div>
   </section>
 
@@ -63,21 +56,30 @@
     <button class="pill" data-filter="Builds">Builds</button>
   </div>
 
+  <!-- Tag filters — populated by JS -->
+  <div class="tag-filter-row" id="tagFilters"></div>
+
   <div class="grid" id="stratGrid">
     <div class="card">
-      <div class="skeleton" style="height:16px;width:55%;margin-bottom:14px;"></div>
-      <div class="skeleton" style="height:13px;width:100%;margin-bottom:7px;"></div>
-      <div class="skeleton" style="height:13px;width:75%;"></div>
+      <div class="card-inner">
+        <div class="skeleton" style="height:16px;width:55%;margin-bottom:14px;"></div>
+        <div class="skeleton" style="height:13px;width:100%;margin-bottom:7px;"></div>
+        <div class="skeleton" style="height:13px;width:75%;"></div>
+      </div>
     </div>
     <div class="card">
-      <div class="skeleton" style="height:16px;width:65%;margin-bottom:14px;"></div>
-      <div class="skeleton" style="height:13px;width:100%;margin-bottom:7px;"></div>
-      <div class="skeleton" style="height:13px;width:60%;"></div>
+      <div class="card-inner">
+        <div class="skeleton" style="height:16px;width:65%;margin-bottom:14px;"></div>
+        <div class="skeleton" style="height:13px;width:100%;margin-bottom:7px;"></div>
+        <div class="skeleton" style="height:13px;width:60%;"></div>
+      </div>
     </div>
     <div class="card">
-      <div class="skeleton" style="height:16px;width:50%;margin-bottom:14px;"></div>
-      <div class="skeleton" style="height:13px;width:100%;margin-bottom:7px;"></div>
-      <div class="skeleton" style="height:13px;width:80%;"></div>
+      <div class="card-inner">
+        <div class="skeleton" style="height:16px;width:50%;margin-bottom:14px;"></div>
+        <div class="skeleton" style="height:13px;width:100%;margin-bottom:7px;"></div>
+        <div class="skeleton" style="height:13px;width:80%;"></div>
+      </div>
     </div>
   </div>
 
@@ -87,18 +89,21 @@
     &nbsp;·&nbsp; <a href="https://twitch.tv/kythikx" target="_blank" rel="noopener">Watch Live</a>
   </footer>
 
+  <!-- ═══════════════════════════════════════
+       MODAL
+  ════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true">
+    <div class="modal" id="modalContent"></div>
+  </div>
+
   <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
-  <!-- ═══════════════════════════════════════
-       CONFIG
-  ════════════════════════════════════════ -->
   <script>
     const CONFIG = {
       TWITCH_CHANNEL: 'kythikx',
       VERCEL_DOMAIN:  'kythik-hub-j6m4.vercel.app',
     };
   </script>
-
   <script src="app.js"></script>
 
 </body>
