@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KythikX — Farm Strategy Hub</title>
-  <meta name="description" content="ARPG farm builds and strategies from the KythikX community. Torchlight Infinite, Diablo IV, Hero Siege, Dwarven Realms." />
+  <title>KythikX — Torchlight Infinite Strategy Hub</title>
+  <meta name="description" content="Torchlight Infinite farm builds and strategies from the KythikX community Discord." />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -50,19 +50,17 @@
   ════════════════════════════════════════ -->
   <div class="db-header">
     <div>
-      <h1 class="display display--lg">Farm <span class="accent">Strategy</span> Database</h1>
-      <p class="subtext" style="margin-top:5px;">Community builds &amp; strategies — sourced from Discord</p>
+      <h1 class="display display--lg">Torchlight Infinite <span class="accent">Strategy Hub</span></h1>
+      <p class="subtext" style="margin-top:5px;">Farm builds &amp; strategies pulled live from Discord</p>
     </div>
     <div class="db-count" id="stratCount">Loading...</div>
   </div>
 
   <div class="filters">
-    <input class="search" type="text" id="searchInput" placeholder="Search builds, classes, strategies..." aria-label="Search strategies" />
-    <button class="pill active" data-filter="all">All Games</button>
-    <button class="pill" data-filter="Torchlight Infinite">Torchlight</button>
-    <button class="pill" data-filter="Diablo IV">Diablo IV</button>
-    <button class="pill" data-filter="Hero Siege">Hero Siege</button>
-    <button class="pill" data-filter="Dwarven Realms">Dwarven Realms</button>
+    <input class="search" type="text" id="searchInput" placeholder="Search strategies, builds, authors..." aria-label="Search strategies" />
+    <button class="pill active" data-filter="all">All</button>
+    <button class="pill" data-filter="Farms">Farms</button>
+    <button class="pill" data-filter="Builds">Builds</button>
   </div>
 
   <div class="grid" id="stratGrid">
@@ -83,88 +81,21 @@
     </div>
   </div>
 
-  <hr class="divider" />
-
-  <!-- ═══════════════════════════════════════
-       SUBMIT FORM
-  ════════════════════════════════════════ -->
-  <div class="submit-section">
-    <div class="submit-header">
-      <h2 class="display display--md">Submit a Strategy</h2>
-      <p class="subtext" style="margin-top:6px;">Post your build or farm route. Fires straight to Discord and lands here after approval.</p>
-    </div>
-
-    <div class="form">
-      <div class="form-group">
-        <label for="fAuthor">Your Name / Discord Handle <span class="required">*</span></label>
-        <input type="text" id="fAuthor" placeholder="@YourHandle" autocomplete="off" />
-      </div>
-
-      <div class="form-group">
-        <label for="fGame">Game <span class="required">*</span></label>
-        <select id="fGame">
-          <option value="">Select a game...</option>
-          <option value="Torchlight Infinite">Torchlight Infinite</option>
-          <option value="Diablo IV">Diablo IV</option>
-          <option value="Hero Siege">Hero Siege</option>
-          <option value="Dwarven Realms">Dwarven Realms</option>
-        </select>
-      </div>
-
-      <div class="form-group form-group--full">
-        <label for="fTitle">Strategy Title <span class="required">*</span></label>
-        <input type="text" id="fTitle" placeholder="e.g. T16 Clear Frostweaver — Budget Friendly" />
-      </div>
-
-      <div class="form-group form-group--full">
-        <label for="fBody">Strategy / Build Details <span class="required">*</span></label>
-        <textarea id="fBody" placeholder="Describe the build, gear, skills, farm zone, tips — go deep."></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="fType">Build Type</label>
-        <select id="fType">
-          <option value="">Select type...</option>
-          <option value="Farm Build">Farm Build</option>
-          <option value="Boss Kill">Boss Kill</option>
-          <option value="Speedrun">Speedrun</option>
-          <option value="Leveling">Leveling</option>
-          <option value="Budget">Budget</option>
-          <option value="Endgame">Endgame</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="fLink">Optional: Pastebin / External Link</label>
-        <input type="url" id="fLink" placeholder="https://..." />
-      </div>
-
-      <button class="submit-btn" id="submitBtn" onclick="submitStrategy()">
-        Submit Strategy → Discord
-      </button>
-    </div>
-  </div>
-
   <footer class="footer">
-    Built for the kythikx community &nbsp;·&nbsp; Strategies synced from Discord
-    &nbsp;·&nbsp; <a href="https://discord.gg/YOURINVITE" target="_blank" rel="noopener">Join the Discord</a>
+    Built for the kythikx community &nbsp;·&nbsp; Strategies sourced from Discord
+    &nbsp;·&nbsp; <a href="https://discord.gg/PLACEHOLDER_DISCORD_INVITE" target="_blank" rel="noopener">Join the Discord</a>
     &nbsp;·&nbsp; <a href="https://twitch.tv/kythikx" target="_blank" rel="noopener">Watch Live</a>
   </footer>
 
   <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
   <!-- ═══════════════════════════════════════
-       CONFIG — fill these in before going live
+       CONFIG
   ════════════════════════════════════════ -->
   <script>
     const CONFIG = {
-      TWITCH_CHANNEL:   'kythikx',
-      VERCEL_DOMAIN:    'kythik-hub-j6m4.vercel.app',
-      AIRTABLE_TOKEN:   'PLACEHOLDER_AIRTABLE_TOKEN',
-      AIRTABLE_BASE:    'PLACEHOLDER_AIRTABLE_BASE_ID',
-      AIRTABLE_TABLE:   'Strategies',
-      MAKE_WEBHOOK:     'PLACEHOLDER_MAKE_WEBHOOK_URL',
-      DISCORD_INVITE:   'PLACEHOLDER_DISCORD_INVITE',
+      TWITCH_CHANNEL: 'kythikx',
+      VERCEL_DOMAIN:  'kythik-hub-j6m4.vercel.app',
     };
   </script>
 
