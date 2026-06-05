@@ -64,67 +64,74 @@ async function initTwitchPlayer() {
    SCROLL — hero → floating player
 ══════════════════════════════════════════ */
 function initScrollBehavior() {
-  const hero    = document.getElementById('hero');
-  const iframe  = document.getElementById('heroIframe');
+  const hero   = document.getElementById('hero');
+  const iframe = document.getElementById('heroIframe');
   if (!iframe) return;
 
-  // Position iframe over the hero player placeholder on load
-  function positionOverHero() {
+  let floating = false;
+
+  // Set base iframe styles — no transition yet so initial placement is instant
+  iframe.style.position     = 'fixed';
+  iframe.style.border       = '1px solid rgba(245,166,35,0.1)';
+  iframe.style.borderRadius = '8px';
+  iframe.style.zIndex       = '100';
+  iframe.style.transition   = 'none';
+
+  function syncToHero() {
     const wrap = document.getElementById('twitchPlayer');
     const rect = wrap.getBoundingClientRect();
-    iframe.style.cssText = `
-      position: fixed;
-      top: ${rect.top + window.scrollY}px;
-      left: ${rect.left}px;
-      width: ${rect.width}px;
-      height: ${rect.height}px;
-      border: none;
-      border-radius: 8px;
-      z-index: 100;
-      transition: top 0.4s ease, left 0.4s ease, width 0.4s ease, height 0.4s ease, border-radius 0.4s ease;
-    `;
+    iframe.style.top    = rect.top + 'px';
+    iframe.style.left   = rect.left + 'px';
+    iframe.style.width  = rect.width + 'px';
+    iframe.style.height = rect.height + 'px';
+    iframe.style.bottom = 'auto';
+    iframe.style.right  = 'auto';
   }
 
-  // Reposition on scroll/resize while in hero mode
-  function updateHeroPosition() {
-    if (document.body.classList.contains('player-floating')) return;
-    const wrap = document.getElementById('twitchPlayer');
-    const rect = wrap.getBoundingClientRect();
-    iframe.style.top    = `${rect.top}px`;
-    iframe.style.left   = `${rect.left}px`;
-    iframe.style.width  = `${rect.width}px`;
-    iframe.style.height = `${rect.height}px`;
+  function floatPlayer() {
+    // Enable transition only when floating starts
+    iframe.style.transition   = 'top 0.4s ease, left 0.4s ease, width 0.4s ease, height 0.4s ease, bottom 0.4s ease, right 0.4s ease, border-radius 0.4s ease, box-shadow 0.4s ease';
+    iframe.style.top          = 'auto';
+    iframe.style.left         = 'auto';
+    iframe.style.bottom       = '24px';
+    iframe.style.right        = '24px';
+    iframe.style.width        = '260px';
+    iframe.style.height       = '160px';
+    iframe.style.borderRadius = '10px';
+    iframe.style.border       = '1px solid rgba(245,166,35,0.3)';
+    iframe.style.boxShadow    = '0 12px 48px rgba(0,0,0,0.7)';
   }
 
-  positionOverHero();
-  window.addEventListener('scroll', updateHeroPosition, { passive: true });
+  function returnToHero() {
+    iframe.style.transition   = 'none';
+    iframe.style.boxShadow    = 'none';
+    iframe.style.border       = '1px solid rgba(245,166,35,0.1)';
+    iframe.style.borderRadius = '8px';
+    syncToHero();
+  }
+
+  // Keep iframe in sync with hero while not floating
+  window.addEventListener('scroll', () => {
+    if (!floating) syncToHero();
+  }, { passive: true });
+
   window.addEventListener('resize', () => {
-    if (!document.body.classList.contains('player-floating')) positionOverHero();
-  });
+    if (!floating) syncToHero();
+  }, { passive: true });
+
+  // Initial sync after layout
+  requestAnimationFrame(syncToHero);
 
   const observer = new IntersectionObserver(entries => {
     const heroVisible = entries[0].isIntersecting;
-
-    if (!heroVisible) {
-      // Float to bottom-right
+    if (!heroVisible && !floating) {
+      floating = true;
+      floatPlayer();
       document.body.classList.add('player-floating');
-      iframe.style.top          = 'auto';
-      iframe.style.bottom       = '24px';
-      iframe.style.left         = 'auto';
-      iframe.style.right        = '24px';
-      iframe.style.width        = '260px';
-      iframe.style.height       = '160px';
-      iframe.style.borderRadius = '10px';
-      iframe.style.border       = '1px solid rgba(245,166,35,0.3)';
-      iframe.style.boxShadow    = '0 12px 48px rgba(0,0,0,0.7)';
-    } else {
-      // Return to hero
+    } else if (heroVisible && floating) {
+      floating = false;
       document.body.classList.remove('player-floating');
-      iframe.style.bottom    = 'auto';
-      iframe.style.right     = 'auto';
-      iframe.style.boxShadow = 'none';
-      iframe.style.border    = '1px solid rgba(245,166,35,0.1)';
-      positionOverHero();
+      returnToHero();
     }
   }, { threshold: 0.05 });
 
