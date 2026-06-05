@@ -742,11 +742,15 @@ async function khCheckStream() {
   try {
     const r = await fetch('/api/twitch');
     const d = await r.json();
-    const frame = document.getElementById('khTwitchFrame');
-    if (!d.isLive && d.vodId) {
-      frame.src = `https://player.twitch.tv/?video=${d.vodId}&parent=kythik-hub-j6m4.vercel.app&autoplay=true&muted=false`;
-    }
-  } catch(e) { console.log('Stream check failed', e); }
+    const container = document.getElementById('khTwitchFrame');
+    const src = d.isLive || !d.vodId
+      ? `https://player.twitch.tv/?channel=kythikx&parent=kythik-hub-j6m4.vercel.app&autoplay=true&muted=false`
+      : `https://player.twitch.tv/?video=${d.vodId}&parent=kythik-hub-j6m4.vercel.app&autoplay=true&muted=false`;
+    container.innerHTML = `<iframe src="${src}" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>`;
+  } catch(e) {
+    const container = document.getElementById('khTwitchFrame');
+    container.innerHTML = `<iframe src="https://player.twitch.tv/?channel=kythikx&parent=kythik-hub-j6m4.vercel.app&autoplay=true&muted=false" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>`;
+  }
 }
 khCheckStream();
 khFetch();
