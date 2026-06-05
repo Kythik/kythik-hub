@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════
    KYTHIK HUB — bot/backfill.js
-   One-time script to import existing Discord
-   forum threads into Airtable.
+   One-time script to import/update existing
+   Discord forum threads in Airtable.
    Run with: node backfill.js
    ═══════════════════════════════════════════ */
 
@@ -12,7 +12,29 @@ const DISCORD_TOKEN  = process.env.DISCORD_BOT_TOKEN;
 const FARMS_CHANNEL  = process.env.FARMS_CHANNEL_ID;
 const BUILDS_CHANNEL = process.env.BUILDS_CHANNEL_ID;
 
+const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
+
+function isImageAttachment(attachment) {
+  if (attachment.content_type && attachment.content_type.startsWith('image/')) return true;
+  const url = (attachment.url || attachment.proxy_url || '').toLowerCase().split('?')[0];
+  return IMAGE_EXTENSIONS.some(ext => url.endsWith(ext));
+}
+
 /* ── DISCORD HELPERS ────────────────────── */
+
+// Fetch channel info including available tags
+async function getChannelTags(channelId) {
+  const res = await fetch(
+    `https://discord.com/api/v10/channels/${channelId}`,
+    { headers: { Authorization: `Bot ${DISCORD_TOKEN}` } }
+  );
+  if (!res.ok) return {};
+  const data = await res.json();
+  const map = {};
+  (data.available_tags || []).forEach(t => { map[t.id] = t.name; });
+  return map;
+}
+
 async function getArchivedThreads(channelId) {
   const threads = [];
   let before = null;
@@ -21,14 +43,8 @@ async function getArchivedThreads(channelId) {
     const url = `https://discord.com/api/v10/channels/${channelId}/threads/archived/public?limit=100` +
       (before ? `&before=${before}` : '');
 
-    const res  = await fetch(url, {
-      headers: { Authorization: `Bot ${DISCORD_TOKEN}` }
-    });
-
-    if (!res.ok) {
-      console.error(`Failed to fetch archived threads: ${res.status}`);
-      break;
-    }
+    const res = await fetch(url, { headers: { Authorization: `Bot ${DISCORD_TOKEN}` } });
+    if (!res.ok) { console.error(`Failed to fetch archived threads: ${res.status}`); break; }
 
     const data = await res.json();
     threads.push(...(data.threads || []));
@@ -51,7 +67,7 @@ async function getActiveThreads(channelId) {
   return (data.threads || []).filter(t => t.parent_id === channelId);
 }
 
-async function getThreadFirstMessage(threadId) {
+async function getThreadMessages(threadId) {
   const res = await fetch(
     `https://discord.com/api/v10/channels/${threadId}/messages?limit=100`,
     { headers: { Authorization: `Bot ${DISCORD_TOKEN}` } }
@@ -61,35 +77,47 @@ async function getThreadFirstMessage(threadId) {
   const messages = await res.json();
   if (!messages.length) return { content: '', author: '', images: '', commentCount: 0 };
 
-  // Messages come newest first — get the oldest (first post)
-  const first  = messages[messages.length - 1];
-  const images = (first.attachments || [])
-    .filter(a => a.content_type && a.content_type.startsWith('image/'))
-    .map(a => a.url)
-    .join(', ');
+  const first = messages[messages.length - 1];
+
+  const allImages = [];
+  for (const msg of messages) {
+    for (const a of (msg.attachments || [])) {
+      if (isImageAttachment(a)) allImages.push(a.url);
+    }
+    for (const e of (msg.embeds || [])) {
+      if (e.image?.url) allImages.push(e.image.url);
+      if (e.thumbnail?.url) allImages.push(e.thumbnail.url);
+    }
+  }
 
   return {
     content:      first.content || '',
     author:       first.author?.username || '',
-    images,
+    images:       [...new Set(allImages)].join(', '),
     commentCount: Math.max(0, messages.length - 1),
   };
 }
 
 /* ── AIRTABLE HELPERS ───────────────────── */
-async function getExistingURLs() {
-  const existing = new Set();
+async function getExistingRecords() {
+  const existing = new Map();
   let offset = null;
 
   while (true) {
     const url = `https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(TABLE)}` +
-      `?fields[]=DiscordMessageURL${offset ? `&offset=${offset}` : ''}`;
+      `?fields[]=DiscordMessageURL&fields[]=ImageURLs&fields[]=Tags${offset ? `&offset=${offset}` : ''}`;
 
     const res  = await fetch(url, { headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` } });
     const data = await res.json();
 
     (data.records || []).forEach(r => {
-      if (r.fields.DiscordMessageURL) existing.add(r.fields.DiscordMessageURL);
+      if (r.fields.DiscordMessageURL) {
+        existing.set(r.fields.DiscordMessageURL, {
+          id:        r.id,
+          hasImages: !!r.fields.ImageURLs,
+          hasTags:   !!r.fields.Tags,
+        });
+      }
     });
 
     if (!data.offset) break;
@@ -111,18 +139,15 @@ async function addToAirtable(record) {
   return data;
 }
 
-/* ── PROCESS CHANNEL ────────────────────── */
-async function processChannel(channelId, channelName) {
-  console.log(`\nFetching threads from ${channelName}...`);
-
-  const [active, archived] = await Promise.all([
-    getActiveThreads(channelId),
-    getArchivedThreads(channelId),
-  ]);
-
-  const allThreads = [...active, ...archived];
-  console.log(`Found ${allThreads.length} threads (${active.length} active, ${archived.length} archived)`);
-  return allThreads.map(t => ({ ...t, channelName }));
+async function patchAirtable(recordId, fields) {
+  const url = `https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(TABLE)}/${recordId}`;
+  const res  = await fetch(url, {
+    method:  'PATCH',
+    headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}`, 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ fields })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(JSON.stringify(data.error));
 }
 
 /* ── MAIN ───────────────────────────────── */
@@ -131,58 +156,84 @@ async function run() {
   console.log('  Kythik Hub — Backfill Script');
   console.log('═══════════════════════════════════');
 
-  // Get existing records to avoid duplicates
+  // Fetch tag maps for both channels
+  console.log('\nFetching channel tag maps...');
+  const [farmsTags, buildsTags] = await Promise.all([
+    getChannelTags(FARMS_CHANNEL),
+    getChannelTags(BUILDS_CHANNEL),
+  ]);
+  console.log(`Farms tags: ${Object.values(farmsTags).join(', ') || 'none'}`);
+  console.log(`Builds tags: ${Object.values(buildsTags).join(', ') || 'none'}`);
+
+  const tagMaps = {
+    Farms:  farmsTags,
+    Builds: buildsTags,
+  };
+
   console.log('\nChecking existing Airtable records...');
-  const existingURLs = await getExistingURLs();
-  console.log(`Found ${existingURLs.size} existing records — skipping these.`);
+  const existingRecords = await getExistingRecords();
+  console.log(`Found ${existingRecords.size} existing records.`);
 
-  // Fetch all threads from both channels
-  const farmsThreads  = await processChannel(FARMS_CHANNEL, 'Farms');
-  const buildsThreads = await processChannel(BUILDS_CHANNEL, 'Builds');
-  const allThreads    = [...farmsThreads, ...buildsThreads];
+  // Fetch all threads
+  console.log('\nFetching Discord threads...');
+  const [active1, archived1] = await Promise.all([getActiveThreads(FARMS_CHANNEL), getArchivedThreads(FARMS_CHANNEL)]);
+  const [active2, archived2] = await Promise.all([getActiveThreads(BUILDS_CHANNEL), getArchivedThreads(BUILDS_CHANNEL)]);
 
-  console.log(`\nTotal threads to process: ${allThreads.length}`);
+  const allThreads = [
+    ...[...active1, ...archived1].map(t => ({ ...t, channelName: 'Farms' })),
+    ...[...active2, ...archived2].map(t => ({ ...t, channelName: 'Builds' })),
+  ];
+
+  console.log(`Total threads: ${allThreads.length}`);
 
   let imported = 0;
+  let updated  = 0;
   let skipped  = 0;
   let failed   = 0;
 
   for (const thread of allThreads) {
     const guildId    = thread.guild_id;
     const discordURL = `https://discord.com/channels/${guildId}/${thread.id}`;
+    const existing   = existingRecords.get(discordURL);
 
-    // Skip if already in Airtable
-    if (existingURLs.has(discordURL)) {
-      skipped++;
-      continue;
-    }
+    // Resolve tag names
+    const tagMap = tagMaps[thread.channelName] || {};
+    const tags   = (thread.applied_tags || [])
+      .map(id => tagMap[id] || null)
+      .filter(Boolean)
+      .join(', ');
 
     try {
-      const { content, author, images, commentCount } = await getThreadFirstMessage(thread.id);
+      const { content, author, images, commentCount } = await getThreadMessages(thread.id);
 
-      // Extract tags from applied_tags
-      const tags = (thread.applied_tags || [])
-        .map(tagId => {
-          // Tags are stored as IDs — we'll store the IDs as a comma list
-          // The bot has access to parent channel tag names; backfill stores IDs
-          return tagId;
-        })
-        .join(', ');
+      if (existing) {
+        // Patch missing fields on existing records
+        const patch = {};
+        if (!existing.hasImages && images) patch.ImageURLs = images;
+        if (!existing.hasTags && tags)     patch.Tags = tags;
 
-      await addToAirtable({
-        Title:             thread.name,
-        Author:            author,
-        Channel:           thread.channelName,
-        Body:              content,
-        DiscordMessageURL: discordURL,
-        ImageURLs:         images,
-        CommentCount:      commentCount,
-      });
+        if (Object.keys(patch).length) {
+          await patchAirtable(existing.id, patch);
+          console.log(`✓ Updated: ${thread.name} (${Object.keys(patch).join(', ')})`);
+          updated++;
+        } else {
+          skipped++;
+        }
+      } else {
+        await addToAirtable({
+          Title:             thread.name,
+          Author:            author,
+          Channel:           thread.channelName,
+          Body:              content,
+          DiscordMessageURL: discordURL,
+          ImageURLs:         images,
+          Tags:              tags,
+          CommentCount:      commentCount,
+        });
+        console.log(`✓ Imported: ${thread.name}`);
+        imported++;
+      }
 
-      console.log(`✓ Imported: ${thread.name}`);
-      imported++;
-
-      // Rate limit protection — Airtable allows ~5 req/sec
       await new Promise(resolve => setTimeout(resolve, 250));
 
     } catch (err) {
@@ -194,7 +245,8 @@ async function run() {
   console.log('\n═══════════════════════════════════');
   console.log(`  Done!`);
   console.log(`  Imported: ${imported}`);
-  console.log(`  Skipped:  ${skipped} (already existed)`);
+  console.log(`  Updated:  ${updated}`);
+  console.log(`  Skipped:  ${skipped}`);
   console.log(`  Failed:   ${failed}`);
   console.log('═══════════════════════════════════');
 }
