@@ -91,14 +91,6 @@ function initScrollBehavior() {
 
   let floating = false;
 
-  function resumePlayback() {
-    if (window.twitchPlayer) {
-      setTimeout(() => {
-        try { window.twitchPlayer.play(); } catch(e) {}
-      }, 100);
-    }
-  }
-
   const observer = new IntersectionObserver(entries => {
     const heroVisible = entries[0].isIntersecting;
 
@@ -106,12 +98,17 @@ function initScrollBehavior() {
       floating = true;
       playerWrap.classList.add('floating');
       document.body.classList.add('player-floating');
-      resumePlayback();
+      // Give Twitch time to settle after resize before resuming
+      setTimeout(() => {
+        try { if (window.twitchPlayer) window.twitchPlayer.play(); } catch(e) {}
+      }, 800);
     } else if (heroVisible && floating) {
       floating = false;
       playerWrap.classList.remove('floating');
       document.body.classList.remove('player-floating');
-      resumePlayback();
+      setTimeout(() => {
+        try { if (window.twitchPlayer) window.twitchPlayer.play(); } catch(e) {}
+      }, 100);
     }
   }, { threshold: 0.05 });
 
