@@ -65,34 +65,25 @@ async function initTwitchPlayer() {
 ══════════════════════════════════════════ */
 function initScrollBehavior() {
   const hero        = document.getElementById('hero');
+  const heroWrap    = document.getElementById('twitchPlayer');
   const floatPlayer = document.getElementById('floatPlayer');
   const floatScreen = document.getElementById('floatScreen');
-  let floatInjected = false;
 
   const observer = new IntersectionObserver(entries => {
     const heroVisible = entries[0].isIntersecting;
+    const iframe      = document.getElementById('heroIframe');
+    if (!iframe) return;
 
     if (!heroVisible) {
-      // Hero scrolled out — show float player
+      // Move iframe into float player
       floatPlayer.classList.add('visible');
-
-      if (!floatInjected && playerInited) {
-        const base = `https://player.twitch.tv/?parent=${CONFIG.VERCEL_DOMAIN}&parent=www.${CONFIG.VERCEL_DOMAIN}&autoplay=true&muted=true`;
-        const src  = isLiveStream
-          ? `${base}&channel=${CONFIG.TWITCH_CHANNEL}`
-          : vodId
-            ? `${base}&video=${vodId}`
-            : `${base}&channel=${CONFIG.TWITCH_CHANNEL}`;
-
-        const fi = document.createElement('iframe');
-        fi.src           = src;
-        fi.allowFullscreen = true;
-        fi.style.cssText = 'width:100%;height:100%;border:none;display:block;';
-        floatScreen.appendChild(fi);
-        floatInjected = true;
-      }
+      iframe.style.cssText = 'width:100%;height:100%;border:none;display:block;';
+      floatScreen.appendChild(iframe);
     } else {
+      // Move iframe back into hero
       floatPlayer.classList.remove('visible');
+      iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;';
+      heroWrap.appendChild(iframe);
     }
   }, { threshold: 0.1 });
 
