@@ -36,6 +36,7 @@ client.on('threadCreate', async (thread) => {
   if (!channel) return;
 
   try {
+    await new Promise(resolve => setTimeout(resolve, 2000));
     const messages = await thread.messages.fetch({ limit: 1 });
     const first    = messages.last();
     const content  = first ? first.content : '';
