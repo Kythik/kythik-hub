@@ -14,107 +14,171 @@ const TABLE          = 'Strategies';
 const FARMS_CHANNEL  = process.env.FARMS_CHANNEL_ID;
 const BUILDS_CHANNEL = process.env.BUILDS_CHANNEL_ID;
 
+const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
+
+function isImageAttachment(a) {
+  if (a.contentType && a.contentType.startsWith('image/')) return true;
+  const url = (a.url || '').toLowerCase().split('?')[0];
+  return IMAGE_EXTENSIONS.some(ext => url.endsWith(ext));
+}
+
+function getImages(attachments) {
+  return [...attachments.values()]
+    .filter(isImageAttachment)
+    .map(a => a.url)
+    .join(', ');
+}
+
 /* ── AIRTABLE HELPERS ───────────────────── */
-async function addToAirtable(record) {
+async function findRecord(discordURL) {
+  const url = `https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(TABLE)}` +
+    `?filterByFormula=${encodeURIComponent(`{DiscordMessageURL}="${discordURL}"`)}`;
+  const res  = await fetch(url, { headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` } });
+  const data = await res.json();
+  return data.records && data.records.length ? data.records[0] : null;
+}
+
+async function addToAirtable(fields) {
   const url = `https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(TABLE)}`;
   const res  = await fetch(url, {
     method:  'POST',
     headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}`, 'Content-Type': 'application/json' },
-    body:    JSON.stringify({ fields: record })
+    body:    JSON.stringify({ fields })
   });
   const data = await res.json();
   if (data.error) throw new Error(data.error.message);
   return data;
 }
 
-async function deleteFromAirtable(discordThreadURL) {
-  // Find the record by DiscordMessageURL
-  const searchURL = `https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(TABLE)}` +
-    `?filterByFormula=${encodeURIComponent(`{DiscordMessageURL}="${discordThreadURL}"`)}`;
-
-  const res  = await fetch(searchURL, {
-    headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
+async function updateAirtable(recordId, fields) {
+  const url = `https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(TABLE)}/${recordId}`;
+  const res  = await fetch(url, {
+    method:  'PATCH',
+    headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}`, 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ fields })
   });
   const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data;
+}
 
-  if (!data.records || !data.records.length) {
-    console.log(`No Airtable record found for ${discordThreadURL}`);
-    return;
-  }
+async function deleteFromAirtable(discordURL) {
+  const record = await findRecord(discordURL);
+  if (!record) { console.log(`No record found for ${discordURL}`); return; }
+  const url = `https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(TABLE)}/${record.id}`;
+  await fetch(url, { method: 'DELETE', headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` } });
+  console.log(`✓ Deleted record: ${record.id}`);
+}
 
-  const recordId  = data.records[0].id;
-  const deleteURL = `https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(TABLE)}/${recordId}`;
+function getTags(thread) {
+  if (!thread.appliedTags || !thread.parent) return '';
+  return thread.appliedTags
+    .map(tagId => {
+      const tag = thread.parent.availableTags?.find(t => t.id === tagId);
+      return tag ? tag.name : null;
+    })
+    .filter(Boolean)
+    .join(', ');
+}
 
-  await fetch(deleteURL, {
-    method:  'DELETE',
-    headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
-  });
+function isOurChannel(parentId) {
+  return parentId === FARMS_CHANNEL || parentId === BUILDS_CHANNEL;
+}
 
-  console.log(`✓ Deleted record: ${recordId}`);
+function channelName(parentId) {
+  return parentId === FARMS_CHANNEL ? 'Farms' : 'Builds';
 }
 
 /* ── THREAD CREATED ─────────────────────── */
 client.on('threadCreate', async (thread) => {
-  const parentId = thread.parentId;
-  let channel = null;
-  if (parentId === FARMS_CHANNEL)  channel = 'Farms';
-  if (parentId === BUILDS_CHANNEL) channel = 'Builds';
-  if (!channel) return;
+  if (!isOurChannel(thread.parentId)) return;
 
   try {
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    const messages = await thread.messages.fetch({ limit: 100 });
-    const first    = messages.last();
-    const content  = first ? first.content : '';
-    const author   = first ? first.author.username : thread.ownerId;
-    const commentCount = Math.max(0, messages.size - 1); // subtract the opening post
-    const url      = `https://discord.com/channels/${thread.guildId}/${thread.id}`;
-
-    const images = first
-      ? [...first.attachments.values()]
-          .filter(a => a.contentType && a.contentType.startsWith('image/'))
-          .map(a => a.url)
-          .join(', ')
-      : '';
-
-    const tags = thread.appliedTags && thread.parent
-      ? thread.appliedTags
-          .map(tagId => {
-            const tag = thread.parent.availableTags.find(t => t.id === tagId);
-            return tag ? tag.name : null;
-          })
-          .filter(Boolean)
-          .join(', ')
-      : '';
+    await new Promise(r => setTimeout(r, 2000));
+    const messages     = await thread.messages.fetch({ limit: 100 });
+    const first        = messages.last();
+    const content      = first ? first.content : '';
+    const author       = first ? first.author.username : thread.ownerId;
+    const images       = first ? getImages(first.attachments) : '';
+    const commentCount = Math.max(0, messages.size - 1);
+    const url          = `https://discord.com/channels/${thread.guildId}/${thread.id}`;
+    const tags         = getTags(thread);
 
     await addToAirtable({
       Title:             thread.name,
       Author:            author,
-      Channel:           channel,
+      Channel:           channelName(thread.parentId),
       Body:              content,
       DiscordMessageURL: url,
       Tags:              tags,
       ImageURLs:         images,
       CommentCount:      commentCount,
     });
-
-    console.log(`✓ Saved thread: ${thread.name}`);
+    console.log(`✓ Saved: ${thread.name}`);
   } catch (err) {
-    console.error('Error saving thread:', err.message);
+    console.error('threadCreate error:', err.message);
+  }
+});
+
+/* ── THREAD UPDATED (title/tags changed) ── */
+client.on('threadUpdate', async (oldThread, newThread) => {
+  if (!isOurChannel(newThread.parentId)) return;
+
+  const titleChanged = oldThread.name !== newThread.name;
+  const tagsChanged  = JSON.stringify(oldThread.appliedTags) !== JSON.stringify(newThread.appliedTags);
+  if (!titleChanged && !tagsChanged) return;
+
+  try {
+    const url    = `https://discord.com/channels/${newThread.guildId}/${newThread.id}`;
+    const record = await findRecord(url);
+    if (!record) return;
+
+    const patch = {};
+    if (titleChanged) patch.Title = newThread.name;
+    if (tagsChanged)  patch.Tags  = getTags(newThread);
+
+    await updateAirtable(record.id, patch);
+    console.log(`✓ Updated thread: ${newThread.name} (${Object.keys(patch).join(', ')})`);
+  } catch (err) {
+    console.error('threadUpdate error:', err.message);
+  }
+});
+
+/* ── MESSAGE UPDATED (body/images changed) ─ */
+client.on('messageUpdate', async (oldMsg, newMsg) => {
+  if (!newMsg.channel || !newMsg.channel.parentId) return;
+  if (!isOurChannel(newMsg.channel.parentId)) return;
+
+  // Only care about the first message in the thread
+  try {
+    const messages = await newMsg.channel.messages.fetch({ limit: 1, after: '0' });
+    const firstMsg = messages.last();
+    if (!firstMsg || firstMsg.id !== newMsg.id) return;
+
+    const url    = `https://discord.com/channels/${newMsg.guildId}/${newMsg.channel.id}`;
+    const record = await findRecord(url);
+    if (!record) return;
+
+    const images = getImages(newMsg.attachments);
+    await updateAirtable(record.id, {
+      Body:      newMsg.content || '',
+      ImageURLs: images,
+    });
+    console.log(`✓ Updated body/images: ${newMsg.channel.name}`);
+  } catch (err) {
+    console.error('messageUpdate error:', err.message);
   }
 });
 
 /* ── THREAD DELETED ─────────────────────── */
 client.on('threadDelete', async (thread) => {
-  const parentId = thread.parentId;
-  if (parentId !== FARMS_CHANNEL && parentId !== BUILDS_CHANNEL) return;
-
+  if (!isOurChannel(thread.parentId)) return;
   try {
     const url = `https://discord.com/channels/${thread.guildId}/${thread.id}`;
     await deleteFromAirtable(url);
-    console.log(`✓ Deleted thread: ${thread.name}`);
+    console.log(`✓ Deleted: ${thread.name}`);
   } catch (err) {
-    console.error('Error deleting thread:', err.message);
+    console.error('threadDelete error:', err.message);
   }
 });
 
