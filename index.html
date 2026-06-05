@@ -1,562 +1,107 @@
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300&display=swap');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KythikX — Farm Strategy Hub</title>
+  <meta name="description" content="ARPG farm builds and strategies from the KythikX community. Torchlight Infinite, Diablo IV, Hero Siege, Dwarven Realms." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
 
-:root {
-  --bg: #09090e;
-  --surface: #111118;
-  --surface-2: #17171f;
-  --surface-3: #1e1e28;
-  --border: rgba(245,166,35,0.1);
-  --border-hover: rgba(245,166,35,0.35);
-  --accent: #f5a623;
-  --accent-dim: rgba(245,166,35,0.08);
-  --accent-glow: rgba(245,166,35,0.2);
-  --text: #e0e0ee;
-  --text-dim: #7a7a9a;
-  --text-muted: #44445a;
-  --green: #4ec97e;
-  --red: #e05252;
-}
+  <!-- ═══════════════════════════════════════
+       STREAM SECTION
+  ════════════════════════════════════════ -->
+  <section class="stream-section">
+    <div class="stream-grid">
 
-#kythik-hub *{box-sizing:border-box;margin:0;padding:0;}
-
-#kythik-hub {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  width: 100%;
-}
-
-/* ── TWITCH ─────────────────────────────────────── */
-.kh-stream {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-}
-.kh-stream-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 32px 24px;
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 28px;
-  align-items: start;
-}
-.kh-twitch-wrap {
-  position: relative;
-  padding-bottom: 56.25%;
-  height: 0;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  background: #000;
-}
-.kh-twitch-wrap iframe {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-.kh-live-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #e91916;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  padding: 4px 10px;
-  border-radius: 3px;
-  margin-bottom: 14px;
-}
-.kh-live-dot {
-  width: 6px; height: 6px;
-  background: #fff;
-  border-radius: 50%;
-  animation: kh-pulse 1.4s ease-in-out infinite;
-}
-@keyframes kh-pulse {
-  0%,100%{opacity:1} 50%{opacity:.25}
-}
-.kh-channel-name {
-  font-family: 'Cinzel', serif;
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--accent);
-  letter-spacing: .02em;
-  margin-bottom: 10px;
-}
-.kh-channel-bio {
-  font-size: 13px;
-  color: var(--text-dim);
-  line-height: 1.65;
-  margin-bottom: 6px;
-}
-.kh-channel-meta {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-bottom: 20px;
-}
-.kh-twitch-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: #9147ff;
-  color: #fff;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  padding: 10px 18px;
-  border-radius: 5px;
-  text-decoration: none;
-  transition: background .2s, transform .15s;
-}
-.kh-twitch-btn:hover{background:#7b2ee0;transform:translateY(-1px);}
-
-/* ── HEADER ──────────────────────────────────────── */
-.kh-db-header {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 44px 24px 6px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-}
-.kh-db-title {
-  font-family: 'Cinzel', serif;
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: .02em;
-}
-.kh-db-title span { color: var(--accent); }
-.kh-db-sub {
-  font-size: 13px;
-  color: var(--text-dim);
-  margin-top: 5px;
-}
-.kh-count {
-  font-size: 12px;
-  color: var(--text-muted);
-  padding: 4px 10px;
-  border: 1px solid var(--border);
-  border-radius: 20px;
-}
-
-/* ── FILTERS ─────────────────────────────────────── */
-.kh-filters {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 18px 24px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-.kh-search {
-  flex: 1;
-  min-width: 200px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 10px 14px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  color: var(--text);
-  outline: none;
-  transition: border-color .2s;
-}
-.kh-search::placeholder { color: var(--text-muted); }
-.kh-search:focus { border-color: var(--accent); }
-.kh-pill {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 7px 14px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-dim);
-  cursor: pointer;
-  transition: all .15s;
-  white-space: nowrap;
-}
-.kh-pill:hover,.kh-pill.active {
-  background: var(--accent-dim);
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-/* ── GRID ────────────────────────────────────────── */
-.kh-grid {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 4px 24px 40px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 14px;
-}
-.kh-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 20px;
-  position: relative;
-  overflow: hidden;
-  transition: border-color .2s, transform .2s, box-shadow .2s;
-  cursor: default;
-}
-.kh-card::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--accent) 0%, transparent 70%);
-  opacity: 0;
-  transition: opacity .25s;
-}
-.kh-card:hover {
-  border-color: var(--border-hover);
-  transform: translateY(-3px);
-  box-shadow: 0 10px 40px rgba(0,0,0,.5), 0 0 0 1px var(--accent-glow);
-}
-.kh-card:hover::after { opacity: 1; }
-
-.kh-card-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-.kh-tags { display: flex; flex-wrap: wrap; gap: 5px; }
-.kh-tag {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .07em;
-  text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 3px;
-  background: var(--surface-3);
-  color: var(--text-dim);
-  border: 1px solid var(--border);
-}
-.kh-tag.game {
-  background: var(--accent-dim);
-  color: var(--accent);
-  border-color: rgba(245,166,35,.2);
-}
-.kh-card-date {
-  font-size: 11px;
-  color: var(--text-muted);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.kh-card-title {
-  font-family: 'Cinzel', serif;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text);
-  line-height: 1.35;
-  letter-spacing: .01em;
-  margin-bottom: 10px;
-}
-.kh-card-body {
-  font-size: 13px;
-  color: var(--text-dim);
-  line-height: 1.65;
-  margin-bottom: 14px;
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.kh-card-foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 12px;
-  border-top: 1px solid var(--border);
-  gap: 8px;
-}
-.kh-author {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-.kh-avatar {
-  width: 22px; height: 22px;
-  border-radius: 50%;
-  background: var(--surface-3);
-  border: 1px solid rgba(245,166,35,.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  color: var(--accent);
-  font-weight: 700;
-  flex-shrink: 0;
-}
-.kh-discord-link {
-  font-size: 11px;
-  color: var(--text-muted);
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  transition: color .2s;
-  white-space: nowrap;
-}
-.kh-discord-link:hover { color: #7289da; }
-
-/* Skeleton */
-.kh-skel {
-  background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
-  background-size: 200% 100%;
-  animation: kh-shimmer 1.5s infinite;
-  border-radius: 4px;
-}
-@keyframes kh-shimmer {
-  0%{background-position:200% 0} 100%{background-position:-200% 0}
-}
-
-/* Empty / error state */
-.kh-empty {
-  grid-column: 1/-1;
-  text-align: center;
-  padding: 60px 0;
-  color: var(--text-muted);
-  font-size: 14px;
-}
-.kh-empty-icon { font-size: 36px; margin-bottom: 12px; opacity: .4; }
-
-/* ── DIVIDER ─────────────────────────────────────── */
-.kh-sep {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-.kh-sep hr {
-  border: none;
-  border-top: 1px solid var(--border);
-}
-
-/* ── SUBMIT FORM ──────────────────────────────────── */
-.kh-submit {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 24px 60px;
-}
-.kh-submit-head { margin-bottom: 22px; }
-.kh-submit-head h3 {
-  font-family: 'Cinzel', serif;
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-.kh-submit-head p { font-size: 13px; color: var(--text-dim); }
-
-.kh-form {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 28px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-.kh-fg { display: flex; flex-direction: column; gap: 6px; }
-.kh-fg.full { grid-column: 1/-1; }
-.kh-fg label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-.kh-fg input,
-.kh-fg select,
-.kh-fg textarea {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 11px 14px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  color: var(--text);
-  outline: none;
-  transition: border-color .2s;
-  width: 100%;
-}
-.kh-fg input:focus,
-.kh-fg select:focus,
-.kh-fg textarea:focus { border-color: var(--accent); }
-.kh-fg select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a4a6a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-}
-.kh-fg select option { background: var(--surface-2); }
-.kh-fg textarea { min-height: 130px; resize: vertical; line-height: 1.6; }
-
-.kh-required { color: var(--accent); margin-left: 2px; }
-
-.kh-submit-btn {
-  grid-column: 1/-1;
-  background: var(--accent);
-  color: #09090e;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: .03em;
-  padding: 14px 28px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all .2s;
-}
-.kh-submit-btn:hover {
-  background: #ffc145;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 24px var(--accent-glow);
-}
-.kh-submit-btn:active { transform: translateY(0); }
-.kh-submit-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
-
-/* ── TOAST ───────────────────────────────────────── */
-.kh-toast {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background: var(--surface-3);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 14px 18px;
-  font-size: 13px;
-  color: var(--text);
-  box-shadow: 0 8px 40px rgba(0,0,0,.6);
-  z-index: 99999;
-  transform: translateY(60px);
-  opacity: 0;
-  pointer-events: none;
-  transition: all .3s ease;
-  max-width: 320px;
-}
-.kh-toast.show { transform: translateY(0); opacity: 1; }
-.kh-toast.success { border-color: var(--green); color: var(--green); }
-.kh-toast.error { border-color: var(--red); color: var(--red); }
-
-/* ── FOOTER ──────────────────────────────────────── */
-.kh-footer {
-  border-top: 1px solid var(--border);
-  padding: 18px 24px;
-  text-align: center;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-.kh-footer a { color: #7289da; text-decoration: none; }
-.kh-footer a:hover { text-decoration: underline; }
-
-/* ── RESPONSIVE ──────────────────────────────────── */
-@media (max-width: 860px) {
-  .kh-stream-inner { grid-template-columns: 1fr; }
-}
-@media (max-width: 600px) {
-  .kh-grid { grid-template-columns: 1fr; }
-  .kh-form { grid-template-columns: 1fr; }
-  .kh-fg.full, .kh-submit-btn { grid-column: 1; }
-  .kh-db-title { font-size: 20px; }
-  .kh-db-header { flex-direction: column; align-items: flex-start; gap: 8px; }
-}
-</style>
-
-<!-- ═══════════════════════════════════════════════ -->
-<!--  KYTHIK STRATEGY HUB — Squarespace Code Block  -->
-<!--  Paste this entire file into a Code Block       -->
-<!-- ═══════════════════════════════════════════════ -->
-
-<div id="kythik-hub">
-
-  <!-- ── TWITCH STREAM ── -->
-  <section class="kh-stream">
-    <div class="kh-stream-inner">
+      <!-- Player -->
       <div>
-        <div class="kh-live-pill">
-          <div class="kh-live-dot"></div> Live on Twitch
+        <div id="streamStatus" class="live-pill">
+          <div class="live-dot"></div>
+          Live on Twitch
         </div>
-        <div class="kh-twitch-wrap" id="khTwitchFrame">
-</div>
+        <div class="twitch-wrap" id="twitchPlayer">
+          <!-- Injected by JS after live/VOD check -->
+        </div>
       </div>
-      <div>
-        <div class="kh-channel-name">KythikX</div>
-        <p class="kh-channel-bio">
-          ARPG enjoyer. S-Tier Yapper. Elder gamer energy. Streaming Torchlight Infinite, Diablo IV, and whatever else has a loot table.
+
+      <!-- Channel info -->
+      <div class="channel-info">
+        <div class="channel-name">KythikX</div>
+        <p class="subtext">
+          ARPG enjoyer. S-Tier Yapper. Elder gamer energy.<br>
+          Streaming Torchlight Infinite, Diablo IV, and whatever else has a loot table.
         </p>
-        <p class="kh-channel-meta">5 days/week &nbsp;·&nbsp; ~6hr streams &nbsp;·&nbsp; Build theory &amp; commentary</p>
-        <a class="kh-twitch-btn" href="https://twitch.tv/kythikx" target="_blank">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+        <p class="channel-meta">5 days/week &nbsp;·&nbsp; ~6hr streams &nbsp;·&nbsp; Build theory &amp; commentary</p>
+        <a class="twitch-btn" href="https://twitch.tv/kythikx" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
+          </svg>
           Follow on Twitch
         </a>
       </div>
+
     </div>
   </section>
 
-  <!-- ── STRATEGY DATABASE ── -->
-  <div class="kh-db-header">
+  <!-- ═══════════════════════════════════════
+       STRATEGY DATABASE
+  ════════════════════════════════════════ -->
+  <div class="db-header">
     <div>
-      <div class="kh-db-title">Farm <span>Strategy</span> Database</div>
-      <div class="kh-db-sub">Community builds &amp; strategies — sourced from Discord</div>
+      <h1 class="display display--lg">Farm <span class="accent">Strategy</span> Database</h1>
+      <p class="subtext" style="margin-top:5px;">Community builds &amp; strategies — sourced from Discord</p>
     </div>
-    <div class="kh-count" id="khCount">Loading...</div>
+    <div class="db-count" id="stratCount">Loading...</div>
   </div>
 
-  <div class="kh-filters">
-    <input class="kh-search" type="text" id="khSearch" placeholder="Search builds, classes, strategies..." />
-    <button class="kh-pill active" data-filter="all">All Games</button>
-    <button class="kh-pill" data-filter="Torchlight Infinite">Torchlight</button>
-    <button class="kh-pill" data-filter="Diablo IV">Diablo IV</button>
-    <button class="kh-pill" data-filter="Hero Siege">Hero Siege</button>
-    <button class="kh-pill" data-filter="Dwarven Realms">Dwarven Realms</button>
+  <div class="filters">
+    <input class="search" type="text" id="searchInput" placeholder="Search builds, classes, strategies..." aria-label="Search strategies" />
+    <button class="pill active" data-filter="all">All Games</button>
+    <button class="pill" data-filter="Torchlight Infinite">Torchlight</button>
+    <button class="pill" data-filter="Diablo IV">Diablo IV</button>
+    <button class="pill" data-filter="Hero Siege">Hero Siege</button>
+    <button class="pill" data-filter="Dwarven Realms">Dwarven Realms</button>
   </div>
 
-  <div class="kh-grid" id="khGrid">
-    <!-- Skeletons while loading -->
-    <div class="kh-card">
-      <div class="kh-skel" style="height:16px;width:55%;margin-bottom:14px;"></div>
-      <div class="kh-skel" style="height:13px;width:100%;margin-bottom:7px;"></div>
-      <div class="kh-skel" style="height:13px;width:75%;"></div>
+  <div class="grid" id="stratGrid">
+    <div class="card">
+      <div class="skeleton" style="height:16px;width:55%;margin-bottom:14px;"></div>
+      <div class="skeleton" style="height:13px;width:100%;margin-bottom:7px;"></div>
+      <div class="skeleton" style="height:13px;width:75%;"></div>
     </div>
-    <div class="kh-card">
-      <div class="kh-skel" style="height:16px;width:65%;margin-bottom:14px;"></div>
-      <div class="kh-skel" style="height:13px;width:100%;margin-bottom:7px;"></div>
-      <div class="kh-skel" style="height:13px;width:60%;"></div>
+    <div class="card">
+      <div class="skeleton" style="height:16px;width:65%;margin-bottom:14px;"></div>
+      <div class="skeleton" style="height:13px;width:100%;margin-bottom:7px;"></div>
+      <div class="skeleton" style="height:13px;width:60%;"></div>
     </div>
-    <div class="kh-card">
-      <div class="kh-skel" style="height:16px;width:50%;margin-bottom:14px;"></div>
-      <div class="kh-skel" style="height:13px;width:100%;margin-bottom:7px;"></div>
-      <div class="kh-skel" style="height:13px;width:80%;"></div>
+    <div class="card">
+      <div class="skeleton" style="height:16px;width:50%;margin-bottom:14px;"></div>
+      <div class="skeleton" style="height:13px;width:100%;margin-bottom:7px;"></div>
+      <div class="skeleton" style="height:13px;width:80%;"></div>
     </div>
   </div>
 
-  <div class="kh-sep"><hr /></div>
+  <hr class="divider" />
 
-  <!-- ── SUBMIT FORM ── -->
-  <div class="kh-submit">
-    <div class="kh-submit-head">
-      <h3>Submit a Strategy</h3>
-      <p>Post your build or farm route. It fires straight to Discord and lands here after approval.</p>
+  <!-- ═══════════════════════════════════════
+       SUBMIT FORM
+  ════════════════════════════════════════ -->
+  <div class="submit-section">
+    <div class="submit-header">
+      <h2 class="display display--md">Submit a Strategy</h2>
+      <p class="subtext" style="margin-top:6px;">Post your build or farm route. Fires straight to Discord and lands here after approval.</p>
     </div>
-    <div class="kh-form">
-      <div class="kh-fg">
-        <label>Your Name / Discord Handle <span class="kh-required">*</span></label>
-        <input type="text" id="fAuthor" placeholder="@YourHandle" />
+
+    <div class="form">
+      <div class="form-group">
+        <label for="fAuthor">Your Name / Discord Handle <span class="required">*</span></label>
+        <input type="text" id="fAuthor" placeholder="@YourHandle" autocomplete="off" />
       </div>
-      <div class="kh-fg">
-        <label>Game <span class="kh-required">*</span></label>
+
+      <div class="form-group">
+        <label for="fGame">Game <span class="required">*</span></label>
         <select id="fGame">
           <option value="">Select a game...</option>
           <option value="Torchlight Infinite">Torchlight Infinite</option>
@@ -565,16 +110,19 @@
           <option value="Dwarven Realms">Dwarven Realms</option>
         </select>
       </div>
-      <div class="kh-fg full">
-        <label>Strategy Title <span class="kh-required">*</span></label>
+
+      <div class="form-group form-group--full">
+        <label for="fTitle">Strategy Title <span class="required">*</span></label>
         <input type="text" id="fTitle" placeholder="e.g. T16 Clear Frostweaver — Budget Friendly" />
       </div>
-      <div class="kh-fg full">
-        <label>Strategy / Build Details <span class="kh-required">*</span></label>
+
+      <div class="form-group form-group--full">
+        <label for="fBody">Strategy / Build Details <span class="required">*</span></label>
         <textarea id="fBody" placeholder="Describe the build, gear, skills, farm zone, tips — go deep."></textarea>
       </div>
-      <div class="kh-fg">
-        <label>Build Type</label>
+
+      <div class="form-group">
+        <label for="fType">Build Type</label>
         <select id="fType">
           <option value="">Select type...</option>
           <option value="Farm Build">Farm Build</option>
@@ -585,173 +133,42 @@
           <option value="Endgame">Endgame</option>
         </select>
       </div>
-      <div class="kh-fg">
-        <label>Optional: Pastebin / External Link</label>
-        <input type="text" id="fLink" placeholder="https://..." />
+
+      <div class="form-group">
+        <label for="fLink">Optional: Pastebin / External Link</label>
+        <input type="url" id="fLink" placeholder="https://..." />
       </div>
-      <button class="kh-submit-btn" id="khSubmitBtn" onclick="khSubmit()">
+
+      <button class="submit-btn" id="submitBtn" onclick="submitStrategy()">
         Submit Strategy → Discord
       </button>
     </div>
   </div>
 
-  <div class="kh-footer">
+  <footer class="footer">
     Built for the kythikx community &nbsp;·&nbsp; Strategies synced from Discord
-    &nbsp;·&nbsp; <a href="https://discord.gg/YOURINVITE" target="_blank">Join the Discord</a>
-    &nbsp;·&nbsp; <a href="https://twitch.tv/kythikx" target="_blank">Watch Live</a>
-  </div>
+    &nbsp;·&nbsp; <a href="https://discord.gg/YOURINVITE" target="_blank" rel="noopener">Join the Discord</a>
+    &nbsp;·&nbsp; <a href="https://twitch.tv/kythikx" target="_blank" rel="noopener">Watch Live</a>
+  </footer>
 
-</div>
-<div class="kh-toast" id="khToast"></div>
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
-<script>
-// ═══════════════════════════════════════════════════
-// CONFIG — FILL THESE IN BEFORE GOING LIVE
-// ═══════════════════════════════════════════════════
-const KH = {
-  AIRTABLE_TOKEN:  'YOUR_AIRTABLE_API_TOKEN',   // From airtable.com/create/tokens
-  AIRTABLE_BASE:   'YOUR_BASE_ID',               // From Airtable URL: airtable.com/YOUR_BASE_ID/...
-  AIRTABLE_TABLE:  'Strategies',                 // Must match exactly what you name the table
-  MAKE_WEBHOOK:    'YOUR_MAKE_WEBHOOK_URL',       // From Make.com scenario webhook module
-};
-// ═══════════════════════════════════════════════════
+  <!-- ═══════════════════════════════════════
+       CONFIG — fill these in before going live
+  ════════════════════════════════════════ -->
+  <script>
+    const CONFIG = {
+      TWITCH_CHANNEL:   'kythikx',
+      VERCEL_DOMAIN:    'kythik-hub-j6m4.vercel.app',
+      AIRTABLE_TOKEN:   'PLACEHOLDER_AIRTABLE_TOKEN',
+      AIRTABLE_BASE:    'PLACEHOLDER_AIRTABLE_BASE_ID',
+      AIRTABLE_TABLE:   'Strategies',
+      MAKE_WEBHOOK:     'PLACEHOLDER_MAKE_WEBHOOK_URL',
+      DISCORD_INVITE:   'PLACEHOLDER_DISCORD_INVITE',
+    };
+  </script>
 
-let khAll = [];
-let khFilter = 'all';
+  <script src="app.js"></script>
 
-// ─── FETCH ───────────────────────────────────────
-async function khFetch() {
-  try {
-    const url = `https://api.airtable.com/v0/${KH.AIRTABLE_BASE}/${encodeURIComponent(KH.AIRTABLE_TABLE)}?sort[0][field]=Created&sort[0][direction]=desc&maxRecords=60`;
-    const r = await fetch(url, { headers: { Authorization: `Bearer ${KH.AIRTABLE_TOKEN}` } });
-    const d = await r.json();
-    if (!d.records) throw new Error('No records');
-    khAll = d.records.map(rec => ({ id: rec.id, ...rec.fields }));
-    khRender(khAll);
-  } catch(e) {
-    document.getElementById('khGrid').innerHTML = `
-      <div class="kh-empty">
-        <div class="kh-empty-icon">⚠</div>
-        <p>Couldn't load strategies — check Airtable config.</p>
-      </div>`;
-    document.getElementById('khCount').textContent = '—';
-  }
-}
-
-// ─── RENDER ──────────────────────────────────────
-function khRender(list) {
-  const grid = document.getElementById('khGrid');
-  document.getElementById('khCount').textContent = list.length + ' strategies';
-  if (!list.length) {
-    grid.innerHTML = `<div class="kh-empty"><div class="kh-empty-icon">📜</div><p>No strategies yet. Be the first.</p></div>`;
-    return;
-  }
-  const discordSVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.003.022.015.043.032.056a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>`;
-  grid.innerHTML = list.map(s => {
-    const init = (s.Author || '?')[0].toUpperCase();
-    const date = s.Created ? new Date(s.Created).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
-    const discordBtn = s.DiscordMessageURL
-      ? `<a class="kh-discord-link" href="${s.DiscordMessageURL}" target="_blank">${discordSVG} Discord</a>` : '';
-    return `<div class="kh-card" data-game="${s.Game||''}">
-      <div class="kh-card-top">
-        <div class="kh-tags">
-          ${s.Game ? `<span class="kh-tag game">${s.Game}</span>` : ''}
-          ${s.BuildType ? `<span class="kh-tag">${s.BuildType}</span>` : ''}
-        </div>
-        <span class="kh-card-date">${date}</span>
-      </div>
-      <div class="kh-card-title">${s.Title||'Untitled Strategy'}</div>
-      <div class="kh-card-body">${s.Body||''}</div>
-      <div class="kh-card-foot">
-        <div class="kh-author"><div class="kh-avatar">${init}</div>${s.Author||'Anonymous'}</div>
-        ${discordBtn}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ─── FILTER ──────────────────────────────────────
-function khApplyFilters() {
-  const q = document.getElementById('khSearch').value.toLowerCase().trim();
-  let out = khAll;
-  if (khFilter !== 'all') out = out.filter(s => s.Game === khFilter);
-  if (q) out = out.filter(s =>
-    [s.Title,s.Body,s.Author,s.BuildType].some(v => (v||'').toLowerCase().includes(q))
-  );
-  khRender(out);
-}
-document.getElementById('khSearch').addEventListener('input', khApplyFilters);
-document.querySelectorAll('.kh-pill').forEach(b => {
-  b.addEventListener('click', function() {
-    document.querySelectorAll('.kh-pill').forEach(x => x.classList.remove('active'));
-    this.classList.add('active');
-    khFilter = this.dataset.filter;
-    khApplyFilters();
-  });
-});
-
-// ─── SUBMIT ──────────────────────────────────────
-async function khSubmit() {
-  const author   = document.getElementById('fAuthor').value.trim();
-  const game     = document.getElementById('fGame').value;
-  const title    = document.getElementById('fTitle').value.trim();
-  const body     = document.getElementById('fBody').value.trim();
-  const buildType= document.getElementById('fType').value;
-  const link     = document.getElementById('fLink').value.trim();
-
-  if (!author || !game || !title || !body) {
-    khToast('Fill in all required fields.', 'error'); return;
-  }
-
-  const btn = document.getElementById('khSubmitBtn');
-  btn.disabled = true;
-  btn.textContent = 'Sending to Discord...';
-
-  try {
-    const res = await fetch(KH.MAKE_WEBHOOK, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ author, game, title, body, buildType, link, timestamp: new Date().toISOString() })
-    });
-    if (res.ok || res.status === 200) {
-      khToast('✓ Submitted! Check Discord — your strategy is pending approval.', 'success');
-      ['fAuthor','fTitle','fBody','fLink'].forEach(id => document.getElementById(id).value='');
-      ['fGame','fType'].forEach(id => document.getElementById(id).selectedIndex=0);
-      setTimeout(khFetch, 4000);
-    } else { throw new Error('bad response'); }
-  } catch(e) {
-    khToast('Something went wrong. Try again.', 'error');
-  }
-  btn.disabled = false;
-  btn.textContent = 'Submit Strategy → Discord';
-}
-
-// ─── TOAST ───────────────────────────────────────
-function khToast(msg, type) {
-  const t = document.getElementById('khToast');
-  t.textContent = msg;
-  t.className = 'kh-toast ' + (type||'');
-  t.classList.add('show');
-  clearTimeout(t._tid);
-  t._tid = setTimeout(() => t.classList.remove('show'), 4500);
-}
-
-// Init
-// Twitch live/VOD check
-async function khCheckStream() {
-  try {
-    const r = await fetch('/api/twitch');
-    const d = await r.json();
-    const container = document.getElementById('khTwitchFrame');
-    const src = d.isLive || !d.vodId
-      ? `https://player.twitch.tv/?channel=kythikx&parent=kythik-hub-j6m4.vercel.app&autoplay=true&muted=false`
-      : `https://player.twitch.tv/?video=${d.vodId}&parent=kythik-hub-j6m4.vercel.app&autoplay=true&muted=false`;
-    container.innerHTML = `<iframe src="${src}" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>`;
-  } catch(e) {
-    const container = document.getElementById('khTwitchFrame');
-    container.innerHTML = `<iframe src="https://player.twitch.tv/?channel=kythikx&parent=kythik-hub-j6m4.vercel.app&autoplay=true&muted=false" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>`;
-  }
-}
-khCheckStream();
-khFetch();
-</script>
+</body>
+</html>
