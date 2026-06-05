@@ -195,7 +195,7 @@ function renderStrategies(list) {
       ? s.Tags.split(',').map(t => t.trim()).filter(Boolean)
           .map(t => `<span class="tag">${t}</span>`).join('')
       : '';
-    const hasImg   = s.ImageUrls && s.ImageUrls.trim();
+    const hasImg   = s.ImageURls && s.ImageURls.trim();
     const imgThumb = hasImg
       ? `<div class="card-thumb"><img src="${s.ImageUrls.split(',')[0].trim()}" alt="Strategy screenshot" loading="lazy" /></div>`
       : '';
