@@ -320,6 +320,11 @@ button { cursor: pointer; font-family: var(--font-body); }
   color: var(--text);
   line-height: 1.35;
   letter-spacing: .01em;
+  margin-bottom: 6px;
+}
+.card-created {
+  font-size: 11px;
+  color: var(--text-muted);
   margin-bottom: 12px;
 }
 .card-body { display: none; }
@@ -594,3 +599,23 @@ button { cursor: pointer; font-family: var(--font-body); }
   .modal-title { font-size: 18px; }
   .modal-images { grid-template-columns: 1fr; }
 }
+
+/* ── UNMUTE BUTTON ──────────────────────── */
+.fp-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fp-unmute-btn {
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: border-color .15s;
+  padding: 0;
+}
+.fp-unmute-btn:hover { border-color: var(--interactive); }
