@@ -824,3 +824,32 @@ button { cursor: pointer; font-family: var(--font-body); }
   .modal-title { font-size: 18px; }
   .modal-images { grid-template-columns: 1fr; }
 }
+
+/* ── COMMENT COUNT ──────────────────────── */
+.comment-count {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  transition: color var(--transition);
+  white-space: nowrap;
+}
+
+.comment-count:hover { color: var(--discord); }
+
+.card-foot-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.modal-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}

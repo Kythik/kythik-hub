@@ -195,9 +195,9 @@ function renderStrategies(list) {
       ? s.Tags.split(',').map(t => t.trim()).filter(Boolean)
           .map(t => `<span class="tag">${t}</span>`).join('')
       : '';
-    const hasImg   = s.ImageURLs && s.ImageURLs.trim();
+    const hasImg   = s.ImageUrls && s.ImageUrls.trim();
     const imgThumb = hasImg
-      ? `<div class="card-thumb"><img src="${s.ImageURLs.split(',')[0].trim()}" alt="Strategy screenshot" loading="lazy" /></div>`
+      ? `<div class="card-thumb"><img src="${s.ImageUrls.split(',')[0].trim()}" alt="Strategy screenshot" loading="lazy" /></div>`
       : '';
 
     return `
@@ -218,7 +218,10 @@ function renderStrategies(list) {
               <div class="avatar" aria-hidden="true">${initial}</div>
               ${s.Author || 'Anonymous'}
             </div>
-            ${voteHTML(s.id, true)}
+            <div class="card-foot-right">
+              ${s.CommentCount ? `<a class="comment-count" href="${s.DiscordMessageURL}" target="_blank" rel="noopener">💬 ${s.CommentCount}</a>` : ''}
+              ${voteHTML(s.id, true)}
+            </div>
           </div>
         </div>
       </article>`;
@@ -277,8 +280,8 @@ function openModal(id) {
         .map(t => `<span class="tag">${t}</span>`).join('')
     : '';
 
-  const images = s.ImageURLs
-    ? s.ImageURLs.split(',').map(u => u.trim()).filter(Boolean)
+  const images = s.ImageUrls
+    ? s.ImageUrls.split(',').map(u => u.trim()).filter(Boolean)
         .map(u => `<a href="${u}" target="_blank" rel="noopener"><img src="${u}" alt="Strategy screenshot" /></a>`)
         .join('')
     : '';
@@ -309,6 +312,7 @@ function openModal(id) {
     <div class="modal-body">${(s.Body || '').replace(/\n/g, '<br>')}</div>
     ${images ? `<div class="modal-images">${images}</div>` : ''}
     <div class="modal-foot">
+      ${s.CommentCount ? `<a class="comment-count" href="${s.DiscordMessageURL}" target="_blank" rel="noopener">💬 ${s.CommentCount} comments in Discord</a>` : ''}
       ${voteHTML(s.id)}
       ${discordBtn}
     </div>
