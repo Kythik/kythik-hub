@@ -10,15 +10,20 @@ let vodId          = null;
 let playerInited   = false;
 
 /* ══════════════════════════════════════════
-   TWITCH
+   TWITCH JS API
 ══════════════════════════════════════════ */
-async function initTwitchPlayer() {
-  const heroPlayer  = document.getElementById('twitchPlayer');
-  const statusEl    = document.getElementById('streamStatus');
-  const floatState  = document.getElementById('floatState');
-  const base        = `https://player.twitch.tv/?parent=${CONFIG.VERCEL_DOMAIN}&parent=www.${CONFIG.VERCEL_DOMAIN}&autoplay=true`;
+function loadTwitchAPI() {
+  return new Promise(resolve => {
+    if (window.Twitch) { resolve(); return; }
+    const script  = document.createElement('script');
+    script.src    = 'https://player.twitch.tv/js/embed/v1.js';
+    script.onload = resolve;
+    document.head.appendChild(script);
+  });
+}
 
-  let src;
+async function initTwitchPlayer() {
+  const statusEl = document.getElementById('streamStatus');
 
   try {
     const res  = await fetch('/api/twitch');
@@ -26,36 +31,52 @@ async function initTwitchPlayer() {
     const data = await res.json();
     isLiveStream = data.isLive;
     vodId        = data.vodId;
-
-    if (isLiveStream) {
-      src = `${base}&channel=${CONFIG.TWITCH_CHANNEL}`;
-    } else if (vodId) {
-      src = `${base}&video=${vodId}`;
-    } else {
-      src = `${base}&channel=${CONFIG.TWITCH_CHANNEL}`;
-    }
   } catch (err) {
-    src = `https://player.twitch.tv/?parent=${CONFIG.VERCEL_DOMAIN}&parent=www.${CONFIG.VERCEL_DOMAIN}&autoplay=true&channel=${CONFIG.TWITCH_CHANNEL}`;
+    console.warn('Twitch API check failed:', err);
   }
 
-  // Status pill
   if (isLiveStream) {
     statusEl.innerHTML = '<div class="live-dot"></div> Live on Twitch';
     statusEl.className = 'live-pill';
-    if (floatState) floatState.textContent = 'Live';
   } else {
     statusEl.textContent = '▶ Latest VOD';
     statusEl.className   = 'live-pill live-pill--vod';
-    if (floatState) floatState.textContent = 'Latest VOD';
   }
 
-  // Hero iframe
-  const iframe = document.createElement('iframe');
-  iframe.src             = src;
-  iframe.allowFullscreen = true;
-  iframe.style.cssText   = 'position:absolute;inset:0;width:100%;height:100%;border:none;';
-  iframe.id              = 'heroIframe';
-  heroPlayer.appendChild(iframe);
+  await loadTwitchAPI();
+
+  const wrap  = document.getElementById('twitchPlayerWrap');
+  const inner = document.getElementById('twitchPlayerInner');
+
+  // Twitch JS API needs explicit pixel dimensions on init
+  const w = wrap.offsetWidth || 640;
+  const h = Math.round(w * 9 / 16);
+  inner.style.width  = w + 'px';
+  inner.style.height = h + 'px';
+
+  const options = {
+    width:   w,
+    height:  h,
+    autoplay: true,
+    muted:   false,
+    parent:  [CONFIG.VERCEL_DOMAIN, 'www.' + CONFIG.VERCEL_DOMAIN],
+  };
+
+  if (isLiveStream) {
+    options.channel = CONFIG.TWITCH_CHANNEL;
+  } else if (vodId) {
+    options.video = vodId;
+  } else {
+    options.channel = CONFIG.TWITCH_CHANNEL;
+  }
+
+  window.twitchPlayer = new Twitch.Player('twitchPlayerInner', options);
+
+  // Let CSS handle sizing after player initialises
+  setTimeout(() => {
+    inner.style.width  = '';
+    inner.style.height = '';
+  }, 1000);
 
   playerInited = true;
 }
@@ -64,8 +85,8 @@ async function initTwitchPlayer() {
    SCROLL — hero → floating player
 ══════════════════════════════════════════ */
 function initScrollBehavior() {
-  const hero        = document.getElementById('hero');
-  const playerWrap  = document.getElementById('twitchPlayerWrap');
+  const hero       = document.getElementById('hero');
+  const playerWrap = document.getElementById('twitchPlayerWrap');
   if (!playerWrap) return;
 
   let floating = false;
@@ -75,12 +96,12 @@ function initScrollBehavior() {
 
     if (!heroVisible && !floating) {
       floating = true;
-      document.body.classList.add('player-floating');
       playerWrap.classList.add('floating');
+      document.body.classList.add('player-floating');
     } else if (heroVisible && floating) {
       floating = false;
-      document.body.classList.remove('player-floating');
       playerWrap.classList.remove('floating');
+      document.body.classList.remove('player-floating');
     }
   }, { threshold: 0.05 });
 
@@ -93,14 +114,12 @@ function initScrollBehavior() {
 async function fetchStrategies() {
   try {
     const res = await fetch('/api/airtable');
-    if (!res.ok) throw new Error(`API error ${res.status}`);
+    if (!res.ok) throw new Error('API error ' + res.status);
     const data = await res.json();
     if (data.error) throw new Error(data.error);
-
     allStrategies = data.records || [];
     buildTagFilters();
     applyFilters();
-
   } catch (err) {
     console.error('Strategy fetch failed:', err);
     document.getElementById('stratGrid').innerHTML = `
@@ -112,7 +131,6 @@ async function fetchStrategies() {
   }
 }
 
-/* ── TAG FILTERS ────────────────────────── */
 function buildTagFilters() {
   const tagSet = new Set();
   allStrategies.forEach(s => {
@@ -140,11 +158,10 @@ function buildTagFilters() {
   });
 }
 
-/* ── RENDER ─────────────────────────────── */
 function renderStrategies(list) {
   const grid = document.getElementById('stratGrid');
   document.getElementById('stratCount').textContent =
-    `${list.length} strateg${list.length === 1 ? 'y' : 'ies'}`;
+    list.length + ' strateg' + (list.length === 1 ? 'y' : 'ies');
 
   if (!list.length) {
     grid.innerHTML = `
@@ -160,9 +177,8 @@ function renderStrategies(list) {
     const dateStr  = s.Created
       ? new Date(s.Created).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
       : '';
-    const tags     = s.Tags
-      ? s.Tags.split(',').map(t => t.trim()).filter(Boolean)
-          .map(t => `<span class="tag">${t}</span>`).join('')
+    const tags = s.Tags
+      ? s.Tags.split(',').map(t => t.trim()).filter(Boolean).map(t => `<span class="tag">${t}</span>`).join('')
       : '';
     const hasImg   = s.ImageURLs && s.ImageURLs.trim();
     const imgThumb = hasImg
@@ -197,7 +213,6 @@ function renderStrategies(list) {
   }).join('');
 }
 
-/* ── FILTER ─────────────────────────────── */
 function applyFilters() {
   const query = document.getElementById('searchInput').value.toLowerCase().trim();
   let filtered = allStrategies;
@@ -210,11 +225,9 @@ function applyFilters() {
   }
   if (query) {
     filtered = filtered.filter(s =>
-      [s.Title, s.Body, s.Author, s.Channel, s.Tags]
-        .some(v => (v || '').toLowerCase().includes(query))
+      [s.Title, s.Body, s.Author, s.Channel, s.Tags].some(v => (v || '').toLowerCase().includes(query))
     );
   }
-
   renderStrategies(filtered);
 }
 
@@ -243,7 +256,6 @@ function saveVote(id, type) {
   try {
     const stored  = JSON.parse(localStorage.getItem('kh_votes') || '{}');
     const current = stored[id] || { up: 0, down: 0, voted: null };
-
     if (current.voted === type) {
       current[type] = Math.max(0, current[type] - 1);
       current.voted = null;
@@ -252,25 +264,22 @@ function saveVote(id, type) {
       current[type]++;
       current.voted = type;
     }
-
     stored[id] = current;
     localStorage.setItem('kh_votes', JSON.stringify(stored));
     return current;
   } catch { return { up: 0, down: 0, voted: null }; }
 }
 
-function voteHTML(id, inline = false) {
+function voteHTML(id, inline) {
   const v   = getVotes(id);
   const cls = inline ? 'votes votes--inline' : 'votes';
   return `
     <div class="${cls}" data-id="${id}">
-      <button class="vote-btn vote-btn--up ${v.voted === 'up' ? 'active' : ''}"
-              onclick="handleVote('${id}','up',event)" aria-label="Upvote">
+      <button class="vote-btn vote-btn--up ${v.voted === 'up' ? 'active' : ''}" onclick="handleVote('${id}','up',event)" aria-label="Upvote">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l8 8H4z"/></svg>
         <span class="vote-count" data-type="up">${v.up}</span>
       </button>
-      <button class="vote-btn vote-btn--down ${v.voted === 'down' ? 'active' : ''}"
-              onclick="handleVote('${id}','down',event)" aria-label="Downvote">
+      <button class="vote-btn vote-btn--down ${v.voted === 'down' ? 'active' : ''}" onclick="handleVote('${id}','down',event)" aria-label="Downvote">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20l-8-8h16z"/></svg>
         <span class="vote-count" data-type="down">${v.down}</span>
       </button>
@@ -280,9 +289,9 @@ function voteHTML(id, inline = false) {
 function handleVote(id, type, e) {
   e.stopPropagation();
   const v = saveVote(id, type);
-  document.querySelectorAll(`.votes[data-id="${id}"]`).forEach(el => {
-    el.querySelector('.vote-btn--up').className  = `vote-btn vote-btn--up ${v.voted === 'up' ? 'active' : ''}`;
-    el.querySelector('.vote-btn--down').className = `vote-btn vote-btn--down ${v.voted === 'down' ? 'active' : ''}`;
+  document.querySelectorAll('.votes[data-id="' + id + '"]').forEach(el => {
+    el.querySelector('.vote-btn--up').className   = 'vote-btn vote-btn--up '   + (v.voted === 'up'   ? 'active' : '');
+    el.querySelector('.vote-btn--down').className = 'vote-btn vote-btn--down ' + (v.voted === 'down' ? 'active' : '');
     el.querySelector('[data-type="up"]').textContent   = v.up;
     el.querySelector('[data-type="down"]').textContent = v.down;
   });
@@ -299,21 +308,15 @@ function openModal(id) {
     ? new Date(s.Created).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
     : '';
   const tags = s.Tags
-    ? s.Tags.split(',').map(t => t.trim()).filter(Boolean)
-        .map(t => `<span class="tag">${t}</span>`).join('')
+    ? s.Tags.split(',').map(t => t.trim()).filter(Boolean).map(t => `<span class="tag">${t}</span>`).join('')
     : '';
 
-  // Build image gallery for lightbox
-  lightboxImages = s.ImageURLs
-    ? s.ImageURLs.split(',').map(u => u.trim()).filter(Boolean)
-    : [];
+  lightboxImages = s.ImageURLs ? s.ImageURLs.split(',').map(u => u.trim()).filter(Boolean) : [];
 
   const images = lightboxImages.length
-    ? `<div class="modal-images">
-        ${lightboxImages.map((u, i) =>
-          `<img src="${u}" alt="Strategy screenshot" onclick="openLightbox(${i})" loading="lazy" />`
-        ).join('')}
-       </div>`
+    ? `<div class="modal-images">${lightboxImages.map((u, i) =>
+        `<img src="${u}" alt="Strategy screenshot" onclick="openLightbox(${i})" loading="lazy" />`
+      ).join('')}</div>`
     : '';
 
   const discordBtn = s.DiscordMessageURL
@@ -362,9 +365,9 @@ document.getElementById('modalOverlay').addEventListener('click', function(e) {
 });
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeModal(); closeLightbox(); }
-  if (e.key === 'ArrowLeft')  lightboxNav(-1);
-  if (e.key === 'ArrowRight') lightboxNav(1);
+  if (e.key === 'Escape')      { closeModal(); closeLightbox(); }
+  if (e.key === 'ArrowLeft')   lightboxNav(-1);
+  if (e.key === 'ArrowRight')  lightboxNav(1);
 });
 
 /* ══════════════════════════════════════════
@@ -372,24 +375,17 @@ document.addEventListener('keydown', e => {
 ══════════════════════════════════════════ */
 function openLightbox(index) {
   lightboxIndex = index;
-  const lb = document.getElementById('lightbox');
   updateLightbox();
-  lb.classList.add('open');
+  document.getElementById('lightbox').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
 function updateLightbox() {
-  const img     = document.getElementById('lightboxImg');
+  document.getElementById('lightboxImg').src = lightboxImages[lightboxIndex];
   const counter = document.getElementById('lightboxCounter');
-  const prev    = document.getElementById('lightboxPrev');
-  const next    = document.getElementById('lightboxNext');
-
-  img.src           = lightboxImages[lightboxIndex];
-  counter.textContent = lightboxImages.length > 1
-    ? `${lightboxIndex + 1} / ${lightboxImages.length}`
-    : '';
-  prev.style.display = lightboxImages.length > 1 ? 'flex' : 'none';
-  next.style.display = lightboxImages.length > 1 ? 'flex' : 'none';
+  counter.textContent = lightboxImages.length > 1 ? (lightboxIndex + 1) + ' / ' + lightboxImages.length : '';
+  document.getElementById('lightboxPrev').style.display = lightboxImages.length > 1 ? 'flex' : 'none';
+  document.getElementById('lightboxNext').style.display = lightboxImages.length > 1 ? 'flex' : 'none';
 }
 
 function lightboxNav(dir, e) {
@@ -400,14 +396,16 @@ function lightboxNav(dir, e) {
 
 function closeLightbox() {
   document.getElementById('lightbox').classList.remove('open');
-  document.body.style.overflow = '';
+  if (!document.getElementById('modalOverlay').classList.contains('open')) {
+    document.body.style.overflow = '';
+  }
 }
 
 /* ── TOAST ──────────────────────────────── */
 function showToast(msg, type) {
   const el = document.getElementById('toast');
   el.textContent = msg;
-  el.className   = `toast ${type || ''}`;
+  el.className   = 'toast ' + (type || '');
   el.classList.add('show');
   clearTimeout(el._timer);
   el._timer = setTimeout(() => el.classList.remove('show'), 4500);
