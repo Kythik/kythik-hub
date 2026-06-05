@@ -16,7 +16,7 @@ async function initTwitchPlayer() {
   const heroPlayer  = document.getElementById('twitchPlayer');
   const statusEl    = document.getElementById('streamStatus');
   const floatState  = document.getElementById('floatState');
-  const base        = `https://player.twitch.tv/?parent=${CONFIG.VERCEL_DOMAIN}&autoplay=true`;
+  const base        = `https://player.twitch.tv/?parent=${CONFIG.VERCEL_DOMAIN}&parent=www.${CONFIG.VERCEL_DOMAIN}&autoplay=true`;
 
   let src;
 
@@ -35,7 +35,7 @@ async function initTwitchPlayer() {
       src = `${base}&channel=${CONFIG.TWITCH_CHANNEL}`;
     }
   } catch (err) {
-    src = `https://player.twitch.tv/?parent=${CONFIG.VERCEL_DOMAIN}&autoplay=true&channel=${CONFIG.TWITCH_CHANNEL}`;
+    src = `https://player.twitch.tv/?parent=${CONFIG.VERCEL_DOMAIN}&parent=www.${CONFIG.VERCEL_DOMAIN}&autoplay=true&channel=${CONFIG.TWITCH_CHANNEL}`;
   }
 
   // Status pill
@@ -77,7 +77,7 @@ function initScrollBehavior() {
       floatPlayer.classList.add('visible');
 
       if (!floatInjected && playerInited) {
-        const base = `https://player.twitch.tv/?parent=${CONFIG.VERCEL_DOMAIN}&autoplay=true&muted=true`;
+        const base = `https://player.twitch.tv/?parent=${CONFIG.VERCEL_DOMAIN}&parent=www.${CONFIG.VERCEL_DOMAIN}&autoplay=true&muted=true`;
         const src  = isLiveStream
           ? `${base}&channel=${CONFIG.TWITCH_CHANNEL}`
           : vodId
