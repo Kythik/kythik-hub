@@ -937,58 +937,24 @@ button { cursor: pointer; font-family: var(--font-body); }
 
 .discord-btn:hover { background: #5f73bc; transform: translateY(-1px); }
 
-/* ── FLOATING PLAYER ────────────────────── */
-.float-player {
+/* ── FLOAT LABEL ────────────────────────── */
+.float-label {
   position: fixed;
-  bottom: 24px;
+  bottom: 192px;
   right: 24px;
-  width: 260px;
-  background: var(--surface);
-  border: 1px solid var(--border-hover);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: 0 12px 48px rgba(0,0,0,0.7);
-  z-index: 500;
-  opacity: 0;
-  transform: translateY(20px);
-  pointer-events: none;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.float-player.visible {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: all;
-}
-
-.float-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  background: var(--surface-2);
-  border-bottom: 1px solid var(--border);
-}
-
-.float-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
-  color: var(--text);
-  font-family: var(--font-display);
-}
-
-.float-state {
-  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--text-muted);
+  z-index: 101;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
 }
 
-.float-screen {
-  height: 146px;
-  background: #000;
-  overflow: hidden;
+.player-floating .float-label {
+  opacity: 1;
 }
 
 /* ── LIGHTBOX ───────────────────────────── */

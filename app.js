@@ -64,34 +64,69 @@ async function initTwitchPlayer() {
    SCROLL — hero → floating player
 ══════════════════════════════════════════ */
 function initScrollBehavior() {
-  const hero        = document.getElementById('hero');
-  const heroWrap    = document.getElementById('twitchPlayer');
-  const floatPlayer = document.getElementById('floatPlayer');
-  const floatScreen = document.getElementById('floatScreen');
-  let moveTimeout   = null;
+  const hero    = document.getElementById('hero');
+  const iframe  = document.getElementById('heroIframe');
+  if (!iframe) return;
+
+  // Position iframe over the hero player placeholder on load
+  function positionOverHero() {
+    const wrap = document.getElementById('twitchPlayer');
+    const rect = wrap.getBoundingClientRect();
+    iframe.style.cssText = `
+      position: fixed;
+      top: ${rect.top + window.scrollY}px;
+      left: ${rect.left}px;
+      width: ${rect.width}px;
+      height: ${rect.height}px;
+      border: none;
+      border-radius: 8px;
+      z-index: 100;
+      transition: top 0.4s ease, left 0.4s ease, width 0.4s ease, height 0.4s ease, border-radius 0.4s ease;
+    `;
+  }
+
+  // Reposition on scroll/resize while in hero mode
+  function updateHeroPosition() {
+    if (document.body.classList.contains('player-floating')) return;
+    const wrap = document.getElementById('twitchPlayer');
+    const rect = wrap.getBoundingClientRect();
+    iframe.style.top    = `${rect.top}px`;
+    iframe.style.left   = `${rect.left}px`;
+    iframe.style.width  = `${rect.width}px`;
+    iframe.style.height = `${rect.height}px`;
+  }
+
+  positionOverHero();
+  window.addEventListener('scroll', updateHeroPosition, { passive: true });
+  window.addEventListener('resize', () => {
+    if (!document.body.classList.contains('player-floating')) positionOverHero();
+  });
 
   const observer = new IntersectionObserver(entries => {
-    const ratio      = entries[0].intersectionRatio;
-    const heroGone   = ratio === 0;
-    const heroFull   = ratio > 0.5;
-    const iframe     = document.getElementById('heroIframe');
-    if (!iframe) return;
+    const heroVisible = entries[0].isIntersecting;
 
-    clearTimeout(moveTimeout);
-
-    if (heroGone) {
-      // Hero fully out — move iframe to float immediately
-      floatPlayer.classList.add('visible');
-      iframe.style.cssText = 'width:100%;height:100%;border:none;display:block;';
-      floatScreen.appendChild(iframe);
-    } else if (heroFull) {
-      // Hero mostly visible — move iframe back to hero
-      floatPlayer.classList.remove('visible');
-      iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;';
-      heroWrap.appendChild(iframe);
+    if (!heroVisible) {
+      // Float to bottom-right
+      document.body.classList.add('player-floating');
+      iframe.style.top          = 'auto';
+      iframe.style.bottom       = '24px';
+      iframe.style.left         = 'auto';
+      iframe.style.right        = '24px';
+      iframe.style.width        = '260px';
+      iframe.style.height       = '160px';
+      iframe.style.borderRadius = '10px';
+      iframe.style.border       = '1px solid rgba(245,166,35,0.3)';
+      iframe.style.boxShadow    = '0 12px 48px rgba(0,0,0,0.7)';
+    } else {
+      // Return to hero
+      document.body.classList.remove('player-floating');
+      iframe.style.bottom    = 'auto';
+      iframe.style.right     = 'auto';
+      iframe.style.boxShadow = 'none';
+      iframe.style.border    = '1px solid rgba(245,166,35,0.1)';
+      positionOverHero();
     }
-    // In between — don't move, let scroll settle
-  }, { threshold: [0, 0.1, 0.5, 1.0] });
+  }, { threshold: 0.05 });
 
   observer.observe(hero);
 }
