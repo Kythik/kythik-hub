@@ -1,125 +1,106 @@
-/* ═══════════════════════════════════════════
-   KYTHIK HUB — app.js
-   ═══════════════════════════════════════════ */
-
 'use strict';
 
-/* ── STATE ──────────────────────────────── */
-let allStrategies = [];
-let activeFilter  = 'all';
-let activeTag     = 'all';
+let allStrategies  = [];
+let activeFilter   = 'all';
+let activeTag      = 'all';
+let lightboxImages = [];
+let lightboxIndex  = 0;
+let isLiveStream   = false;
+let vodId          = null;
+let playerInited   = false;
 
 /* ══════════════════════════════════════════
-   TWITCH — live check + player inject
+   TWITCH
 ══════════════════════════════════════════ */
 async function initTwitchPlayer() {
-  const player = document.getElementById('twitchPlayer');
-  const status = document.getElementById('streamStatus');
-  const base   = `https://player.twitch.tv/?parent=${CONFIG.VERCEL_DOMAIN}&autoplay=true`;
+  const heroPlayer  = document.getElementById('twitchPlayer');
+  const statusEl    = document.getElementById('streamStatus');
+  const floatState  = document.getElementById('floatState');
+  const base        = `https://player.twitch.tv/?parent=${CONFIG.VERCEL_DOMAIN}&autoplay=true`;
 
   let src;
-  let isLive = false;
 
   try {
     const res  = await fetch('/api/twitch');
     if (!res.ok) throw new Error('API error');
     const data = await res.json();
-    isLive     = data.isLive;
+    isLiveStream = data.isLive;
+    vodId        = data.vodId;
 
-    if (isLive) {
+    if (isLiveStream) {
       src = `${base}&channel=${CONFIG.TWITCH_CHANNEL}`;
-    } else if (data.vodId) {
-      src = `${base}&video=${data.vodId}`;
+    } else if (vodId) {
+      src = `${base}&video=${vodId}`;
     } else {
       src = `${base}&channel=${CONFIG.TWITCH_CHANNEL}`;
     }
   } catch (err) {
-    console.warn('Twitch API check failed, falling back to channel embed.', err);
-    src = `${base}&channel=${CONFIG.TWITCH_CHANNEL}`;
+    src = `https://player.twitch.tv/?parent=${CONFIG.VERCEL_DOMAIN}&autoplay=true&channel=${CONFIG.TWITCH_CHANNEL}`;
   }
 
-  if (isLive) {
-    status.innerHTML = '<div class="live-dot"></div> Live on Twitch';
-    status.className = 'live-pill';
+  // Status pill
+  if (isLiveStream) {
+    statusEl.innerHTML = '<div class="live-dot"></div> Live on Twitch';
+    statusEl.className = 'live-pill';
+    if (floatState) floatState.textContent = 'Live';
   } else {
-    status.textContent = '▶ Latest VOD';
-    status.className   = 'live-pill live-pill--vod';
+    statusEl.textContent = '▶ Latest VOD';
+    statusEl.className   = 'live-pill live-pill--vod';
+    if (floatState) floatState.textContent = 'Latest VOD';
   }
 
+  // Hero iframe
   const iframe = document.createElement('iframe');
   iframe.src             = src;
   iframe.allowFullscreen = true;
   iframe.style.cssText   = 'position:absolute;inset:0;width:100%;height:100%;border:none;';
-  player.appendChild(iframe);
+  iframe.id              = 'heroIframe';
+  heroPlayer.appendChild(iframe);
+
+  playerInited = true;
 }
 
 /* ══════════════════════════════════════════
-   VOTES — browser localStorage
+   SCROLL — hero → floating player
 ══════════════════════════════════════════ */
-function getVotes(id) {
-  try {
-    const stored = JSON.parse(localStorage.getItem('kh_votes') || '{}');
-    return stored[id] || { up: 0, down: 0, voted: null };
-  } catch { return { up: 0, down: 0, voted: null }; }
-}
+function initScrollBehavior() {
+  const hero        = document.getElementById('hero');
+  const floatPlayer = document.getElementById('floatPlayer');
+  const floatScreen = document.getElementById('floatScreen');
+  let floatInjected = false;
 
-function saveVote(id, type) {
-  try {
-    const stored = JSON.parse(localStorage.getItem('kh_votes') || '{}');
-    const current = stored[id] || { up: 0, down: 0, voted: null };
+  const observer = new IntersectionObserver(entries => {
+    const heroVisible = entries[0].isIntersecting;
 
-    if (current.voted === type) {
-      // undo vote
-      current[type] = Math.max(0, current[type] - 1);
-      current.voted = null;
-    } else {
-      // remove old vote if switching
-      if (current.voted) {
-        current[current.voted] = Math.max(0, current[current.voted] - 1);
+    if (!heroVisible) {
+      // Hero scrolled out — show float player
+      floatPlayer.classList.add('visible');
+
+      if (!floatInjected && playerInited) {
+        const base = `https://player.twitch.tv/?parent=${CONFIG.VERCEL_DOMAIN}&autoplay=true&muted=true`;
+        const src  = isLiveStream
+          ? `${base}&channel=${CONFIG.TWITCH_CHANNEL}`
+          : vodId
+            ? `${base}&video=${vodId}`
+            : `${base}&channel=${CONFIG.TWITCH_CHANNEL}`;
+
+        const fi = document.createElement('iframe');
+        fi.src           = src;
+        fi.allowFullscreen = true;
+        fi.style.cssText = 'width:100%;height:100%;border:none;display:block;';
+        floatScreen.appendChild(fi);
+        floatInjected = true;
       }
-      current[type]++;
-      current.voted = type;
+    } else {
+      floatPlayer.classList.remove('visible');
     }
+  }, { threshold: 0.1 });
 
-    stored[id] = current;
-    localStorage.setItem('kh_votes', JSON.stringify(stored));
-    return current;
-  } catch { return { up: 0, down: 0, voted: null }; }
-}
-
-function voteHTML(id, inline = false) {
-  const v = getVotes(id);
-  const cls = inline ? 'votes votes--inline' : 'votes';
-  return `
-    <div class="${cls}" data-id="${id}">
-      <button class="vote-btn vote-btn--up ${v.voted === 'up' ? 'active' : ''}"
-              onclick="handleVote('${id}','up',event)">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l8 8H4z"/></svg>
-        <span class="vote-count" data-type="up">${v.up}</span>
-      </button>
-      <button class="vote-btn vote-btn--down ${v.voted === 'down' ? 'active' : ''}"
-              onclick="handleVote('${id}','down',event)">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20l-8-8h16z"/></svg>
-        <span class="vote-count" data-type="down">${v.down}</span>
-      </button>
-    </div>`;
-}
-
-function handleVote(id, type, e) {
-  e.stopPropagation();
-  const v = saveVote(id, type);
-
-  // Update all vote UIs for this id
-  document.querySelectorAll(`.votes[data-id="${id}"]`).forEach(el => {
-    el.querySelector('.vote-btn--up').className  = `vote-btn vote-btn--up ${v.voted === 'up' ? 'active' : ''}`;
-    el.querySelector('.vote-btn--down').className = `vote-btn vote-btn--down ${v.voted === 'down' ? 'active' : ''}`;
-    el.querySelector('[data-type="up"]').textContent   = v.up;
-    el.querySelector('[data-type="down"]').textContent = v.down;
-  });
+  observer.observe(hero);
 }
 
 /* ══════════════════════════════════════════
-   AIRTABLE — fetch strategies via serverless
+   AIRTABLE
 ══════════════════════════════════════════ */
 async function fetchStrategies() {
   try {
@@ -143,7 +124,7 @@ async function fetchStrategies() {
   }
 }
 
-/* ── BUILD TAG FILTER PILLS ─────────────── */
+/* ── TAG FILTERS ────────────────────────── */
 function buildTagFilters() {
   const tagSet = new Set();
   allStrategies.forEach(s => {
@@ -219,7 +200,7 @@ function renderStrategies(list) {
               ${s.Author || 'Anonymous'}
             </div>
             <div class="card-foot-right">
-              ${s.CommentCount ? `<a class="comment-count" href="${s.DiscordMessageURL}" target="_blank" rel="noopener">💬 ${s.CommentCount}</a>` : ''}
+              ${s.CommentCount ? `<a class="comment-count" href="${s.DiscordMessageURL}" target="_blank" rel="noopener" onclick="event.stopPropagation()">💬 ${s.CommentCount}</a>` : ''}
               ${voteHTML(s.id, true)}
             </div>
           </div>
@@ -233,16 +214,12 @@ function applyFilters() {
   const query = document.getElementById('searchInput').value.toLowerCase().trim();
   let filtered = allStrategies;
 
-  if (activeFilter !== 'all') {
-    filtered = filtered.filter(s => s.Channel === activeFilter);
-  }
-
+  if (activeFilter !== 'all') filtered = filtered.filter(s => s.Channel === activeFilter);
   if (activeTag !== 'all') {
     filtered = filtered.filter(s =>
       s.Tags && s.Tags.split(',').map(t => t.trim()).includes(activeTag)
     );
   }
-
   if (query) {
     filtered = filtered.filter(s =>
       [s.Title, s.Body, s.Author, s.Channel, s.Tags]
@@ -265,6 +242,65 @@ document.querySelectorAll('.pill[data-filter]').forEach(btn => {
 });
 
 /* ══════════════════════════════════════════
+   VOTES
+══════════════════════════════════════════ */
+function getVotes(id) {
+  try {
+    const stored = JSON.parse(localStorage.getItem('kh_votes') || '{}');
+    return stored[id] || { up: 0, down: 0, voted: null };
+  } catch { return { up: 0, down: 0, voted: null }; }
+}
+
+function saveVote(id, type) {
+  try {
+    const stored  = JSON.parse(localStorage.getItem('kh_votes') || '{}');
+    const current = stored[id] || { up: 0, down: 0, voted: null };
+
+    if (current.voted === type) {
+      current[type] = Math.max(0, current[type] - 1);
+      current.voted = null;
+    } else {
+      if (current.voted) current[current.voted] = Math.max(0, current[current.voted] - 1);
+      current[type]++;
+      current.voted = type;
+    }
+
+    stored[id] = current;
+    localStorage.setItem('kh_votes', JSON.stringify(stored));
+    return current;
+  } catch { return { up: 0, down: 0, voted: null }; }
+}
+
+function voteHTML(id, inline = false) {
+  const v   = getVotes(id);
+  const cls = inline ? 'votes votes--inline' : 'votes';
+  return `
+    <div class="${cls}" data-id="${id}">
+      <button class="vote-btn vote-btn--up ${v.voted === 'up' ? 'active' : ''}"
+              onclick="handleVote('${id}','up',event)" aria-label="Upvote">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l8 8H4z"/></svg>
+        <span class="vote-count" data-type="up">${v.up}</span>
+      </button>
+      <button class="vote-btn vote-btn--down ${v.voted === 'down' ? 'active' : ''}"
+              onclick="handleVote('${id}','down',event)" aria-label="Downvote">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20l-8-8h16z"/></svg>
+        <span class="vote-count" data-type="down">${v.down}</span>
+      </button>
+    </div>`;
+}
+
+function handleVote(id, type, e) {
+  e.stopPropagation();
+  const v = saveVote(id, type);
+  document.querySelectorAll(`.votes[data-id="${id}"]`).forEach(el => {
+    el.querySelector('.vote-btn--up').className  = `vote-btn vote-btn--up ${v.voted === 'up' ? 'active' : ''}`;
+    el.querySelector('.vote-btn--down').className = `vote-btn vote-btn--down ${v.voted === 'down' ? 'active' : ''}`;
+    el.querySelector('[data-type="up"]').textContent   = v.up;
+    el.querySelector('[data-type="down"]').textContent = v.down;
+  });
+}
+
+/* ══════════════════════════════════════════
    MODAL
 ══════════════════════════════════════════ */
 function openModal(id) {
@@ -274,21 +310,27 @@ function openModal(id) {
   const dateStr = s.Created
     ? new Date(s.Created).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
     : '';
-
   const tags = s.Tags
     ? s.Tags.split(',').map(t => t.trim()).filter(Boolean)
         .map(t => `<span class="tag">${t}</span>`).join('')
     : '';
 
-  const images = s.ImageURLs
+  // Build image gallery for lightbox
+  lightboxImages = s.ImageURLs
     ? s.ImageURLs.split(',').map(u => u.trim()).filter(Boolean)
-        .map(u => `<a href="${u}" target="_blank" rel="noopener"><img src="${u}" alt="Strategy screenshot" /></a>`)
-        .join('')
+    : [];
+
+  const images = lightboxImages.length
+    ? `<div class="modal-images">
+        ${lightboxImages.map((u, i) =>
+          `<img src="${u}" alt="Strategy screenshot" onclick="openLightbox(${i})" loading="lazy" />`
+        ).join('')}
+       </div>`
     : '';
 
   const discordBtn = s.DiscordMessageURL
     ? `<a class="modal-discord-btn" href="${s.DiscordMessageURL}" target="_blank" rel="noopener">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.003.022.015.043.032.056a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.003.022.015.043.032.056a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
         View in Discord
        </a>`
     : '';
@@ -310,7 +352,7 @@ function openModal(id) {
       <span class="card-date">${dateStr}</span>
     </div>
     <div class="modal-body">${(s.Body || '').replace(/\n/g, '<br>')}</div>
-    ${images ? `<div class="modal-images">${images}</div>` : ''}
+    ${images}
     <div class="modal-foot">
       ${s.CommentCount ? `<a class="comment-count" href="${s.DiscordMessageURL}" target="_blank" rel="noopener">💬 ${s.CommentCount} comments in Discord</a>` : ''}
       ${voteHTML(s.id)}
@@ -327,15 +369,51 @@ function closeModal() {
   document.body.style.overflow = '';
 }
 
-// Close on overlay click
 document.getElementById('modalOverlay').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
 });
 
-// Close on Escape
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Escape') { closeModal(); closeLightbox(); }
+  if (e.key === 'ArrowLeft')  lightboxNav(-1);
+  if (e.key === 'ArrowRight') lightboxNav(1);
 });
+
+/* ══════════════════════════════════════════
+   LIGHTBOX
+══════════════════════════════════════════ */
+function openLightbox(index) {
+  lightboxIndex = index;
+  const lb = document.getElementById('lightbox');
+  updateLightbox();
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function updateLightbox() {
+  const img     = document.getElementById('lightboxImg');
+  const counter = document.getElementById('lightboxCounter');
+  const prev    = document.getElementById('lightboxPrev');
+  const next    = document.getElementById('lightboxNext');
+
+  img.src           = lightboxImages[lightboxIndex];
+  counter.textContent = lightboxImages.length > 1
+    ? `${lightboxIndex + 1} / ${lightboxImages.length}`
+    : '';
+  prev.style.display = lightboxImages.length > 1 ? 'flex' : 'none';
+  next.style.display = lightboxImages.length > 1 ? 'flex' : 'none';
+}
+
+function lightboxNav(dir, e) {
+  if (e) e.stopPropagation();
+  lightboxIndex = (lightboxIndex + dir + lightboxImages.length) % lightboxImages.length;
+  updateLightbox();
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
 
 /* ── TOAST ──────────────────────────────── */
 function showToast(msg, type) {
@@ -348,5 +426,5 @@ function showToast(msg, type) {
 }
 
 /* ── INIT ───────────────────────────────── */
-initTwitchPlayer();
+initTwitchPlayer().then(() => initScrollBehavior());
 fetchStrategies();
