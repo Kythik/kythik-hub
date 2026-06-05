@@ -117,7 +117,7 @@ async function getExistingRecords() {
 
   while (true) {
     const url = `https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(TABLE)}` +
-      `?fields[]=DiscordMessageURL&fields[]=ImageURLs&fields[]=Tags${offset ? `&offset=${offset}` : ''}`;
+      `?fields[]=DiscordMessageURL&fields[]=ImageURLs&fields[]=Tags&fields[]=PostedAt${offset ? `&offset=${offset}` : ''}`;
 
     const res  = await fetch(url, { headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` } });
     const data = await res.json();
@@ -125,9 +125,10 @@ async function getExistingRecords() {
     (data.records || []).forEach(r => {
       if (r.fields.DiscordMessageURL) {
         existing.set(r.fields.DiscordMessageURL, {
-          id:        r.id,
-          hasImages: !!r.fields.ImageURLs,
-          hasTags:   !!r.fields.Tags,
+          id:          r.id,
+          hasImages:   !!r.fields.ImageURLs,
+          hasTags:     !!r.fields.Tags,
+          hasPostedAt: !!r.fields.PostedAt,
         });
       }
     });
@@ -221,10 +222,15 @@ async function run() {
     try {
       const { content, author, images, commentCount } = await getThreadMessages(thread.id);
 
+      const postedAt = thread.thread_metadata?.create_timestamp
+        || thread.timestamp
+        || null;
+
       if (existing) {
         const patch = {};
-        if (!existing.hasImages && images) patch.ImageURLs = images;
-        if (!existing.hasTags && tags)     patch.Tags = tags;
+        if (!existing.hasImages && images)   patch.ImageURLs = images;
+        if (!existing.hasTags && tags)       patch.Tags = tags;
+        if (!existing.hasPostedAt && postedAt) patch.PostedAt = postedAt;
 
         if (Object.keys(patch).length) {
           await patchAirtable(existing.id, patch);
@@ -234,6 +240,11 @@ async function run() {
           skipped++;
         }
       } else {
+        // Discord thread creation timestamp
+        const postedAt = thread.thread_metadata?.create_timestamp
+          || thread.timestamp
+          || null;
+
         await addToAirtable({
           Title:             thread.name,
           Author:            author,
@@ -243,6 +254,7 @@ async function run() {
           ImageURLs:         images,
           Tags:              tags,
           CommentCount:      commentCount,
+          PostedAt:          postedAt,
         });
         console.log(`✓ Imported: ${thread.name}`);
         imported++;

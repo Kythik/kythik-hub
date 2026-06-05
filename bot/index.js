@@ -113,6 +113,7 @@ client.on('threadCreate', async (thread) => {
       Tags:              tags,
       ImageURLs:         images,
       CommentCount:      commentCount,
+      PostedAt:          thread.createdAt ? thread.createdAt.toISOString() : new Date().toISOString(),
     });
     console.log(`✓ Saved: ${thread.name}`);
   } catch (err) {
