@@ -63,10 +63,11 @@ client.on('threadCreate', async (thread) => {
 
   try {
     await new Promise(resolve => setTimeout(resolve, 2000));
-    const messages = await thread.messages.fetch({ limit: 1 });
+    const messages = await thread.messages.fetch({ limit: 100 });
     const first    = messages.last();
     const content  = first ? first.content : '';
     const author   = first ? first.author.username : thread.ownerId;
+    const commentCount = Math.max(0, messages.size - 1); // subtract the opening post
     const url      = `https://discord.com/channels/${thread.guildId}/${thread.id}`;
 
     const images = first
@@ -94,6 +95,7 @@ client.on('threadCreate', async (thread) => {
       DiscordMessageURL: url,
       Tags:              tags,
       ImageURLs:         images,
+      CommentCount:      commentCount,
     });
 
     console.log(`✓ Saved thread: ${thread.name}`);
