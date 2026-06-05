@@ -12,16 +12,6 @@ let playerExpanded = false;
 /* ══════════════════════════════════════════
    TWITCH
 ══════════════════════════════════════════ */
-function loadTwitchAPI() {
-  return new Promise(resolve => {
-    if (window.Twitch) { resolve(); return; }
-    const s   = document.createElement('script');
-    s.src     = 'https://player.twitch.tv/js/embed/v1.js';
-    s.onload  = resolve;
-    document.head.appendChild(s);
-  });
-}
-
 async function initTwitchPlayer() {
   try {
     const res  = await fetch('/api/twitch');
@@ -31,43 +21,40 @@ async function initTwitchPlayer() {
   } catch(e) { console.warn('Twitch API failed', e); }
 
   updateLiveUI();
-  await loadTwitchAPI();
 
-  // Set explicit dimensions on container before init
+  // Use raw iframe for reliable muted autoplay
   const container = document.getElementById('twitchSmall');
-  container.style.width  = '220px';
-  container.style.height = '124px';
+  const base      = `https://player.twitch.tv/?parent=${CONFIG.VERCEL_DOMAIN}&parent=www.${CONFIG.VERCEL_DOMAIN}&autoplay=true&muted=true`;
+  const src       = isLiveStream
+    ? `${base}&channel=${CONFIG.TWITCH_CHANNEL}`
+    : vodId
+      ? `${base}&video=${vodId}`
+      : `${base}&channel=${CONFIG.TWITCH_CHANNEL}`;
 
-  const opts = {
-    width:    220,
-    height:   124,
-    autoplay: true,
-    muted:    true,
-    parent:   [CONFIG.VERCEL_DOMAIN, 'www.' + CONFIG.VERCEL_DOMAIN],
-  };
+  const iframe = document.createElement('iframe');
+  iframe.src             = src;
+  iframe.allowFullscreen = true;
+  iframe.allow           = 'autoplay; fullscreen';
+  iframe.style.cssText   = 'width:100%;height:100%;border:none;display:block;';
+  container.appendChild(iframe);
 
-  if (isLiveStream) opts.channel = CONFIG.TWITCH_CHANNEL;
-  else if (vodId)   opts.video   = vodId;
-  else              opts.channel = CONFIG.TWITCH_CHANNEL;
-
-  window.twitchPlayer = new Twitch.Player('twitchSmall', opts);
-
-  window.twitchPlayer.addEventListener(Twitch.Player.READY, () => {
-    try {
-      window.twitchPlayer.setMuted(true);
-      window.twitchPlayer.play();
-    } catch(e) {}
-  });
+  // Store reference for unmute button
+  window.twitchIframe = iframe;
 }
 
 function unmutePlayer() {
-  if (!window.twitchPlayer) return;
-  try {
-    const muted = window.twitchPlayer.getMuted();
-    window.twitchPlayer.setMuted(!muted);
-    const btn = document.getElementById('fpUnmuteBtn');
-    if (btn) btn.textContent = muted ? '🔊' : '🔇';
-  } catch(e) {}
+  const btn    = document.getElementById('fpUnmuteBtn');
+  const iframe = window.twitchIframe;
+  if (!iframe) return;
+
+  // Toggle muted in iframe src
+  const src    = iframe.src;
+  const muted  = src.includes('muted=true');
+  iframe.src   = muted
+    ? src.replace('muted=true', 'muted=false')
+    : src.replace('muted=false', 'muted=true');
+
+  if (btn) btn.textContent = muted ? '🔊' : '🔇';
 }
 
 function updateLiveUI() {
