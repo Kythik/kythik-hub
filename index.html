@@ -56,10 +56,23 @@
 
   <!-- ── STRATEGY DATABASE ── -->
   <main class="main">
+    <!-- ── FEATURED SECTION ── -->
+    <div class="featured-section" id="featuredSection" style="display:none">
+      <div class="featured-header">
+        <span class="featured-label">⭐ Featured</span>
+        <div class="featured-nav">
+          <button class="featured-btn" id="featPrev" onclick="featNav(-1)" aria-label="Previous">‹</button>
+          <span class="featured-counter" id="featCounter"></span>
+          <button class="featured-btn" id="featNext" onclick="featNav(1)" aria-label="Next">›</button>
+        </div>
+      </div>
+      <div class="featured-track" id="featuredTrack"></div>
+    </div>
+
     <div class="db-header">
       <div>
-        <h1 class="display display--lg">Torchlight Infinite</h1>
-        <p class="subtext" style="margin-top:5px;">Strategies pulled live from Discord</p>
+        <h1 class="display display--lg">Torchlight Infinite <span class="accent">Strategy Hub</span></h1>
+        <p class="subtext" style="margin-top:5px;">Farm builds &amp; strategies pulled live from Discord</p>
       </div>
       <div class="db-count" id="stratCount">Loading...</div>
     </div>

@@ -117,6 +117,7 @@ async function fetchStrategies() {
     allStrategies = data.records || [];
     buildTagFilters();
     applyFilters();
+    buildFeatured();
   } catch(err) {
     console.error('Fetch failed:', err);
     document.getElementById('stratGrid').innerHTML = `
@@ -341,6 +342,90 @@ function showToast(msg, type) {
   el.classList.add('show');
   clearTimeout(el._timer);
   el._timer = setTimeout(() => el.classList.remove('show'), 4500);
+}
+
+/* ══════════════════════════════════════════
+   FEATURED SECTION
+══════════════════════════════════════════ */
+let featuredList  = [];
+let featuredIndex = 0;
+let featuredTimer = null;
+
+function buildFeatured() {
+  // Manual featured first, then top voted auto-fill up to 5
+  const manual  = allStrategies.filter(s => s.Featured);
+  const voted   = allStrategies
+    .filter(s => !s.Featured)
+    .sort((a, b) => (getVotes(b.id).up - getVotes(b.id).down) - (getVotes(a.id).up - getVotes(a.id).down))
+    .slice(0, Math.max(0, 5 - manual.length));
+
+  featuredList = [...manual, ...voted].slice(0, 5);
+
+  const section = document.getElementById('featuredSection');
+  if (!featuredList.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+
+  featuredIndex = 0;
+  renderFeatured();
+  startFeaturedTimer();
+}
+
+function renderFeatured() {
+  const s = featuredList[featuredIndex];
+  if (!s) return;
+
+  const track   = document.getElementById('featuredTrack');
+  const counter = document.getElementById('featCounter');
+  counter.textContent = (featuredIndex + 1) + ' / ' + featuredList.length;
+
+  const tags    = s.Tags ? s.Tags.split(',').map(t => t.trim()).filter(Boolean).map(t => `<span class="tag">${t}</span>`).join('') : '';
+  const hasImg  = s.ImageURLs && s.ImageURLs.trim();
+  const imgHTML = hasImg ? `<div class="feat-img"><img src="${s.ImageURLs.split(',')[0].trim()}" alt="Strategy screenshot" loading="lazy" /></div>` : '';
+  const dateStr = s.Created ? new Date(s.Created).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+  const v       = getVotes(s.id);
+
+  track.innerHTML = `
+    <div class="feat-card" onclick="openModal('${s.id}')">
+      ${imgHTML}
+      <div class="feat-body">
+        <div class="feat-top">
+          <div class="card-tags">${tags}</div>
+          <span class="card-date">${dateStr}</span>
+        </div>
+        <h2 class="feat-title">${s.Title || 'Untitled'}</h2>
+        <p class="feat-excerpt">${(s.Body || '').substring(0, 180)}${s.Body && s.Body.length > 180 ? '…' : ''}</p>
+        <div class="feat-foot">
+          <div class="author">
+            <div class="avatar">${(s.Author || '?')[0].toUpperCase()}</div>
+            ${s.Author || 'Anonymous'}
+          </div>
+          <div class="card-foot-right">
+            ${s.CommentCount ? `<span class="comment-count">💬 ${s.CommentCount}</span>` : ''}
+            ${voteHTML(s.id, true)}
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function featNav(dir) {
+  featuredIndex = (featuredIndex + dir + featuredList.length) % featuredList.length;
+  renderFeatured();
+  resetFeaturedTimer();
+}
+
+function startFeaturedTimer() {
+  clearInterval(featuredTimer);
+  if (featuredList.length < 2) return;
+  featuredTimer = setInterval(() => {
+    featuredIndex = (featuredIndex + 1) % featuredList.length;
+    renderFeatured();
+  }, 6000);
+}
+
+function resetFeaturedTimer() {
+  clearInterval(featuredTimer);
+  startFeaturedTimer();
 }
 
 /* ── INIT ── */
