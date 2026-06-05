@@ -84,33 +84,16 @@
 
   <!-- ── FLOATING PLAYER ── -->
   <div class="fp" id="floatingPlayer">
-    <div class="fp-screen" id="fpScreen" onclick="expandPlayer()">
+    <a class="fp-link" href="https://twitch.tv/kythikx" target="_blank" rel="noopener" aria-label="Watch on Twitch">
       <div id="twitchSmall"></div>
-      <div class="fp-expand-hint">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-      </div>
-    </div>
+      <div class="fp-overlay-hint">Watch on Twitch ↗</div>
+    </a>
     <div class="fp-bar">
       <div class="fp-info">
         <div class="live-dot" id="fpDot"></div>
         <span class="fp-name">Kythik</span>
       </div>
       <span class="fp-state" id="fpState"></span>
-    </div>
-  </div>
-
-  <!-- ── EXPANDED OVERLAY ── -->
-  <div class="ep-overlay" id="epOverlay" onclick="collapsePlayer(event)">
-    <div class="ep-wrap">
-      <div class="ep-screen" id="twitchLarge"></div>
-      <div class="ep-bar">
-        <div class="ep-info">
-          <div class="live-dot" id="epDot"></div>
-          <span class="ep-name">Kythik</span>
-          <span class="ep-state" id="epState"></span>
-        </div>
-        <button class="ep-close" onclick="collapsePlayer()" aria-label="Close">✕</button>
-      </div>
     </div>
   </div>
 

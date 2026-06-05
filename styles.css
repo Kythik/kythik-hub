@@ -6,18 +6,19 @@
 
 /* ── TOKENS ─────────────────────────────── */
 :root {
-  --bg:           #07070c;
-  --surface:      #0d0d16;
-  --surface-2:    #12121c;
-  --surface-3:    #181824;
-  --border:       rgba(255,255,255,0.06);
-  --border-hover: rgba(245,166,35,0.3);
-  --accent:       #f5a623;
-  --accent-dim:   rgba(245,166,35,0.07);
-  --accent-glow:  rgba(245,166,35,0.15);
-  --text:         #e8e8f0;
-  --text-dim:     #6a6a88;
-  --text-muted:   #3a3a52;
+  --bg:           #07080B;
+  --surface:      #111722;
+  --surface-2:    #131a29;
+  --surface-3:    #151D2B;
+  --border:       #273044;
+  --border-hover: #D6A84F;
+  --accent:       #D6A84F;
+  --accent-hover: #F0C76A;
+  --accent-dim:   rgba(214,168,79,0.08);
+  --accent-glow:  rgba(214,168,79,0.18);
+  --text:         #F4EEDC;
+  --text-dim:     #A8A28F;
+  --text-muted:   #4a5068;
   --green:        #4ec97e;
   --red:          #e05252;
   --twitch:       #9147ff;
@@ -243,7 +244,7 @@ button { cursor: pointer; font-family: var(--font-body); }
   padding: 3px 8px; border-radius: var(--radius-sm);
   background: var(--surface-3); color: var(--text-dim); border: 1px solid var(--border);
 }
-.tag--channel, .tag--game { background: var(--accent-dim); color: var(--accent); border-color: rgba(245,166,35,.2); }
+.tag--channel, .tag--game { background: var(--accent-dim); color: var(--accent); border-color: rgba(214,168,79,.2); }
 
 .card-date { font-size: 11px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
 
@@ -255,7 +256,7 @@ button { cursor: pointer; font-family: var(--font-body); }
 .card-foot-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
 
 .author { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-muted); }
-.avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--surface-3); border: 1px solid rgba(245,166,35,.2); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+.avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--surface-3); border: 1px solid rgba(214,168,79,.2); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--accent); font-weight: 700; flex-shrink: 0; }
 
 .comment-count { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; transition: color .2s; white-space: nowrap; }
 .comment-count:hover { color: var(--discord); }
@@ -295,43 +296,48 @@ button { cursor: pointer; font-family: var(--font-body); }
   z-index: 300;
 }
 
-.fp-screen {
+.fp-link {
+  display: block;
+  position: relative;
   width: 220px;
   height: 124px;
   border-radius: var(--radius);
   overflow: hidden;
   background: #000;
-  cursor: pointer;
-  position: relative;
+  text-decoration: none;
 }
 
-.fp-screen > div:first-child {
+.fp-link #twitchSmall {
   width: 100%;
   height: 100%;
+  pointer-events: none;
 }
 
-.fp-screen > div:first-child iframe {
+.fp-link #twitchSmall iframe {
   width: 100% !important;
   height: 100% !important;
   border: none !important;
+  pointer-events: none;
 }
 
-.fp-expand-hint {
+.fp-overlay-hint {
   position: absolute;
   inset: 0;
   background: rgba(0,0,0,0);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background .2s;
-  border-radius: var(--radius);
-  color: rgba(245,166,35,0);
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0);
+  letter-spacing: .04em;
   transition: all .2s;
+  border-radius: var(--radius);
 }
 
-.fp-screen:hover .fp-expand-hint {
-  background: rgba(0,0,0,.45);
-  color: var(--accent);
+.fp-link:hover .fp-overlay-hint {
+  background: rgba(0,0,0,.55);
+  color: #fff;
 }
 
 .fp-bar {
@@ -358,83 +364,6 @@ button { cursor: pointer; font-family: var(--font-body); }
   font-size: 10px;
   color: var(--text-muted);
 }
-
-/* ── EXPANDED PLAYER OVERLAY ─────────────── */
-.ep-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .25s;
-}
-.ep-overlay.open { opacity: 1; pointer-events: all; }
-
-.ep-wrap {
-  width: 100%;
-  max-width: 800px;
-}
-
-.ep-screen {
-  width: 100%;
-  aspect-ratio: 16/9;
-  position: relative;
-  background: #000;
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-
-.ep-screen iframe {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  border: none !important;
-}
-
-.ep-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 2px 0;
-}
-
-.ep-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.ep-name {
-  font-family: var(--font-display);
-  font-size: 14px;
-  color: var(--accent);
-  letter-spacing: .04em;
-}
-
-.ep-state {
-  font-size: 11px;
-  color: var(--text-dim);
-}
-
-.ep-close {
-  background: var(--surface-3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text-dim);
-  font-size: 14px;
-  width: 28px; height: 28px;
-  display: flex; align-items: center; justify-content: center;
-  transition: all .15s;
-}
-.ep-close:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ── MODAL ──────────────────────────────── */
 .modal-overlay {

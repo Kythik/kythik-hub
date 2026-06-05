@@ -46,6 +46,10 @@ async function initTwitchPlayer() {
   else              opts.channel = CONFIG.TWITCH_CHANNEL;
 
   window.twitchPlayer = new Twitch.Player('twitchSmall', opts);
+
+  window.twitchPlayer.addEventListener(Twitch.Player.READY, () => {
+    try { window.twitchPlayer.play(); } catch(e) {}
+  });
 }
 
 function updateLiveUI() {
@@ -69,30 +73,7 @@ function updateLiveUI() {
   }
 }
 
-/* ── EXPAND / COLLAPSE ──────────────────── */
-function expandPlayer() {
-  if (playerExpanded) return;
-  playerExpanded = true;
 
-  const overlay  = document.getElementById('epOverlay');
-  const small    = document.getElementById('twitchSmall');
-  const large    = document.getElementById('twitchLarge');
-
-  overlay.classList.add('open');
-  document.body.style.overflow = 'hidden';
-
-  // Move the iframe from small container to large container
-  const iframe = small.querySelector('iframe');
-  if (iframe) {
-    iframe.style.cssText = 'position:absolute;inset:0;width:100%!important;height:100%!important;border:none!important;';
-    large.appendChild(iframe);
-  }
-
-  if (window.twitchPlayer) {
-    try { window.twitchPlayer.setMuted(false); } catch(e) {}
-    setTimeout(() => { try { window.twitchPlayer.play(); } catch(err){} }, 150);
-  }
-}
 
 function collapsePlayer(e) {
   if (e && e.target !== document.getElementById('epOverlay') && !e.target.closest('.ep-close')) return;
