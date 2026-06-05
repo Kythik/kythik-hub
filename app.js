@@ -195,9 +195,9 @@ function renderStrategies(list) {
       ? s.Tags.split(',').map(t => t.trim()).filter(Boolean)
           .map(t => `<span class="tag">${t}</span>`).join('')
       : '';
-    const hasImg   = s.ImageURls && s.ImageURls.trim();
+    const hasImg   = s.ImageURLs && s.ImageURLs.trim();
     const imgThumb = hasImg
-      ? `<div class="card-thumb"><img src="${s.ImageUrls.split(',')[0].trim()}" alt="Strategy screenshot" loading="lazy" /></div>`
+      ? `<div class="card-thumb"><img src="${s.ImageURLs.split(',')[0].trim()}" alt="Strategy screenshot" loading="lazy" /></div>`
       : '';
 
     return `
@@ -277,8 +277,8 @@ function openModal(id) {
         .map(t => `<span class="tag">${t}</span>`).join('')
     : '';
 
-  const images = s.ImageUrls
-    ? s.ImageUrls.split(',').map(u => u.trim()).filter(Boolean)
+  const images = s.ImageURLs
+    ? s.ImageURLs.split(',').map(u => u.trim()).filter(Boolean)
         .map(u => `<a href="${u}" target="_blank" rel="noopener"><img src="${u}" alt="Strategy screenshot" /></a>`)
         .join('')
     : '';
