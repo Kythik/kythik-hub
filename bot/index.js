@@ -42,12 +42,33 @@ client.on('threadCreate', async (thread) => {
     const author   = first ? first.author.username : thread.ownerId;
     const url      = `https://discord.com/channels/${thread.guildId}/${thread.id}`;
 
+    // Grab image attachments
+    const images = first
+      ? [...first.attachments.values()]
+          .filter(a => a.contentType && a.contentType.startsWith('image/'))
+          .map(a => a.url)
+          .join(', ')
+      : '';
+
+    // Grab forum thread tags
+    const tags = thread.appliedTags && thread.parent
+      ? thread.appliedTags
+          .map(tagId => {
+            const tag = thread.parent.availableTags.find(t => t.id === tagId);
+            return tag ? tag.name : null;
+          })
+          .filter(Boolean)
+          .join(', ')
+      : '';
+
     await addToAirtable({
       Title:             thread.name,
       Author:            author,
       Channel:           channel,
       Body:              content,
       DiscordMessageURL: url,
+      Tags:              tags,
+      ImageURLs:         images,
     });
 
     console.log(`✓ Saved thread: ${thread.name}`);
