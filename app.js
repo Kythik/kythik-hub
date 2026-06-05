@@ -33,12 +33,17 @@ async function initTwitchPlayer() {
   updateLiveUI();
   await loadTwitchAPI();
 
+  // Set explicit dimensions on container before init
+  const container = document.getElementById('twitchSmall');
+  container.style.width  = '220px';
+  container.style.height = '124px';
+
   const opts = {
-    width:   220,
-    height:  124,
+    width:    220,
+    height:   124,
     autoplay: true,
-    muted:   true,
-    parent:  [CONFIG.VERCEL_DOMAIN, 'www.' + CONFIG.VERCEL_DOMAIN],
+    muted:    true,
+    parent:   [CONFIG.VERCEL_DOMAIN, 'www.' + CONFIG.VERCEL_DOMAIN],
   };
 
   if (isLiveStream) opts.channel = CONFIG.TWITCH_CHANNEL;
@@ -49,6 +54,11 @@ async function initTwitchPlayer() {
 
   window.twitchPlayer.addEventListener(Twitch.Player.READY, () => {
     try { window.twitchPlayer.play(); } catch(e) {}
+  });
+
+  window.twitchPlayer.addEventListener(Twitch.Player.PAUSE, () => {
+    // Auto-resume if paused externally (e.g. browser throttling)
+    setTimeout(() => { try { window.twitchPlayer.play(); } catch(e) {} }, 500);
   });
 }
 

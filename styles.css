@@ -296,48 +296,24 @@ button { cursor: pointer; font-family: var(--font-body); }
   z-index: 300;
 }
 
-.fp-link {
-  display: block;
-  position: relative;
+.fp-screen {
   width: 220px;
   height: 124px;
   border-radius: var(--radius);
   overflow: hidden;
   background: #000;
-  text-decoration: none;
+  position: relative;
 }
 
-.fp-link #twitchSmall {
+.fp-screen #twitchSmall {
   width: 100%;
   height: 100%;
-  pointer-events: none;
 }
 
-.fp-link #twitchSmall iframe {
+.fp-screen #twitchSmall iframe {
   width: 100% !important;
   height: 100% !important;
   border: none !important;
-  pointer-events: none;
-}
-
-.fp-overlay-hint {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(255,255,255,0);
-  letter-spacing: .04em;
-  transition: all .2s;
-  border-radius: var(--radius);
-}
-
-.fp-link:hover .fp-overlay-hint {
-  background: rgba(0,0,0,.55);
-  color: #fff;
 }
 
 .fp-bar {
@@ -364,6 +340,15 @@ button { cursor: pointer; font-family: var(--font-body); }
   font-size: 10px;
   color: var(--text-muted);
 }
+
+.fp-twitch-btn {
+  font-size: 13px;
+  color: var(--text-muted);
+  transition: color .2s;
+  text-decoration: none;
+  padding: 2px 4px;
+}
+.fp-twitch-btn:hover { color: var(--accent); }
 
 /* ── MODAL ──────────────────────────────── */
 .modal-overlay {
