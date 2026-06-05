@@ -167,7 +167,7 @@ function renderStrategies(list) {
       <div class="card-inner">
         <div class="card-top">
           <div class="card-tags">
-            ${s.Channel ? `<span class="tag tag--channel">${s.Channel}</span>` : ''}
+            
             ${tags}
           </div>
           <span class="card-date">${dateStr}</span>
@@ -273,7 +273,7 @@ function openModal(id) {
 
   document.getElementById('modalContent').innerHTML = `
     <div class="modal-head">
-      <div class="modal-tags">${s.Channel ? `<span class="tag tag--channel">${s.Channel}</span>` : ''}${tags}</div>
+      <div class="modal-tags">${tags}</div>
       <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
     </div>
     <h2 class="modal-title">${s.Title || 'Untitled'}</h2>
