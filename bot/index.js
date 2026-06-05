@@ -16,7 +16,7 @@ const BUILDS_CHANNEL = process.env.BUILDS_CHANNEL_ID;
 
 async function addToAirtable(record) {
   const url = `https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(TABLE)}`;
-  await fetch(url, {
+  const res = await fetch(url, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${AIRTABLE_TOKEN}`,
@@ -24,6 +24,8 @@ async function addToAirtable(record) {
     },
     body: JSON.stringify({ fields: record })
   });
+  const data = await res.json();
+  console.log('Airtable response:', JSON.stringify(data));
 }
 
 client.on('threadCreate', async (thread) => {
