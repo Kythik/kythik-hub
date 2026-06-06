@@ -155,7 +155,8 @@ function renderStrategies(list) {
     const dateStr  = ( s.PostedAt || s.Created) ? new Date(s.PostedAt || s.Created).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
     const tags     = s.Tags ? s.Tags.split(',').map(t => t.trim()).filter(Boolean).map(t => `<span class="tag">${t}</span>`).join('') : '';
     const hasImg   = s.ImageURLs && s.ImageURLs.trim();
-    const imgThumb = hasImg ? `<div class="card-thumb"><img src="${s.ImageURLs.split(',')[0].trim()}" alt="Strategy screenshot" loading="lazy" /></div>` : '';
+    const thumbSrc = hasImg ? s.ImageURLs.split(',')[0].trim() : getPlaceholder(s.id);
+    const imgThumb = `<div class="card-thumb${hasImg ? '' : ' card-thumb--placeholder'}"><img src="${thumbSrc}" alt="Strategy screenshot" loading="lazy" /></div>`;
 
     return `<article class="card" data-id="${s.id}" onclick="openModal('${s.id}')">
       ${imgThumb}
@@ -366,6 +367,18 @@ function buildFeatured() {
   startFeaturedTimer();
 }
 
+const PLACEHOLDERS = [
+  '/images/placeholder-1.png',
+  '/images/placeholder-2.png',
+  '/images/placeholder-3.png',
+  '/images/placeholder-4.png',
+];
+
+function getPlaceholder(id) {
+  const idx = id ? id.charCodeAt(id.length - 1) % PLACEHOLDERS.length : 0;
+  return PLACEHOLDERS[idx];
+}
+
 function renderFeatured() {
   const s = featuredList[featuredIndex];
   if (!s) return;
@@ -376,27 +389,37 @@ function renderFeatured() {
 
   const tags    = s.Tags ? s.Tags.split(',').map(t => t.trim()).filter(Boolean).map(t => `<span class="tag">${t}</span>`).join('') : '';
   const hasImg  = s.ImageURLs && s.ImageURLs.trim();
-  const imgHTML = hasImg ? `<div class="feat-img"><img src="${s.ImageURLs.split(',')[0].trim()}" alt="Strategy screenshot" loading="lazy" /></div>` : '';
-  const dateStr = ( s.PostedAt || s.Created) ? new Date(s.PostedAt || s.Created).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
-  const v       = getVotes(s.id);
+  const screenshot = hasImg ? s.ImageURLs.split(',')[0].trim() : null;
+  const dateStr = (s.PostedAt || s.Created)
+    ? new Date(s.PostedAt || s.Created).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : '';
+  const zone = s.Tags ? s.Tags.split(',')[0].trim() : (s.Channel || '');
 
   track.innerHTML = `
     <div class="feat-card" onclick="openModal('${s.id}')">
-      ${imgHTML}
-      <div class="feat-body">
-        <div class="feat-top">
-          <div class="card-tags">${tags}</div>
-          <span class="card-date">${dateStr}</span>
-        </div>
-        <h2 class="feat-title">${s.Title || 'Untitled'}</h2>
-        <p class="feat-excerpt">${(s.Body || '').substring(0, 180)}${s.Body && s.Body.length > 180 ? '…' : ''}</p>
-        <div class="feat-foot">
-          <div class="author">
-            <div class="avatar">${(s.Author || '?')[0].toUpperCase()}</div>
-            ${s.Author || 'Anonymous'}
+      <div class="feat-screenshot">
+        ${screenshot
+          ? `<img src="${screenshot}" alt="Strategy screenshot" loading="lazy" />`
+          : `<div class="feat-screenshot-empty"><span>No screenshot</span></div>`
+        }
+        <div class="feat-screenshot-fade"></div>
+      </div>
+      <div class="feat-art-panel" style="background-image:url('/images/featured-panel.png')">
+        <div class="feat-art-overlay"></div>
+        <div class="feat-art-content">
+          <div>
+            <div class="feat-eyebrow">${zone}${dateStr ? ' · ' + dateStr : ''}</div>
+            <h2 class="feat-title">${s.Title || 'Untitled'}</h2>
+            <div class="feat-tags-row">${tags}</div>
           </div>
-          <div class="card-foot-right">
-            ${s.CommentCount ? `<span class="comment-count">💬 ${s.CommentCount}</span>` : ''}
+          <div class="feat-foot">
+            <div class="author">
+              <div class="avatar">${(s.Author || '?')[0].toUpperCase()}</div>
+              <div>
+                <div class="feat-author-name">${s.Author || 'Anonymous'}</div>
+                ${s.CommentCount ? `<div class="feat-author-meta">💬 ${s.CommentCount} comments</div>` : ''}
+              </div>
+            </div>
             ${voteHTML(s.id, true)}
           </div>
         </div>
