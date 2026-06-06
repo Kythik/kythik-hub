@@ -31,19 +31,22 @@
 </head>
 <body>
 
+  <!-- ── PAGE BACKGROUND IMAGE ── -->
+  <div class="page-bg-img"></div>
+
   <!-- ── HEX BACKGROUND ── -->
   <svg class="hex-bg" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <defs>
       <pattern id="hexGrid" width="50" height="84" patternUnits="userSpaceOnUse">
         <!-- Center hex -->
         <polygon points="25,0 50,14 50,42 25,56 0,42 0,14"
-                 fill="none" stroke="#4A6080" stroke-width="0.8"/>
+                 fill="none" stroke="#1A3055" stroke-width="0.8"/>
         <!-- Staggered row hex — left edge -->
         <polygon points="0,42 25,56 25,84 0,98 -25,84 -25,56"
-                 fill="none" stroke="#4A6080" stroke-width="0.8"/>
+                 fill="none" stroke="#1A3055" stroke-width="0.8"/>
         <!-- Staggered row hex — right edge -->
         <polygon points="50,42 75,56 75,84 50,98 25,84 25,56"
-                 fill="none" stroke="#4A6080" stroke-width="0.8"/>
+                 fill="none" stroke="#1A3055" stroke-width="0.8"/>
       </pattern>
     </defs>
     <rect width="100%" height="100%" fill="url(#hexGrid)"/>
@@ -77,7 +80,7 @@
     <!-- ── FEATURED SECTION ── -->
     <div class="featured-section" id="featuredSection" style="display:none">
       <div class="featured-header">
-        <span class="featured-label">⭐ Featured</span>
+        <div class="featured-label">Featured Strategy</div>
         <div class="featured-nav">
           <button class="featured-btn" id="featPrev" onclick="featNav(-1)" aria-label="Previous">‹</button>
           <span class="featured-counter" id="featCounter"></span>
@@ -140,7 +143,10 @@
         <span class="fp-name">Kythik</span>
         <span class="fp-state" id="fpState"></span>
       </div>
-      <a class="fp-twitch-btn" href="https://twitch.tv/kythikx" target="_blank" rel="noopener">↗</a>
+      <div class="fp-actions">
+        <button class="fp-unmute-btn" id="fpUnmuteBtn" onclick="unmutePlayer()" title="Unmute">🔇</button>
+        <a class="fp-twitch-btn" href="https://twitch.tv/kythikx" target="_blank" rel="noopener">↗</a>
+      </div>
     </div>
   </div>
 
