@@ -349,7 +349,10 @@ select:focus{border-color:var(--gold-muted)}
 <div id="reroll-decision-panel" class="reroll-panel">
   <div class="reroll-panel-title">
     <span>Reroll Decision</span>
-    <span class="reroll-alice-note" id="reroll-alice-note"></span>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="reroll-alice-note" id="reroll-alice-note"></span>
+      <button onclick="showLightbox()" style="background:transparent;border:none;color:var(--blue-light);font-size:11px;cursor:pointer;padding:0">how this works ↗</button>
+    </div>
   </div>
   <div id="reroll-has-rerolls" style="display:none">
     <div class="reroll-verdict v-keep" id="reroll-verdict">
@@ -376,6 +379,45 @@ select:focus{border-color:var(--gold-muted)}
     <tbody id="tbody"></tbody>
   </table>
 
+</div>
+
+<!-- Reroll Decision Lightbox -->
+<div id="lightbox-overlay" onclick="hideLightbox()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;padding:20px">
+  <div onclick="event.stopPropagation()" style="background:var(--bg-panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);max-width:560px;width:100%;padding:28px;position:relative;max-height:85vh;overflow-y:auto">
+    <button onclick="hideLightbox()" style="position:absolute;top:16px;right:16px;background:transparent;border:none;color:var(--text-faint);font-size:18px;cursor:pointer">✕</button>
+    <h2 style="font-family:var(--font-display);font-size:18px;color:var(--gold-primary);margin-bottom:6px">Reroll Recommendation</h2>
+    <p style="font-size:11px;color:var(--text-faint);margin-bottom:18px">How the Keep / Reroll decision is calculated</p>
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.7;display:flex;flex-direction:column;gap:14px">
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">The Core Question</div>
+        Is your best current option worth more than what you'd expect from a reroll? If rerolling gives a better expected outcome on average, reroll.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Pool Average EV</div>
+        The service pool is weighted by rarity — Bronze (~54%), Amethyst (~43%), Gold (~3%), Rainbow (~0.5%). The expected value of a random draw from this weighted pool sets the baseline. <span style="color:var(--red-loss)">Pool weights from Chinese community doc — reflect clockwork quality nodes. Builds with clockwork_41/42/45/46 see more Gold/Diamond services.</span></div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Why Thresholds Differ by Rerolls</div>
+        With 2 rerolls you get two chances to improve — so you should be more selective on the first reroll. With 1 reroll left you take S or A since the next draw might be worse.
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;gap:8px;font-size:12px"><span style="color:var(--text-faint);width:160px">Reroll 1 of 2:</span><span>Keep S+ or S only</span></div>
+          <div style="display:flex;gap:8px;font-size:12px"><span style="color:var(--text-faint);width:160px">Reroll 2 of 2 (last):</span><span>Keep S+, S, or A</span></div>
+        </div></div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Tier Thresholds</div>
+        <div style="display:flex;flex-direction:column;gap:3px;font-size:12px">
+          <div style="display:flex;gap:8px"><span style="width:40px;color:#ff9ef5;font-weight:700">S+</span><span>≥300% of base pool (Roses only)</span></div>
+          <div style="display:flex;gap:8px"><span style="width:40px;color:var(--gold-bright);font-weight:700">S</span><span>100–300% (Nut Trick, Heist, Roulette, All Tabs, Bloody Mary)</span></div>
+          <div style="display:flex;gap:8px"><span style="width:40px;color:#a78bfa;font-weight:700">A</span><span>30–100% (ID20, ID9, ID23, Hunting Ground, ID19)</span></div>
+          <div style="display:flex;gap:8px"><span style="width:40px;color:#60a5fa;font-weight:700">B</span><span>19–30% (ID11, ID8, ID15/17, ID10, ID21, ID13)</span></div>
+          <div style="display:flex;gap:8px"><span style="width:40px;color:var(--text-faint);font-weight:700">C</span><span>5–19% (minor utility services)</span></div>
+        </div></div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Caveats</div>
+        <ul style="padding-left:16px;display:flex;flex-direction:column;gap:4px">
+          <li>Pool weights are from Chinese community doc — unverified for S12</li>
+          <li>Combat services (IDs 4-7) add survival value not captured in EV</li>
+          <li>IDs 13-14 only show value with Booster Drink / Time Extender nodes checked</li>
+          <li>Roulette EV depends on unverified voucher rarity distribution</li>
+          <li>These are long-run averages — individual runs vary widely</li>
+        </ul></div>
+      <div style="font-size:11px;color:var(--text-faint);padding-top:10px;border-top:1px solid var(--border-blue)">
+        Model: recursive expected value — E[best of 3 draws] via 200k Monte Carlo simulation. Thresholds are scale-independent ratios.</div>
+    </div>
+  </div>
 </div>
 
 <div class="page-footer">
