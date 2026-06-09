@@ -1,32 +1,42 @@
 /* ═══════════════════════════════════════════
-   api/airtable.js — Vercel serverless function
-   Returns current season strategies from Airtable.
-   6hr cache. Credentials never exposed to browser.
+   api/strategies.js — Public API endpoint
+   Key-protected. Returns clean strategy JSON
+   for third-party use.
+   Usage: /api/strategies?key=YOUR_KEY
+   or: Authorization: Bearer YOUR_KEY
    ═══════════════════════════════════════════ */
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Authorization');
   res.setHeader('Cache-Control', 's-maxage=21600, stale-while-revalidate=3600');
+
+  // Key check — query param or Authorization header
+  const VALID_KEYS = [
+    process.env.API_KEY_1,
+    process.env.API_KEY_2,
+    process.env.API_KEY_3,
+  ].filter(Boolean);
+
+  const providedKey =
+    req.query.key ||
+    (req.headers.authorization || '').replace('Bearer ', '').trim();
+
+  if (!providedKey || !VALID_KEYS.includes(providedKey)) {
+    return res.status(401).json({
+      error: 'Unauthorized. Contact kythik.com to request API access.',
+    });
+  }
 
   const TOKEN = process.env.AIRTABLE_TOKEN;
   const BASE  = process.env.AIRTABLE_BASE;
   const TABLE = 'Strategies';
-
-  // Season config — reads from season.json in repo root
   const seasonCfg   = await fetch('https://raw.githubusercontent.com/kythikx/kythik-hub/main/season.json').then(r => r.json()).catch(() => ({ seasonStart: '2026-04-16T19:00:00-07:00', seasonName: 'Unknown' }));
   const SEASON_START = seasonCfg.seasonStart;
   const SEASON_NAME  = seasonCfg.seasonName;
 
-  if (!TOKEN || !BASE) {
-    return res.status(500).json({ error: 'Missing Airtable credentials.' });
-  }
-
   try {
-    // Filter by current season date range using PostedAt or Created
-    let formula = `IS_AFTER({PostedAt}, '${new Date(SEASON_START).toISOString()}')`;
-    if (SEASON_END) {
-      formula = `AND(${formula}, IS_BEFORE({PostedAt}, '${new Date(SEASON_END).toISOString()}'))`;
-    }
+    const formula = `IS_AFTER({PostedAt}, '${new Date(SEASON_START).toISOString()}')`;
 
     const url = [
       `https://api.airtable.com/v0/${BASE}/${encodeURIComponent(TABLE)}`,
@@ -42,19 +52,32 @@ export default async function handler(req, res) {
 
     if (!airtableRes.ok) throw new Error(`Airtable ${airtableRes.status}`);
 
-    const data    = await airtableRes.json();
-    const records = (data.records || []).map(r => ({ id: r.id, ...r.fields }));
+    const data = await airtableRes.json();
+
+    // Clean output — no internal Airtable IDs exposed
+    const strategies = (data.records || []).map(r => ({
+      title:      r.fields.Title || '',
+      author:     r.fields.Author || '',
+      channel:    r.fields.Channel || '',
+      tags:       r.fields.Tags || '',
+      body:       r.fields.Body || '',
+      imageURLs:  r.fields.ImageURLs || '',
+      discordURL: r.fields.DiscordMessageURL || '',
+      comments:   r.fields.CommentCount || 0,
+      postedAt:   r.fields.PostedAt || r.fields.Created || '',
+      featured:   r.fields.Featured || false,
+    }));
 
     return res.status(200).json({
-      records,
+      source:      'kythik.com',
       season:      SEASON_NAME,
       seasonStart: SEASON_START,
       lastUpdated: new Date().toISOString(),
-      count:       records.length,
+      count:       strategies.length,
+      strategies,
     });
 
   } catch (err) {
-    console.error('Airtable fetch error:', err.message);
     return res.status(500).json({ error: err.message });
   }
 }
