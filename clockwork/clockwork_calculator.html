@@ -381,6 +381,27 @@ select:focus{border-color:var(--gold-muted)}
 
 </div>
 
+<!-- Roulette Lightbox -->
+<div id="roulette-lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;padding:20px">
+  <div onclick="event.stopPropagation()" style="background:var(--bg-panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);max-width:560px;width:100%;padding:28px;position:relative;max-height:85vh;overflow-y:auto">
+    <button onclick="hideRouletteLightbox()" style="position:absolute;top:16px;right:16px;background:transparent;border:none;color:var(--text-faint);font-size:18px;cursor:pointer">✕</button>
+    <h2 style="font-family:var(--font-display);font-size:18px;color:var(--gold-primary);margin-bottom:6px">Clockwork Roulette — Strategy</h2>
+    <p style="font-size:11px;color:var(--text-faint);margin-bottom:18px">Why the math says go to max cogs every time</p>
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.7;display:flex;flex-direction:column;gap:14px">
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">The Mechanic</div>
+        Every time you obtain a Cogwheel Voucher, you get 1 extra random voucher, and the next cog gives +1 more voucher than the last. Each cog start has a 10% chance to immediately end the event and lose all vouchers.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">What the Math Shows</div>
+        At every cog point, continuing always has higher expected value than cashing out. The voucher count escalates rapidly — later cogs give far more vouchers than early ones. The 10% fail chance is compounding but the voucher escalation outpaces the risk mathematically.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Why Players Cash Out Early</div>
+        Loss aversion. A wipe feels much worse than missing a big win. Cashing out early is rational risk management — it just costs EV. Over many runs, going to max cogs wins.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">The Real Decision</div>
+        How much variance can you absorb? A wipe loses your entire run's cogwheel output. If painful, cash out earlier. Farming long sessions and can stomach the swings — max cogs is the EV play.</div>
+      <div style="font-size:11px;color:var(--text-faint);padding-top:10px;border-top:1px solid var(--border-blue)">
+        Mechanic data from the <a href="https://docs.qq.com/doc/DUFZyZFZRWnVtUVFt" target="_blank" rel="noopener" style="color:var(--blue-light)">Chinese community doc</a>. <span style="color:var(--red-loss)">Voucher rarity distribution unverified — conservative vs high rarity changes the EV significantly.</span></div>
+    </div>
+  </div>
+</div>
+
 <!-- Reroll Decision Lightbox -->
 <div id="lightbox-overlay" onclick="hideLightbox()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;padding:20px">
   <div onclick="event.stopPropagation()" style="background:var(--bg-panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);max-width:560px;width:100%;padding:28px;position:relative;max-height:85vh;overflow-y:auto">
@@ -421,10 +442,7 @@ select:focus{border-color:var(--gold-muted)}
 </div>
 
 <div class="page-footer">
-  Data: tlidb.com · Prices: titrack.ninja (snapshot — volatile) · Calibrated: 435 maps, Kythik DS build ·
-  Roulette: compounding 10% fail confirmed, fail = entire event ends ·
-  Nut Trick: binomial 200k simulation · ID23: per-outcome EV shown ·
-  <a href="https://kythik.com">kythik.com</a>
+  Data: tlidb.com · <a href="https://kythik.com">kythik.com</a>
 </div>
 
 <script>
