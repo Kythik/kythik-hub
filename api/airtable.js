@@ -3,7 +3,7 @@
    Blob-cached. Airtable only hit every 6hrs.
    ═══════════════════════════════════════════ */
 
-import { put, head, get } from '@vercel/blob';
+import { put, head } from '@vercel/blob';
 
 const CACHE_KEY     = 'strategies-cache.json';
 const CACHE_TTL_MS  = 6 * 60 * 60 * 1000; // 6 hours
