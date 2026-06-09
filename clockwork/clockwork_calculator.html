@@ -770,8 +770,6 @@ function render(){
   const nodeWasteful=!!(document.getElementById('node-wasteful')&&document.getElementById('node-wasteful').checked);
   const nodeOstentatious=!!(document.getElementById('node-ostentatious')&&document.getElementById('node-ostentatious').checked);
   const nodeCb59=!!(document.getElementById('node-cb59')&&document.getElementById('node-cb59').checked);
-  const DOLL_CR={none:0.06,regular:0.19,artifact:0.45};
-  const cr=DOLL_CR[dollVal]||0.45;
   const _gl2=gearsVal==='avg'?[5,6,7]:[parseInt(gearsVal)];
   const theorBase=(1/_gl2.length)*_gl2.reduce((s,n)=>s+bge()*n*MULT[n],0);
   const base=theorBase; // relative scaling — all EVs as fraction of base pool
@@ -783,6 +781,8 @@ function render(){
 
   // ── Service table — lookup from pre-computed rankings ────────────────
   const dollVal=document.getElementById('doll')?.value||'artifact';
+  const DOLL_CR={none:0.06,regular:0.19,artifact:0.45};
+  const cr=DOLL_CR[dollVal]||0.45;
   const probeVal=document.getElementById('probe')?.value||'none';
   const nodeSeasonal=!!(document.getElementById('node-seasonal')?.checked);
   const dollProbe=probeVal==='doll'?1:0;
