@@ -18,12 +18,14 @@ export default async function handler(req, res) {
     // ── Try Blob cache first ──────────────────
     try {
       const { blobs } = await list({ prefix: CACHE_KEY, token: BLOB_TOKEN });
+      console.log('Blobs found:', blobs.length);
       if (blobs.length > 0) {
-        // Sort by uploadedAt descending, use newest
         const blob = blobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))[0];
         const age  = Date.now() - new Date(blob.uploadedAt).getTime();
+        console.log('Blob age (ms):', age, 'TTL:', CACHE_TTL_MS, 'Fresh:', age < CACHE_TTL_MS);
         if (age < CACHE_TTL_MS) {
           const cacheRes = await fetch(blob.url);
+          console.log('Cache fetch status:', cacheRes.status);
           if (cacheRes.ok) {
             const cached     = await cacheRes.json();
             cached.fromCache = true;
