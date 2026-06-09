@@ -3,7 +3,7 @@
    Blob-cached (private store). 6hr TTL.
    ═══════════════════════════════════════════ */
 
-import { put, list, getDownloadUrl } from '@vercel/blob';
+import { put, list } from '@vercel/blob';
 
 const CACHE_KEY    = 'strategies-cache.json';
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
@@ -12,21 +12,25 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=60');
 
-  const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
+  const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 
   try {
     // ── Try Blob cache first ──────────────────
     try {
-      const { blobs } = await list({ prefix: CACHE_KEY, token: TOKEN });
+      const { blobs } = await list({ prefix: CACHE_KEY, token: BLOB_TOKEN });
       if (blobs.length > 0) {
         const blob = blobs[0];
         const age  = Date.now() - new Date(blob.uploadedAt).getTime();
         if (age < CACHE_TTL_MS) {
-          const downloadUrl = await getDownloadUrl(blob.url, { token: TOKEN });
-          const cacheRes    = await fetch(downloadUrl);
-          const cached      = await cacheRes.json();
-          cached.fromCache  = true;
-          return res.status(200).json(cached);
+          // Fetch private blob with token in header
+          const cacheRes = await fetch(blob.url, {
+            headers: { Authorization: `Bearer ${BLOB_TOKEN}` }
+          });
+          if (cacheRes.ok) {
+            const cached     = await cacheRes.json();
+            cached.fromCache = true;
+            return res.status(200).json(cached);
+          }
         }
       }
     } catch(e) {
@@ -72,13 +76,13 @@ export default async function handler(req, res) {
 
     // ── Write to Blob cache ───────────────────
     try {
-      await put(CACHE_KEY, JSON.stringify(payload), {
-        access:         'private',
-        token:          TOKEN,
+      const result = await put(CACHE_KEY, JSON.stringify(payload), {
+        access:         'public',
+        token:          BLOB_TOKEN,
         contentType:    'application/json',
         allowOverwrite: true,
       });
-      console.log('Blob cache written successfully');
+      console.log('Blob cache written:', result.url);
     } catch(e) {
       console.error('Blob write failed:', e.message);
     }
