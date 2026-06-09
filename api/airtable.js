@@ -1,9 +1,9 @@
 /* ═══════════════════════════════════════════
    api/airtable.js — Vercel serverless function
-   Blob-cached (private store). 6hr TTL.
+   Blob-cached (public store). 6hr TTL.
    ═══════════════════════════════════════════ */
 
-import { put, list } from '@vercel/blob';
+import { put, list, del } from '@vercel/blob';
 
 const CACHE_KEY    = 'strategies-cache.json';
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
@@ -19,13 +19,11 @@ export default async function handler(req, res) {
     try {
       const { blobs } = await list({ prefix: CACHE_KEY, token: BLOB_TOKEN });
       if (blobs.length > 0) {
-        const blob = blobs[0];
+        // Sort by uploadedAt descending, use newest
+        const blob = blobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))[0];
         const age  = Date.now() - new Date(blob.uploadedAt).getTime();
         if (age < CACHE_TTL_MS) {
-          // Fetch private blob with token in header
-          const cacheRes = await fetch(blob.url, {
-            headers: { Authorization: `Bearer ${BLOB_TOKEN}` }
-          });
+          const cacheRes = await fetch(blob.url);
           if (cacheRes.ok) {
             const cached     = await cacheRes.json();
             cached.fromCache = true;
@@ -74,15 +72,18 @@ export default async function handler(req, res) {
       fromCache:   false,
     };
 
-    // ── Write to Blob cache ───────────────────
+    // ── Delete old blobs, write fresh cache ───
     try {
-      const result = await put(CACHE_KEY, JSON.stringify(payload), {
-        access:         'public',
-        token:          BLOB_TOKEN,
-        contentType:    'application/json',
-        allowOverwrite: true,
+      const { blobs } = await list({ prefix: CACHE_KEY, token: BLOB_TOKEN });
+      if (blobs.length > 0) {
+        await del(blobs.map(b => b.url), { token: BLOB_TOKEN });
+      }
+      await put(CACHE_KEY, JSON.stringify(payload), {
+        access:      'public',
+        token:       BLOB_TOKEN,
+        contentType: 'application/json',
       });
-      console.log('Blob cache written:', result.url);
+      console.log('Blob cache refreshed');
     } catch(e) {
       console.error('Blob write failed:', e.message);
     }
