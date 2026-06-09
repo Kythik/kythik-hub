@@ -113,6 +113,16 @@ async function fetchStrategies() {
     buildTagFilters();
     applyFilters();
     buildFeatured();
+
+    // Update last synced footer
+    if (data.lastUpdated) {
+      const el = document.getElementById('lastSynced');
+      if (el) {
+        const ago  = Math.round((Date.now() - new Date(data.lastUpdated)) / 60000);
+        const text = ago < 2 ? 'just now' : ago < 60 ? `${ago}m ago` : `${Math.round(ago/60)}h ago`;
+        el.textContent = `Strategies last synced from Discord ${text}`;
+      }
+    }
   } catch(err) {
     console.error('Fetch failed:', err);
     document.getElementById('stratGrid').innerHTML = `
