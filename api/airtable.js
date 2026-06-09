@@ -1,7 +1,6 @@
 /* ═══════════════════════════════════════════
    api/airtable.js — Vercel serverless function
-   Returns current season strategies from Airtable.
-   6hr cache. Credentials never exposed to browser.
+   6hr cache. Season filtered. 
    ═══════════════════════════════════════════ */
 
 export default async function handler(req, res) {
@@ -12,35 +11,37 @@ export default async function handler(req, res) {
   const BASE  = process.env.AIRTABLE_BASE;
   const TABLE = 'Strategies';
 
-  // Season config — reads from season.json in repo root
-  const seasonCfg   = await fetch('https://raw.githubusercontent.com/kythikx/kythik-hub/main/season.json').then(r => r.json()).catch(() => ({ seasonStart: '2026-04-16T19:00:00-07:00', seasonName: 'Unknown' }));
-  const SEASON_START = seasonCfg.seasonStart;
-  const SEASON_NAME  = seasonCfg.seasonName;
-
   if (!TOKEN || !BASE) {
     return res.status(500).json({ error: 'Missing Airtable credentials.' });
   }
 
   try {
-    // Filter by current season date range using PostedAt or Created
-    let formula = `IS_AFTER({PostedAt}, '${new Date(SEASON_START).toISOString()}')`;
-    if (SEASON_END) {
-      formula = `AND(${formula}, IS_BEFORE({PostedAt}, '${new Date(SEASON_END).toISOString()}'))`;
-    }
+    // Fetch season config from repo
+    let SEASON_START = '2026-04-16T19:00:00-07:00';
+    let SEASON_NAME  = 'SS12: Lunaria';
+    try {
+      const cfg = await fetch('https://raw.githubusercontent.com/kythikx/kythik-hub/main/season.json').then(r => r.json());
+      if (cfg.seasonStart) SEASON_START = cfg.seasonStart;
+      if (cfg.seasonName)  SEASON_NAME  = cfg.seasonName;
+    } catch(e) { /* use defaults */ }
 
-    const url = [
-      `https://api.airtable.com/v0/${BASE}/${encodeURIComponent(TABLE)}`,
-      `?filterByFormula=${encodeURIComponent(formula)}`,
-      '&sort[0][field]=PostedAt',
-      '&sort[0][direction]=desc',
-      '&maxRecords=100'
-    ].join('');
+    const seasonISO = new Date(SEASON_START).toISOString();
+
+    // Fall back to Created if PostedAt is empty
+    const formula = encodeURIComponent(
+      `OR(IS_AFTER({PostedAt}, '${seasonISO}'), AND({PostedAt}='', IS_AFTER({Created}, '${seasonISO}')))`
+    );
+
+    const url = `https://api.airtable.com/v0/${BASE}/${encodeURIComponent(TABLE)}?filterByFormula=${formula}&sort[0][field]=Created&sort[0][direction]=desc&maxRecords=100`;
 
     const airtableRes = await fetch(url, {
       headers: { Authorization: `Bearer ${TOKEN}` }
     });
 
-    if (!airtableRes.ok) throw new Error(`Airtable ${airtableRes.status}`);
+    if (!airtableRes.ok) {
+      const err = await airtableRes.text();
+      throw new Error(`Airtable ${airtableRes.status}: ${err}`);
+    }
 
     const data    = await airtableRes.json();
     const records = (data.records || []).map(r => ({ id: r.id, ...r.fields }));
