@@ -256,6 +256,22 @@ select:focus{border-color:var(--gold-muted)}
         <option value="7">7 gears (SSS ×1.6)</option>
       </select>
     </div>
+    <div class="ctrl-group">
+      <label>Collection Doll Astrolabe</label>
+      <select id="doll">
+        <option value="none">Doll Astrolabe (base, ~6% est.)</option>
+        <option value="regular">Collection Doll (~19% est., unverified)</option>
+        <option value="artifact" selected>Collection Doll Artifact (~45% observed)</option>
+      </select>
+    </div>
+    <div class="ctrl-group">
+      <label>Probe</label>
+      <select id="probe">
+        <option value="none">None</option>
+        <option value="compass" selected>Compass Deep Space Probe</option>
+        <option value="doll">Doll Deep Space Probe</option>
+      </select>
+    </div>
 
     <div class="ctrl-group">
       <label>Alice tier</label>
@@ -340,6 +356,16 @@ select:focus{border-color:var(--gold-muted)}
         </span>
       </label>
 
+
+      <label class="chk-row">
+        <input type="checkbox" id="node-seasonal" onchange="render()">
+        <span class="tip">
+          <span class="chk-label-text">In-Map Season Mechanic</span>
+          <span class="tip-icon">?</span>
+          <span class="tip-text">Some seasons add an in-map mechanic that scales with rating effects and rewards. Lunaria (S12) has one. When active, SSS-reaching services like ID11 gain extra value — ID11 hits SSS mid-run before turnin, maximizing season scaling. Not all seasons have an in-map mechanic.</span>
+        </span>
+      </label>
+
     </div>
     <div class="node-exclusive-note" id="exclusive-note" style="display:none">⚠ Sub-60s and Over-60s Podium are mutually exclusive — only one can be active.</div>
   </div>
@@ -399,6 +425,23 @@ select:focus{border-color:var(--gold-muted)}
         Each row shows a possible outcome with its probability. Early end at low cogs produces less than a normal run. Full completion is the target. The tier in the service rankings is the weighted average across all outcomes.</div>
       <div style="font-size:11px;color:var(--text-faint);padding-top:10px;border-top:1px solid var(--border-blue)">
         Mechanic data from the <a href="https://docs.qq.com/doc/DUFZyZFZRWnVtUVFt" target="_blank" rel="noopener" style="color:var(--blue-light)">Chinese community doc</a>.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Alice Proc Lightbox -->
+<div id="alice-lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;padding:20px">
+  <div onclick="event.stopPropagation()" style="background:var(--bg-panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);max-width:520px;width:100%;padding:28px;position:relative;max-height:85vh;overflow-y:auto">
+    <button onclick="hideAliceLightbox()" style="position:absolute;top:16px;right:16px;background:transparent;border:none;color:var(--text-faint);font-size:18px;cursor:pointer">✕</button>
+    <h2 style="font-family:var(--font-display);font-size:18px;color:var(--gold-primary);margin-bottom:6px">Alice — Proc Voucher Bonus</h2>
+    <p style="font-size:11px;color:var(--text-faint);margin-bottom:18px">How the per-run bonus is calculated</p>
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.7;display:flex;flex-direction:column;gap:14px">
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">What Alice Proc Does</div>
+        Alice (Lv2+) has a chance per cogwheel completion to add a free Cogwheel Voucher directly to your total. Separate from her Double Reward effect. Cannot self-proc.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Proc Chances by Level</div>
+        <div style="font-size:12px;color:var(--text-faint)">Lv2-3: 8% per cog · Lv4-5: 16% per cog · Lv6: 16% per cog</div></div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Voucher Distribution</div>
+        Estimated from player observation: Grey ~2%, Blue ~38%, Purple ~38%, Gold ~16%, Red ~4%, Rainbow ~2%. <span style="color:var(--red-loss)">Unverified.</span></div>
     </div>
   </div>
 </div>
@@ -485,8 +528,6 @@ const CHAIN=['grey','blue','purple','gold','red','rainbow'];
 const NUT={5:{p0:0.069,p1:0.931,p2:0.000},6:{p0:0.010,p1:0.776,p2:0.214},7:{p0:0.000,p1:0.470,p2:0.530}};
 const RDIST_EXP={blue:0.7429,purple:0.1714,gold:0.0571,red:0.0286};
 const RDIST_HIGH={blue:0.10,purple:0.20,gold:0.35,red:0.20,rainbow:0.15};
-// AVG_CF removed — cr/cf cancel in all ratio calculations
-const CALIB_BASE=214;
 
 const RLABEL={rainbow:'Rainbow',gold:'Gold',purple:'Purple',blue:'Blue'};
 const RCLS={rainbow:'badge-rainbow',gold:'badge-gold',purple:'badge-purple',blue:'badge-blue'};
@@ -729,6 +770,8 @@ function render(){
   const nodeWasteful=!!(document.getElementById('node-wasteful')&&document.getElementById('node-wasteful').checked);
   const nodeOstentatious=!!(document.getElementById('node-ostentatious')&&document.getElementById('node-ostentatious').checked);
   const nodeCb59=!!(document.getElementById('node-cb59')&&document.getElementById('node-cb59').checked);
+  const DOLL_CR={none:0.06,regular:0.19,artifact:0.45};
+  const cr=DOLL_CR[dollVal]||0.45;
   const _gl2=gearsVal==='avg'?[5,6,7]:[parseInt(gearsVal)];
   const theorBase=(1/_gl2.length)*_gl2.reduce((s,n)=>s+bge()*n*MULT[n],0);
   const base=theorBase; // relative scaling — all EVs as fraction of base pool
@@ -739,7 +782,12 @@ function render(){
 
 
   // ── Service table — lookup from pre-computed rankings ────────────────
-  const rkey=`${gearsVal}|artifact|${document.getElementById('alice').value}|${nodeIndulgent?1:0}|${nodeVain?1:0}|${nodeWasteful?1:0}|${nodeOstentatious?1:0}|${nodeCb59?1:0}|${document.getElementById('rdist').value}`;
+  const dollVal=document.getElementById('doll')?.value||'artifact';
+  const probeVal=document.getElementById('probe')?.value||'none';
+  const nodeSeasonal=!!(document.getElementById('node-seasonal')?.checked);
+  const dollProbe=probeVal==='doll'?1:0;
+  const compassProbe=probeVal==='compass'?1:0;
+  const rkey=`${gearsVal}|${dollVal}|${document.getElementById('alice').value}|${nodeIndulgent?1:0}|${nodeVain?1:0}|${nodeWasteful?1:0}|${nodeOstentatious?1:0}|${nodeCb59?1:0}|${document.getElementById('rdist').value}|${dollProbe}|${compassProbe}`;
   if(!RANKINGS){return;} // wait for JSON to load
   const ridx=RANKINGS.k[rkey];
   const ranked=ridx!==undefined?RANKINGS.r[ridx]:null;
@@ -758,9 +806,10 @@ function render(){
   tbody.innerHTML='';
   svcs.forEach((s,i)=>{
     const t2={l:s.tier,c:'tier-'+s.tier.toLowerCase().replace('+','p')};
+    const seasonBadge=nodeSeasonal&&s.id===11?'<span style="font-size:10px;color:var(--gold-bright);margin-left:4px">★ season</span>':'';
     const bw=s.pct||0;
     const th=s.tag?tagMap[s.tag]||'':'';
-    const nameHtml=s.name?`<span class="svc-name">${s.name}</span>`:s.id?`<span class="svc-name" style="color:var(--text-faint)">ID ${s.id}</span>`:'';
+    const nameHtml=(s.name?`<span class="svc-name">${s.name}</span>`:s.id?`<span class="svc-name" style="color:var(--text-faint)">ID ${s.id}</span>`:'')+seasonBadge;
     const eff=`<div class="svc-effect">${(s.effect||s.desc||'').substring(0,100)}${(s.effect||s.desc||'').length>100?'…':''}${th}</div>`;
     const noteHtml=s.note?`<div class="svc-note">${s.note}</div>`:'';
     let extra='';
@@ -779,11 +828,22 @@ function render(){
   });
 
   // ── Reroll recommendation ──────────────────────────────────────────────
+  if(probeVal==='compass'){
+    const allTabsEV=1.5*gev('rainbow')*MULT[parseInt(gearsVal)];
+    const cgBase=0.07*2*allTabsEV*aliceMult;
+    const cgId11=0.07*2*1.5*gev('rainbow')*1.6*1.18*aliceMult; // ID11 always SSS
+    const cgPct=(cgBase/theorBase*100).toFixed(1);
+    const cgId11Pct=(cgId11/theorBase*100).toFixed(1);
+    document.getElementById('compass-probe-metric').style.display='block';
+    document.getElementById('compass-probe-val').textContent='+'+cgPct+'% of base per run'+'  — ID11 SSS boost: +'+cgId11Pct+'%';
+  } else {
+    document.getElementById('compass-probe-metric').style.display='none';
+  }
   updateVerdict();
   }catch(e){console.error('render() error:',e);}
 }
 
-['gears','alice','sort','rdist','node-indulgent','node-vain','node-wasteful','node-cb59'].forEach(id=>{
+['gears','doll','probe','alice','sort','showz','rdist','node-indulgent','node-vain','node-wasteful','node-cb59','node-seasonal'].forEach(id=>{
   const el=document.getElementById(id);
   if(el)el.addEventListener('change',render);
 });
