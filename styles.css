@@ -121,9 +121,9 @@ button { cursor: pointer; font-family: var(--font-body); }
   margin: 0 auto;
   padding: 0 28px;
   height: 100%;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
 }
 .header-left { display: flex; align-items: center; gap: 20px; }
 .header-name {
@@ -142,7 +142,7 @@ button { cursor: pointer; font-family: var(--font-body); }
   color: var(--text-faint);
   letter-spacing: .06em;
 }
-.header-right { display: flex; align-items: center; gap: 24px; }
+.header-right { display: flex; align-items: center; gap: 24px; justify-content: flex-end; }
 .header-link {
   display: flex;
   align-items: center;
@@ -773,4 +773,12 @@ button { cursor: pointer; font-family: var(--font-body); }
 .footer-links {
   font-size: 12px;
   color: var(--text-faint);
+}
+
+/* ── HEADER CENTER NAV ──────────────────── */
+.header-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
 }
