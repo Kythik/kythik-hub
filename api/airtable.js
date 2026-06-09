@@ -77,14 +77,16 @@ export default async function handler(req, res) {
 
     // ── Write to Blob cache ───────────────────
     try {
-      await put(CACHE_KEY, JSON.stringify(payload), {
+      console.log('BLOB_READ_WRITE_TOKEN present:', !!process.env.BLOB_READ_WRITE_TOKEN);
+      const result = await put(CACHE_KEY, JSON.stringify(payload), {
         access:         'public',
         token:          process.env.BLOB_READ_WRITE_TOKEN,
         contentType:    'application/json',
         allowOverwrite: true,
       });
+      console.log('Blob write success:', result.url);
     } catch(e) {
-      console.warn('Blob write failed:', e.message);
+      console.error('Blob write failed:', e.message, e.stack);
     }
 
     return res.status(200).json(payload);
