@@ -760,7 +760,6 @@ function render(){
     if(s.isRoulette)extra=roulBlock(gearsVal,rdist,base);
     if(s.isID23)extra=id23Block(gearsVal,base,nodeWasteful,nodeOstentatious,nodeCb59);
     if(s.id===35&&gearsVal!=='avg'){const nt=NUT[parseInt(gearsVal)]||NUT[6];extra=`<div class="svc-info">P(0 proc): ${(nt.p0*100).toFixed(1)}% · P(1 proc): ${(nt.p1*100).toFixed(1)}% · P(2 procs): ${(nt.p2*100).toFixed(1)}%</div>`;}
-    if(s.id===10)extra=`<div class="svc-note">High variance — 5-gear/remove-2 results in B rating (16.7% of cases)</div>`;
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td style="color:var(--text-faint);font-size:11px">${i+1}</td>
