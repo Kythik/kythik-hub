@@ -635,7 +635,7 @@ function roulBlock(gearsVal,rdist,base){
   return h+'</div>';
 }
 
-function id23Block(gearsVal,base){
+function id23Block(gearsVal,base,nodeWasteful,nodeOstentatious,nodeCb59){
   const n=gearsVal==='avg'?6:parseInt(gearsVal);
   let h=`<div class="id23-block"><div class="roul-header">Early end (cogs 1 to n-1): safe cashout, bypasses podium. Full completion (last cog): normal podium turnin, all procs fire. <button onclick="showId23Lightbox()" style="background:transparent;border:none;color:var(--blue-light);font-size:10px;cursor:pointer;padding:0;margin-left:4px">how this works ↗</button></div>`;
   h+=`<div class="id23-row roul-row-head"><span class="id23-outcome">Outcome</span><span class="id23-prob">Prob</span><span class="id23-ev">vs baseline</span><span class="id23-rating">Rating</span></div>`;
@@ -687,6 +687,7 @@ const S12_SVCS=[
 ];
 
 function render(){
+  try{
   const gearsVal=document.getElementById('gears').value;
   const alice=ALICE[document.getElementById('alice').value];
   const sort=document.getElementById('sort').value;
@@ -759,7 +760,7 @@ function render(){
 
   // ── Reroll recommendation ──────────────────────────────────────────────
   updateVerdict();
-
+  }catch(e){console.error('render() error:',e);}
 }
 
 ['gears','alice','sort','rdist','node-indulgent','node-vain','node-wasteful','node-cb59'].forEach(id=>{
