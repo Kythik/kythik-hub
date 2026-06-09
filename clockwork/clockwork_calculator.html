@@ -393,7 +393,7 @@ const CHAIN=['grey','blue','purple','gold','red','rainbow'];
 const NUT={5:{p0:0.069,p1:0.931,p2:0.000},6:{p0:0.010,p1:0.776,p2:0.214},7:{p0:0.000,p1:0.470,p2:0.530}};
 const RDIST_EXP={blue:0.7429,purple:0.1714,gold:0.0571,red:0.0286};
 const RDIST_HIGH={blue:0.10,purple:0.20,gold:0.35,red:0.20,rainbow:0.15};
-const AVG_CF=15.13;
+// AVG_CF removed — cr/cf cancel in all ratio calculations
 const CALIB_BASE=214;
 
 const RLABEL={rainbow:'Rainbow',gold:'Gold',purple:'Purple',blue:'Blue'};
@@ -504,23 +504,23 @@ function showLightbox(){document.getElementById('lightbox-overlay').style.displa
 function hideLightbox(){document.getElementById('lightbox-overlay').style.display='none';document.body.style.overflow='';}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){hideLightbox();hideRouletteLightbox();hideId23Lightbox();hideAliceLightbox();}});
 
-function gev(r,cf,cr){return cr*(VOUCHERS[r]||VOUCHERS.grey)*cf;}
+function gev(r){return (VOUCHERS[r]||VOUCHERS.grey);} // cr/cf cancel in ratios — omitted
 function r1u(r){const i=CHAIN.indexOf(r);return i<CHAIN.length-1?CHAIN[i+1]:r;}
-function bge(cf,cr){return Object.entries(DIST).reduce((s,[r,p])=>s+p*gev(r,cf,cr),0);}
-function ege(dist,cf,cr){return Object.entries(dist).reduce((s,[r,p])=>s+p*gev(r,cf,cr),0);}
-function ug(n,cf,cr){return n*Object.entries(DIST).reduce((s,[r,p])=>s+p*(gev(r1u(r),cf,cr)-gev(r,cf,cr)),0);}
+function bge(){return Object.entries(DIST).reduce((s,[r,p])=>s+p*gev(r),0);}
+function ege(dist){return Object.entries(dist).reduce((s,[r,p])=>s+p*gev(r),0);}
+function ug(n){return n*Object.entries(DIST).reduce((s,[r,p])=>s+p*(gev(r1u(r))-gev(r)),0);}
 
 
-function roulEV(cog,n,cf,cr,rdist,base){
-  const theorBase=bge(cf,cr)*n*MULT[n];
+function roulEV(cog,n,rdist,base){
+  const theorBase=bge()*n*MULT[n];
   let tv=0;for(let k=1;k<=cog;k++)tv+=1+k;
-  const raw=Math.pow(0.90,cog)*tv*ege(rdist,cf,cr)*(MULT[cog]||1.2)-theorBase;
+  const raw=Math.pow(0.90,cog)*tv*ege(rdist)*(MULT[cog]||1.2)-theorBase;
   return(raw/theorBase)*base;
 }
 
-function id23CogEV(k,n,cf,cr,base){
-  const theorBase=bge(cf,cr)*n*MULT[n];
-  const raw=k*(1+0.95)*ege(DIST,cf,cr)*(MULT[k]||1.2)-theorBase;
+function id23CogEV(k,n,base){
+  const theorBase=bge()*n*MULT[n];
+  const raw=k*(1+0.95)*ege(DIST)*(MULT[k]||1.2)-theorBase;
   return(raw/theorBase)*base;
 }
 
@@ -535,7 +535,7 @@ function getTier(ev,theorBase){
   return{l:'F',c:'tier-f'};
 }
 
-function roulBlock(gearsVal,cf,cr,rdist,base){
+function roulBlock(gearsVal,rdist,base){
   const isAvg=gearsVal==='avg',gl=isAvg?[5,6,7]:[parseInt(gearsVal)];
   const maxCog=isAvg?6:parseInt(gearsVal);
   const dl=rdist===RDIST_HIGH?'high rarity (observed, unverified)':'expected (conservative)';
@@ -544,7 +544,7 @@ function roulBlock(gearsVal,cf,cr,rdist,base){
   for(let cog=1;cog<=maxCog;cog++){
     const ps=Math.pow(0.90,cog);
     let tv=0;for(let k=1;k<=cog;k++)tv+=1+k;
-    const ev=isAvg?(1/3)*gl.reduce((s,n)=>s+roulEV(cog,n,cf,cr,rdist,base),0):roulEV(cog,parseInt(gearsVal),cf,cr,rdist,base);
+    const ev=isAvg?(1/3)*gl.reduce((s,n)=>s+roulEV(cog,n,rdist,base),0):roulEV(cog,parseInt(gearsVal),rdist,base);
     const ec=ev>0?'pos':'neg';
     const evPct=(ev/base*100).toFixed(0);
     h+=`<div class="roul-row"><span class="roul-cog">Cog ${cog}</span><span class="roul-p">${(ps*100).toFixed(1)}%</span><span class="roul-ev ${ec}">${evPct}% of base</span><span class="roul-v">${tv}v</span></div>`;
@@ -553,7 +553,7 @@ function roulBlock(gearsVal,cf,cr,rdist,base){
   return h+'</div>';
 }
 
-function id23Block(gearsVal,cf,cr,base){
+function id23Block(gearsVal,base){
   const n=gearsVal==='avg'?6:parseInt(gearsVal);
   let h=`<div class="id23-block"><div class="roul-header">Early end (cogs 1 to n-1): safe cashout, bypasses podium. Full completion (last cog): normal podium turnin, all procs fire. <button onclick="showId23Lightbox()" style="background:transparent;border:none;color:var(--blue-light);font-size:10px;cursor:pointer;padding:0;margin-left:4px">how this works ↗</button></div>`;
   h+=`<div class="id23-row roul-row-head"><span class="id23-outcome">Outcome</span><span class="id23-prob">Prob</span><span class="id23-ev">vs baseline</span><span class="id23-rating">Rating</span></div>`;
@@ -562,7 +562,7 @@ function id23Block(gearsVal,cf,cr,base){
     const label=k<n?`End cog ${k}`:`Full run (${n})`;
     const rating=k<=3?'B ×1.2':k===4?'A ×1.25':k===5?'S ×1.3':k===6?'SS ×1.45':'SSS ×1.6';
     const rcol=k<=3?'var(--red-loss)':k<=5?'var(--orange-fire)':'var(--green-recording)';
-    const evK=id23CogEV(k,n,cf,cr,base);
+    const evK=id23CogEV(k,n,base);
     const ec=evK>0?'var(--green-recording)':'var(--red-loss)';
     const evKPct=(evK/base*100).toFixed(0);
     h+=`<div class="id23-row"><span class="id23-outcome">${label}</span><span class="id23-prob">${(p*100).toFixed(1)}%</span><span class="id23-ev" style="color:${ec}">${evKPct}% of base</span><span class="id23-rating" style="color:${rcol}">${rating}</span></div>`;
@@ -609,9 +609,8 @@ function render(){
   const sort=document.getElementById('sort').value;
   const rdist=document.getElementById('rdist').value==='highrarity'?RDIST_HIGH:RDIST_EXP;
   // base removed — using theorBase for relative scaling
-  const cf=AVG_CF;
   // Doll affects compass cogwheel rate but we use calibrated base so just affects relative EV
-  const cr=dollKey==='artifact'?0.6888:dollKey==='regular'?0.4818:0.1931;
+
   const aliceMult=1+alice.doubleP;
 
 
@@ -626,7 +625,7 @@ function render(){
   const nodeOstentatious=!!(document.getElementById('node-ostentatious')&&document.getElementById('node-ostentatious').checked);
   const nodeCb59=!!(document.getElementById('node-cb59')&&document.getElementById('node-cb59').checked);
   const _gl2=gearsVal==='avg'?[5,6,7]:[parseInt(gearsVal)];
-  const theorBase=(1/_gl2.length)*_gl2.reduce((s,n)=>s+bge(cf,cr)*n*MULT[n],0);
+  const theorBase=(1/_gl2.length)*_gl2.reduce((s,n)=>s+bge()*n*MULT[n],0);
   const base=theorBase; // relative scaling — all EVs as fraction of base pool
 
 
@@ -660,8 +659,8 @@ function render(){
     const eff=`<div class="svc-effect">${(s.effect||s.desc||'').substring(0,100)}${(s.effect||s.desc||'').length>100?'…':''}${th}</div>`;
     const noteHtml=s.note?`<div class="svc-note">${s.note}</div>`:'';
     let extra='';
-    if(s.isRoulette)extra=roulBlock(gearsVal,cf,cr,rdist,base);
-    if(s.isID23)extra=id23Block(gearsVal,cf,cr,base,nodeWasteful,nodeOstentatious,nodeCb59);
+    if(s.isRoulette)extra=roulBlock(gearsVal,rdist,base);
+    if(s.isID23)extra=id23Block(gearsVal,base,nodeWasteful,nodeOstentatious,nodeCb59);
     if(s.id===35&&gearsVal!=='avg'){const nt=NUT[parseInt(gearsVal)]||NUT[6];extra=`<div class="svc-info">P(0 proc): ${(nt.p0*100).toFixed(1)}% · P(1 proc): ${(nt.p1*100).toFixed(1)}% · P(2 procs): ${(nt.p2*100).toFixed(1)}%</div>`;}
     if(s.id===10)extra=`<div class="svc-note">High variance — 5-gear/remove-2 results in B rating (16.7% of cases)</div>`;
     const tr=document.createElement('tr');
