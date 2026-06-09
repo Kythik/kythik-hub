@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clockwork Ballet EV Calculator — kythik.com</title>
+<link rel="stylesheet" href="/styles.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
 <style>
@@ -221,14 +222,19 @@ select:focus{border-color:var(--gold-muted)}
 
 <!-- Background effects matching kythik.com -->
 <div class="page-bg-img"></div>
-<svg class="hex-bg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-  <defs>
-    <pattern id="hex" width="56" height="97" patternUnits="userSpaceOnUse" patternTransform="scale(1.5)">
-      <polygon points="28,2 54,16 54,81 28,95 2,81 2,16" fill="none" stroke="var(--gold-primary)" stroke-width="0.75"/>
-    </pattern>
-  </defs>
-  <rect width="100%" height="100%" fill="url(#hex)"/>
-</svg>
+<svg class="hex-bg" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <pattern id="hexGrid" width="50" height="84" patternUnits="userSpaceOnUse">
+        <polygon points="25,0 50,14 50,42 25,56 0,42 0,14"
+                 fill="none" stroke="#1A3055" stroke-width="0.8"/>
+        <polygon points="0,42 25,56 25,84 0,98 -25,84 -25,56"
+                 fill="none" stroke="#1A3055" stroke-width="0.8"/>
+        <polygon points="50,42 75,56 75,84 50,98 25,84 25,56"
+                 fill="none" stroke="#1A3055" stroke-width="0.8"/>
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#hexGrid)"/>
+  </svg>
 
 <div class="page-header">
   <div class="page-eyebrow">Kythik.com — Resource</div>
