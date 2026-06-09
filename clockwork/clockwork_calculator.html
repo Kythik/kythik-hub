@@ -237,7 +237,7 @@ select:focus{border-color:var(--gold-muted)}
   </svg>
 
 <div class="page-header">
-  <div class="page-eyebrow">Kythik.com — Resource</div>
+  <a href="/" class="page-eyebrow" style="text-decoration:none;cursor:pointer">Kythik.com — Resource</a>
   <h1 class="page-title">Clockwork Ballet Service EV</h1>
   <p class="page-sub">Expected value rankings for Clockwork Ballet Member Services. Select your setup to see which services add the most value to your runs.</p>
   <div class="calib-tag">📊 Deep Space calibration · Compass rate ~47% estimated · Wasteful dist: estimated</div>
@@ -410,16 +410,26 @@ select:focus{border-color:var(--gold-muted)}
     <h2 style="font-family:var(--font-display);font-size:18px;color:var(--gold-primary);margin-bottom:6px">Clockwork Roulette — Strategy</h2>
     <p style="font-size:11px;color:var(--text-faint);margin-bottom:18px">Why the math says go to max cogs every time</p>
     <div style="font-size:13px;color:var(--text-muted);line-height:1.7;display:flex;flex-direction:column;gap:14px">
-      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">The Mechanic</div>
-        Every time you obtain a Cogwheel Voucher, you get 1 extra random voucher, and the next cog gives +1 more voucher than the last. Each cog start has a 10% chance to immediately end the event and lose all vouchers.</div>
-      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">What the Math Shows</div>
-        At every cog point, continuing always has higher expected value than cashing out. The voucher count escalates rapidly — later cogs give far more vouchers than early ones. The 10% fail chance is compounding but the voucher escalation outpaces the risk mathematically.</div>
-      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Why Players Cash Out Early</div>
-        Loss aversion. A wipe feels much worse than missing a big win. Cashing out early is rational risk management — it just costs EV. Over many runs, going to max cogs wins.</div>
-      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">The Real Decision</div>
-        How much variance can you absorb? A wipe loses your entire run's cogwheel output. If painful, cash out earlier. Farming long sessions and can stomach the swings — max cogs is the EV play.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">How It Works</div>
+        Each cogwheel gives you vouchers plus 1 extra random voucher, and the next cog gives +1 more than the last — so vouchers escalate fast. Each cog start has a flat 10% chance to wipe: the event ends immediately and you lose everything.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">The Hard Numbers</div>
+        <div style="background:var(--bg-card);border-radius:var(--radius);padding:10px 12px;font-size:12px;display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text-faint)">Complete all 6 cogs:</span><span style="color:var(--orange-fire)">53% of runs</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text-faint)">Wipe before cog 4:</span><span style="color:var(--red-loss)">27% of runs — zero reward</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text-faint)">Breakeven (conservative voucher dist):</span><span style="color:var(--text-soft)">cog 4</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text-faint)">Breakeven (high rarity voucher dist):</span><span style="color:var(--text-soft)">cog 2</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text-faint)">EV at cog 6 (conservative):</span><span style="color:var(--green-recording)">+141% of base run value</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text-faint)">EV at cog 6 (high rarity):</span><span style="color:var(--green-recording)">+547% of base run value</span></div>
+        </div>
+        Frequent wipes on cog 4–5 are not bad RNG. Nearly half of all Roulette runs zero out. That is the mechanic working as intended.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Why Max Cogs Is Always Correct</div>
+        Cog 6 gives 27 vouchers. Cog 3 gives 9. The runs that survive and pay out are so valuable that they more than cover the runs that wipe — mathematically, every early cashout costs EV regardless of how the run has gone so far.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">"But I'm Seeing Rainbow Vouchers — Should I Cash Out?"</div>
+        No. Seeing high rarity drops early means this is exactly the run you want to complete. Those early cogs are just the start — cog 6 on a high rarity run is where the real payout is. Cashing out at cog 3 because you already got a rainbow is leaving most of the value behind. The temptation to lock in a good start is understandable, but the math is clear: keep going.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">When It's Okay to Stop Early</div>
+        If repeated wipes are affecting your session or your run costs are unusually high, cashing out at cog 4–5 is a reasonable variance management call. Just understand you are trading EV for stability — not playing better.</div>
       <div style="font-size:11px;color:var(--text-faint);padding-top:10px;border-top:1px solid var(--border-blue)">
-        Mechanic data from the <a href="https://docs.qq.com/doc/DUFZyZFZRWnVtUVFt" target="_blank" rel="noopener" style="color:var(--blue-light)">Chinese community doc</a>. <span style="color:var(--red-loss)">Voucher rarity distribution unverified — conservative vs high rarity changes the EV significantly.</span></div>
+        <span style="color:var(--red-loss)">Voucher rarity distribution is unverified</span> — the difference between conservative and high rarity is dramatic and this remains the biggest unknown in the Roulette ranking. Mechanic data from the <a href="https://docs.qq.com/doc/DUFZyZFZRWnVtUVFt" target="_blank" rel="noopener" style="color:var(--blue-light)">Chinese community doc</a>.</div>
     </div>
   </div>
 </div>
