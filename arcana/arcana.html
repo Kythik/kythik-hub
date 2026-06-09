@@ -5,20 +5,20 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link rel="stylesheet" href="/styles.css" />
 <link rel="stylesheet" href="/arcana/arcana.css" />
-<title>Arcana Tarot Path Solver</title>
+<title>Arcana Tarot Minigame</title>
 </head>
 <body class="arcana-page">
 <div class="wrap">
   <div class="panel">
-    <h1>Arcana Tarot Path Solver</h1>
+    <h1>Arcana Tarot Minigame</h1>
     <div class="sub">
-       Arcana route testing, upgrade timing, final-tile cycling, and special board setup support.</div>
+      Clean rebuild after the preview issue. Arcana minigame route testing, upgrade timing, final-tile cycling, and special board setup support.</div>
     <div class="controls">
       <label>Seed <input id="seedInput" value="kythik"></label>
       <label>Starting hand <input id="handInput" type="number" min="0" max="12" value="4"></label>
       <label>Life <input id="lifeInput" type="number" min="1" max="20" value="3"></label>
       <label>Board <select id="boardTypeInput">
-        <option value="normal" selected>Normal 80</option>
+        <option value="normal" selected>Normal 80: 10–13 chests</option>
         <option value="special1">Special 1: Chest → Traps → Upgrades</option>
         <option value="special2">Special 2: Upgrades → Traps → Chest</option>
         <option value="special3">Special 3: Rarity Ladder</option>
@@ -41,14 +41,14 @@
     <div class="hand" id="hand"></div>
 
     <div class="controls">
-      <button onclick="suggestMove()">Suggest Next Move</button>
-      <button onclick="takeSuggestion()">Take Suggested Move</button>
+      <button onclick="suggestMove()">Recommend Next Move</button>
+      <button onclick="takeSuggestion()">Take Recommended Move</button>
       <button class="alt" onclick="autoPlay(300)">Auto Play</button>
       <button class="bad" onclick="endRun()">Stop Run</button>
     </div>
 
-    <h3>Solver explanation</h3>
-    <div class="solver" id="solver"></div>
+    <h3>Route Notes</h3>
+    <div class="recommendation logic" id="recommendation logic"></div>
     <h3>Run log</h3>
     <div class="log" id="log"></div>
   </div>
@@ -75,7 +75,7 @@
       <div class="infoCard"><h3>Natural chest rarity distribution</h3>
         <table class="infoTable"><tr><th>Rarity</th><th>Probability</th></tr>
           <tr><td>Green</td><td>27.5544%</td></tr><tr><td>Blue</td><td>41.3316%</td></tr>
-          <tr><td>Purple</td><td>25.295%</td></tr><tr><td>Gold / Orange / Legendary</td><td>5.399%</td></tr>
+          <tr><td>Purple</td><td>25.295%</td></tr><tr><td>Gold</td><td>5.399%</td></tr>
           <tr><td>Red</td><td>0.38%</td></tr><tr><td>Rainbow</td><td>0.02%</td></tr>
         </table>
       </div>
@@ -89,13 +89,13 @@ Undetermined Fate EV per chest =
 Can upgrade:
   green → blue
   blue → purple
-  purple → gold/orange
-  gold/orange → red
+  purple → gold
+  gold → red
   red → rainbow
 
 Rule:
   any chest at or below shown rarity gets +1 rarity</div></div>
-      <div class="infoCard"><h3>Strategy1</h3><ul>
+      <div class="infoCard"><h3>Human strategy</h3><ul>
         <li>Orange/red/rainbow = highest known value.</li>
         <li>Purple+ respected; do not skip reasonable purple+.</li>
         <li>Green/blue are low loot, but still UF tickets.</li>
@@ -124,7 +124,7 @@ Rule:
         <li>Random card tile every 6 rows.</li>
       </ul></div>
       <div class="infoCard"><h3>Todo</h3><ul>
-        <li>Retest strategy distributions with special boards.</li>
+        <li>Retest route distributions with special boards.</li>
         <li>Add special setup/event variants as they are discovered.</li>
         <li>Add configurable tile weights once real board data is collected.</li>
       </ul></div>
@@ -138,6 +138,8 @@ const V={green:1,blue:1.2,purple:4,orange:10,red:16,rainbow:25};
 const maxChests=7;
 let totalTiles=80;
 const tileW={empty:.25,chest:.24,trap:.12,movement:.12,upgrade:.10,life:.07,question:.10};
+const NORMAL_CHEST_MIN=10;
+const NORMAL_CHEST_MAX=13;
 const chestW={green:.275544,blue:.413316,purple:.25295,orange:.05399,red:.0038,rainbow:.0002};
 const qW={life:.14,mapping_card:.17,upgrade_random:.17,upgrade_all:.06,add_chest:.13,add_high:.08,rainbow_all:.005,remove_traps:.08,nothing:.075};
 
@@ -191,13 +193,29 @@ function makeBoard(){
   if(bt==='special1')return makeSpecialBoard1();
   if(bt==='special2')return makeSpecialBoard2();
   if(bt==='special3')return makeSpecialBoard3();
+
   totalTiles=80;
-  let a=[];
-  for(let i=0;i<totalTiles;i++){
-    if(i===0){a.push({type:'start'});continue}
-    let t=wc(tileW);
-    if(t==='chest')a.push({type:'chest',rarity:wc(chestW)});else a.push({type:t});
+  let a=Array.from({length:totalTiles},()=>null);
+  a[0]={type:'start'};
+
+  // Normal boards use a capped random chest count so the board does not flood with free value.
+  // Place chests first, then fill the remaining tiles with non-chest outcomes.
+  let chestCount=NORMAL_CHEST_MIN+Math.floor(rng()*(NORMAL_CHEST_MAX-NORMAL_CHEST_MIN+1));
+  let positions=[];
+  for(let i=1;i<totalTiles;i++)positions.push(i);
+
+  for(let n=0;n<chestCount&&positions.length;n++){
+    let pick=Math.floor(rng()*positions.length);
+    let idx=positions.splice(pick,1)[0];
+    a[idx]={type:'chest',rarity:wc(chestW)};
   }
+
+  let nonChestW={empty:.25,trap:.12,movement:.12,upgrade:.10,life:.07,question:.10};
+  for(let i=1;i<totalTiles;i++){
+    if(a[i])continue;
+    a[i]={type:wc(nonChestW)};
+  }
+
   return a;
 }
 function drawMappingCard(){
@@ -260,7 +278,7 @@ function useUtility(idx){
 function tileScore(i){
   let t=state.tiles[i],dist=Math.abs(i-state.pos),score=-dist*.25,why=[];
   if(t.used)return{score:-8-dist*.25,why:['already-used tile; pathing only']};
-  if(t.type==='chest'){let r=t.rarity;score+=V[r]+0.8;why.push(r+' chest known value');if(['orange','red','rainbow'].includes(r)){score+=10;why.push('orange+ is premium/paycheck')}else if(r==='purple'){score+=4;why.push('purple+ is known value')}else{score-=4;why.push('green/blue is mostly filler but still a UF ticket')}}
+  if(t.type==='chest'){let r=t.rarity;score+=V[r]+0.8;why.push(r+' chest known value');if(['orange','red','rainbow'].includes(r)){score+=10;why.push('gold+ is premium/paycheck')}else if(r==='purple'){score+=4;why.push('purple+ is known value')}else{score-=4;why.push('green/blue is mostly filler but still a UF ticket')}}
   else if(t.type==='question'){score+=(state.pos<25?8:state.pos<45?5:state.pos<60?2:-1);why.push('? is random variance; better early')}
   else if(t.type==='upgrade'){score+=5;why.push('upgrade card can improve future chests')}
   else if(t.type==='movement'){score+=3;why.push('mapping card pickup improves hand')}
@@ -355,7 +373,7 @@ function suggestMove(){
   }
   let opts=buildSequences(depth).sort((a,b)=>b.score-a.score);
   suggested=opts[0]||null;
-  if(!suggested){$('solver').innerHTML='No legal move options.';render();return}
+  if(!suggested){$('recommendation logic').innerHTML='No legal move options.';render();return}
   render();
 }
 function takeSuggestion(){if(!suggested){suggestMove();if(!suggested)return}selected=suggested.first;clickTile(targetFor(selected))}
@@ -439,7 +457,7 @@ function render(){
   $('stats').innerHTML=[
     ['Tile',Math.min(state.pos+1,totalTiles)+'/'+totalTiles],['Move',state.currentMove],['Life',state.life],
     ['Hand',state.hand.length],['Chests',state.collected.length+'/7'],['Phase',phase()],
-    ['Combo',$('comboDepthInput').value+'-card'],['Board',boardType()],['Status',state.dead?'Bricked':state.done?'Manually ended':state.collected.length>=maxChests?'Chest cap reached':state.pos>=totalTiles-1?'Final tile cycling':'Playing'],
+    ['Combo',$('comboDepthInput').value+'-card'],['Board',boardType()],['Board chests',state.tiles.filter(t=>t&&t.type==='chest').length],['Status',state.dead?'Bricked':state.done?'Manually ended':state.collected.length>=maxChests?'Chest cap reached':state.pos>=totalTiles-1?'Final tile cycling':'Playing'],
     ['Loot',state.collected.join(', ')||'—'],['Preview',!selected?'None':selected.type==='current'?'Current move target':state.hand[selected.idx]?.name||'—'],['Path',state.path.join(' → ')||'—']
   ].map(([a,b])=>`<div class="stat"><div class="label">${a}</div><div class="val">${b}</div></div>`).join('');
   $('currentMoveBtn').textContent='Preview current refill Move '+state.currentMove;
@@ -453,9 +471,9 @@ function render(){
   $('log').innerHTML=state.log.map(x=>'<div>'+x+'</div>').join('');
   if(suggested){
     let rows=(suggested.tiles||[]).join(' → ');
-    $('solver').innerHTML='<b>Suggested:</b> '+actionName(suggested.first)+'<br><b>Line:</b> '+suggested.name+'<br><b>Tiles:</b> '+rows+'<br><b>Score:</b> '+suggested.score.toFixed(1)+'<br>'+suggested.why.join('<br>');
+    $('recommendation logic').innerHTML='<b>Recommended:</b> '+actionName(suggested.first)+'<br><b>Line:</b> '+suggested.name+'<br><b>Tiles:</b> '+rows+'<br><b>Score:</b> '+suggested.score.toFixed(1)+'<br>'+suggested.why.join('<br>');
   }else{
-    $('solver').innerHTML='Click <b>Suggest Next Move</b>. Solver uses 2-card route logic by default; 3-card is advanced.';
+    $('recommendation logic').innerHTML='Click <b>Recommend Next Move</b>. Recommendations use 2-card human logic by default; 3-card is advanced.';
   }
 }
 function openInfoModal(){$('infoModal').classList.add('open')}
