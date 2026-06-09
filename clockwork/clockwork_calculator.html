@@ -628,8 +628,11 @@ function roulBlock(gearsVal,rdist,base){
     let tv=0;for(let k=1;k<=cog;k++)tv+=1+k;
     const ev=isAvg?(1/3)*gl.reduce((s,n)=>s+roulEV(cog,n,rdist,base),0):roulEV(cog,parseInt(gearsVal),rdist,base);
     const ec=ev>0?'pos':'neg';
-    const evQualR=ev>0?'above baseline':'below baseline';
-    h+=`<div class="roul-row"><span class="roul-cog">Cog ${cog}</span><span class="roul-p">${(ps*100).toFixed(1)}%</span><span class="roul-ev ${ec}">${evQualR}</span><span class="roul-v">${tv}v</span></div>`;
+    const theorBaseR=bge()*n*MULT[n];
+    const evPctR=Math.max(0,ev/theorBaseR*100);
+    const tR=ev<=0?{l:'F',c:'tier-f'}:evPctR>=300?{l:'S+',c:'tier-sp'}:evPctR>=100?{l:'S',c:'tier-s'}:evPctR>=30?{l:'A',c:'tier-a'}:evPctR>=19?{l:'B',c:'tier-b'}:evPctR>=5?{l:'C',c:'tier-c'}:{l:'F',c:'tier-f'};
+    const bwR=Math.min(evPctR/3,100);
+    h+=`<div class="roul-row"><span class="roul-cog">Cog ${cog}</span><span class="roul-p">${(ps*100).toFixed(1)}%</span><span class="${tR.c} tier" style="font-size:12px">${tR.l}</span><div class="ev-bar-wrap" style="width:80px;display:inline-flex"><div class="ev-bar" style="width:${bwR}px;max-width:80px"></div></div><span class="roul-v">${tv}v</span></div>`;
   }
   h+=`<div class="roul-note">Conservative dist: cog 4+ for positive EV at average baseline. High rarity: may be positive earlier. Roulette voucher rarity distribution is unverified — this is the biggest unknown in the ranking.</div>`;
   return h+'</div>';
@@ -638,7 +641,7 @@ function roulBlock(gearsVal,rdist,base){
 function id23Block(gearsVal,base,nodeWasteful,nodeOstentatious,nodeCb59){
   const n=gearsVal==='avg'?6:parseInt(gearsVal);
   let h=`<div class="id23-block"><div class="roul-header">Early end (cogs 1 to n-1): safe cashout, bypasses podium. Full completion (last cog): normal podium turnin, all procs fire. <button onclick="showId23Lightbox()" style="background:transparent;border:none;color:var(--blue-light);font-size:10px;cursor:pointer;padding:0;margin-left:4px">how this works ↗</button></div>`;
-  h+=`<div class="id23-row roul-row-head"><span class="id23-outcome">Outcome</span><span class="id23-prob">Prob</span><span class="id23-ev">vs baseline</span><span class="id23-rating">Rating</span></div>`;
+  h+=`<div class="id23-row roul-row-head"><span class="id23-outcome">Outcome</span><span class="id23-prob">Prob</span><span class="id23-ev">Tier</span><span style="width:80px;font-size:10px;color:var(--text-faint)">Relative</span><span class="id23-rating">Rating</span></div>`;
   for(let k=1;k<=n;k++){
     const p=k<n?Math.pow(0.90,k-1)*0.10:Math.pow(0.90,n);
     const label=k<n?`End cog ${k}`:`Full run (${n})`;
@@ -654,9 +657,12 @@ function id23Block(gearsVal,base,nodeWasteful,nodeOstentatious,nodeCb59){
       if(nodeCb59) podiumBonus+=ege(DIST)/theorBaseK*base*0.13;
     }
     const evKTotal=evK+podiumBonus;
-    const evQualK=evKTotal>0?'above baseline':'below baseline';
-    const podiumNote=k===n&&podiumBonus>0?' (+podium nodes)':'';
-    h+=`<div class="id23-row"><span class="id23-outcome">${label}</span><span class="id23-prob">${(p*100).toFixed(1)}%</span><span class="id23-ev" style="color:${ec}">${evQualK}${podiumNote}</span><span class="id23-rating" style="color:${rcol}">${rating}</span></div>`;
+    const theorBaseK2=bge()*n*MULT[n];
+    const evPct23=Math.max(0,evKTotal/theorBaseK2*100);
+    const t23=evKTotal<=0?{l:'F',c:'tier-f'}:evPct23>=300?{l:'S+',c:'tier-sp'}:evPct23>=100?{l:'S',c:'tier-s'}:evPct23>=30?{l:'A',c:'tier-a'}:evPct23>=19?{l:'B',c:'tier-b'}:evPct23>=5?{l:'C',c:'tier-c'}:{l:'F',c:'tier-f'};
+    const bw23=Math.min(evPct23/3,100);
+    const podiumNote=k===n&&podiumBonus>0?' (+podium)':'';
+    h+=`<div class="id23-row"><span class="id23-outcome">${label}${podiumNote}</span><span class="id23-prob">${(p*100).toFixed(1)}%</span><span class="${t23.c} tier" style="font-size:12px">${t23.l}</span><div class="ev-bar-wrap" style="width:80px;display:inline-flex"><div class="ev-bar" style="width:${bw23}px;max-width:80px"></div></div></div>`;
   }
   return h+'</div>';
 }
