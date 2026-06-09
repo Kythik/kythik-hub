@@ -732,3 +732,33 @@ button { cursor: pointer; font-family: var(--font-body); }
   .feat-screenshot-fade { display: none; }
   .feat-title { font-size: 18px; }
 }
+
+/* ── PAGE TITLE ─────────────────────────── */
+.page-title {
+  padding: 32px 0 0;
+}
+
+.page-title .display--lg {
+  font-size: 13px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+/* ── CLOCKWORK NAV LINK ─────────────────── */
+.header-link--highlight {
+  color: var(--gold-muted);
+  border: 1px solid rgba(200,164,93,0.2);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  transition: all .2s;
+}
+
+.header-link--highlight:hover {
+  color: var(--gold-primary);
+  border-color: var(--gold-muted);
+  background: rgba(200,164,93,0.06);
+}
