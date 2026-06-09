@@ -628,7 +628,7 @@ function roulBlock(gearsVal,rdist,base){
     let tv=0;for(let k=1;k<=cog;k++)tv+=1+k;
     const ev=isAvg?(1/3)*gl.reduce((s,n)=>s+roulEV(cog,n,rdist,base),0):roulEV(cog,parseInt(gearsVal),rdist,base);
     const ec=ev>0?'pos':'neg';
-    const theorBaseR=bge()*n*MULT[n];
+    const theorBaseR=bge()*maxCog*MULT[maxCog];
     const evPctR=Math.max(0,ev/theorBaseR*100);
     const tR=ev<=0?{l:'F',c:'tier-f'}:evPctR>=300?{l:'S+',c:'tier-sp'}:evPctR>=100?{l:'S',c:'tier-s'}:evPctR>=30?{l:'A',c:'tier-a'}:evPctR>=19?{l:'B',c:'tier-b'}:evPctR>=5?{l:'C',c:'tier-c'}:{l:'F',c:'tier-f'};
     const bwR=Math.min(evPctR/3,100);
