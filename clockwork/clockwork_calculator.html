@@ -381,6 +381,28 @@ select:focus{border-color:var(--gold-muted)}
 
 </div>
 
+<!-- ID23 Lightbox -->
+<div id="id23-lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;padding:20px">
+  <div onclick="event.stopPropagation()" style="background:var(--bg-panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);max-width:560px;width:100%;padding:28px;position:relative;max-height:85vh;overflow-y:auto">
+    <button onclick="hideId23Lightbox()" style="position:absolute;top:16px;right:16px;background:transparent;border:none;color:var(--text-faint);font-size:18px;cursor:pointer">✕</button>
+    <h2 style="font-family:var(--font-display);font-size:18px;color:var(--gold-primary);margin-bottom:6px">ID23 — Completing Operation Cogwheel</h2>
+    <p style="font-size:11px;color:var(--text-faint);margin-bottom:18px">How the EV model works for this service</p>
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.7;display:flex;flex-direction:column;gap:14px">
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">The Mechanic</div>
+        Each cogwheel completion has a 40% chance for +1 extra voucher, 20% for +2, 5% for +3, and a 10% chance to immediately end the game and send you to the podium with all vouchers so far.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Early End vs Full Completion</div>
+        <ul style="padding-left:16px;display:flex;flex-direction:column;gap:4px">
+          <li><strong style="color:var(--text-soft)">Early end (cogs 1 to n-1):</strong> Safe cashout — keep all vouchers, go to podium immediately. No wipe risk. Rating based on cogs completed — fewer cogs = lower multiplier. Podium procs (cb_59, Wasteful, Ostentatious) do NOT fire.</li>
+          <li><strong style="color:var(--text-soft)">Full completion (last cog survives):</strong> Normal run completion. Full rating multiplier. All podium procs fire normally.</li>
+        </ul></div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Reading the Outcomes</div>
+        Each row shows a possible outcome with its probability. Early end at low cogs produces less than a normal run. Full completion is the target. The tier in the service rankings is the weighted average across all outcomes.</div>
+      <div style="font-size:11px;color:var(--text-faint);padding-top:10px;border-top:1px solid var(--border-blue)">
+        Mechanic data from the <a href="https://docs.qq.com/doc/DUFZyZFZRWnVtUVFt" target="_blank" rel="noopener" style="color:var(--blue-light)">Chinese community doc</a>.</div>
+    </div>
+  </div>
+</div>
+
 <!-- Roulette Lightbox -->
 <div id="roulette-lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;padding:20px">
   <div onclick="event.stopPropagation()" style="background:var(--bg-panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);max-width:560px;width:100%;padding:28px;position:relative;max-height:85vh;overflow-y:auto">
@@ -606,8 +628,8 @@ function roulBlock(gearsVal,rdist,base){
     let tv=0;for(let k=1;k<=cog;k++)tv+=1+k;
     const ev=isAvg?(1/3)*gl.reduce((s,n)=>s+roulEV(cog,n,rdist,base),0):roulEV(cog,parseInt(gearsVal),rdist,base);
     const ec=ev>0?'pos':'neg';
-    const evPct=(ev/base*100).toFixed(0);
-    h+=`<div class="roul-row"><span class="roul-cog">Cog ${cog}</span><span class="roul-p">${(ps*100).toFixed(1)}%</span><span class="roul-ev ${ec}">${evPct}% of base</span><span class="roul-v">${tv}v</span></div>`;
+    const evQualR=ev>0?'above baseline':'below baseline';
+    h+=`<div class="roul-row"><span class="roul-cog">Cog ${cog}</span><span class="roul-p">${(ps*100).toFixed(1)}%</span><span class="roul-ev ${ec}">${evQualR}</span><span class="roul-v">${tv}v</span></div>`;
   }
   h+=`<div class="roul-note">Conservative dist: cog 4+ for positive EV at average baseline. High rarity: may be positive earlier. Roulette voucher rarity distribution is unverified — this is the biggest unknown in the ranking.</div>`;
   return h+'</div>';
@@ -624,8 +646,9 @@ function id23Block(gearsVal,base){
     const rcol=k<=3?'var(--red-loss)':k<=5?'var(--orange-fire)':'var(--green-recording)';
     const evK=id23CogEV(k,n,base);
     const ec=evK>0?'var(--green-recording)':'var(--red-loss)';
-    const evKPct=(evK/base*100).toFixed(0);
-    h+=`<div class="id23-row"><span class="id23-outcome">${label}</span><span class="id23-prob">${(p*100).toFixed(1)}%</span><span class="id23-ev" style="color:${ec}">${evKPct}% of base</span><span class="id23-rating" style="color:${rcol}">${rating}</span></div>`;
+    const evQualK=evK>0?'above baseline':'below baseline';
+    const podiumNote=k===n&&podiumBonus>0?' (+podium nodes)':'';
+    h+=`<div class="id23-row"><span class="id23-outcome">${label}</span><span class="id23-prob">${(p*100).toFixed(1)}%</span><span class="id23-ev" style="color:${ec}">${evQualK}${podiumNote}</span><span class="id23-rating" style="color:${rcol}">${rating}</span></div>`;
   }
   return h+'</div>';
 }
