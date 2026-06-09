@@ -1,33 +1,31 @@
 /* ═══════════════════════════════════════════
    api/airtable.js — Vercel serverless function
-   Blob-cached. Airtable only hit every 6hrs.
+   Blob-cached (private store). 6hr TTL.
    ═══════════════════════════════════════════ */
 
-import { put, list } from '@vercel/blob';
+import { put, list, getDownloadUrl } from '@vercel/blob';
 
 const CACHE_KEY    = 'strategies-cache.json';
-const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=60');
 
+  const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
+
   try {
     // ── Try Blob cache first ──────────────────
     try {
-      const { blobs } = await list({
-        prefix: CACHE_KEY,
-        token:  process.env.BLOB_READ_WRITE_TOKEN,
-      });
-
+      const { blobs } = await list({ prefix: CACHE_KEY, token: TOKEN });
       if (blobs.length > 0) {
         const blob = blobs[0];
         const age  = Date.now() - new Date(blob.uploadedAt).getTime();
-
         if (age < CACHE_TTL_MS) {
-          const cacheRes = await fetch(blob.url);
-          const cached   = await cacheRes.json();
-          cached.fromCache = true;
+          const downloadUrl = await getDownloadUrl(blob.url, { token: TOKEN });
+          const cacheRes    = await fetch(downloadUrl);
+          const cached      = await cacheRes.json();
+          cached.fromCache  = true;
           return res.status(200).json(cached);
         }
       }
@@ -36,11 +34,11 @@ export default async function handler(req, res) {
     }
 
     // ── Cache miss — fetch from Airtable ──────
-    const TOKEN = process.env.AIRTABLE_TOKEN;
+    const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
     const BASE  = process.env.AIRTABLE_BASE;
     const TABLE = 'Strategies';
 
-    if (!TOKEN || !BASE) throw new Error('Missing Airtable credentials.');
+    if (!AIRTABLE_TOKEN || !BASE) throw new Error('Missing Airtable credentials.');
 
     let SEASON_START = '2026-04-16T19:00:00-07:00';
     let SEASON_NAME  = 'SS12: Lunaria';
@@ -57,10 +55,7 @@ export default async function handler(req, res) {
 
     const url = `https://api.airtable.com/v0/${BASE}/${encodeURIComponent(TABLE)}?filterByFormula=${formula}&sort[0][field]=Created&sort[0][direction]=desc&maxRecords=100`;
 
-    const airtableRes = await fetch(url, {
-      headers: { Authorization: `Bearer ${TOKEN}` }
-    });
-
+    const airtableRes = await fetch(url, { headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` } });
     if (!airtableRes.ok) throw new Error(`Airtable ${airtableRes.status}`);
 
     const data    = await airtableRes.json();
@@ -77,16 +72,15 @@ export default async function handler(req, res) {
 
     // ── Write to Blob cache ───────────────────
     try {
-      console.log('BLOB_READ_WRITE_TOKEN present:', !!process.env.BLOB_READ_WRITE_TOKEN);
-      const result = await put(CACHE_KEY, JSON.stringify(payload), {
-        access:         'public',
-        token:          process.env.BLOB_READ_WRITE_TOKEN,
+      await put(CACHE_KEY, JSON.stringify(payload), {
+        access:         'private',
+        token:          TOKEN,
         contentType:    'application/json',
         allowOverwrite: true,
       });
-      console.log('Blob write success:', result.url);
+      console.log('Blob cache written successfully');
     } catch(e) {
-      console.error('Blob write failed:', e.message, e.stack);
+      console.error('Blob write failed:', e.message);
     }
 
     return res.status(200).json(payload);
