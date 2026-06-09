@@ -14,6 +14,29 @@ const TABLE          = 'Strategies';
 const FARMS_CHANNEL  = process.env.FARMS_CHANNEL_ID;
 const BUILDS_CHANNEL = process.env.BUILDS_CHANNEL_ID;
 
+// Season config — loaded from season.json, refreshed every 6 hours
+let SEASON_START = new Date('2026-04-16T19:00:00-07:00');
+
+async function refreshSeasonConfig() {
+  try {
+    const r = await fetch('https://raw.githubusercontent.com/kythikx/kythik-hub/main/season.json');
+    const cfg = await r.json();
+    if (cfg.seasonStart) SEASON_START = new Date(cfg.seasonStart);
+    console.log(`Season config loaded: ${cfg.seasonName} starts ${cfg.seasonStart}`);
+  } catch(e) {
+    console.warn('Could not load season.json, using default:', e.message);
+  }
+}
+
+function isCurrentSeason(date) {
+  if (!date) return true;
+  return new Date(date) >= SEASON_START;
+}
+
+// Load on startup, refresh every 6 hours
+refreshSeasonConfig();
+setInterval(refreshSeasonConfig, 6 * 60 * 60 * 1000);
+
 const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
 
 function isImageAttachment(a) {
@@ -124,6 +147,7 @@ client.on('threadCreate', async (thread) => {
 /* ── THREAD UPDATED (title/tags changed) ── */
 client.on('threadUpdate', async (oldThread, newThread) => {
   if (!isOurChannel(newThread.parentId)) return;
+  if (!isCurrentSeason(newThread.createdAt)) return; // ignore old season threads
 
   const titleChanged = oldThread.name !== newThread.name;
   const tagsChanged  = JSON.stringify(oldThread.appliedTags) !== JSON.stringify(newThread.appliedTags);
@@ -149,6 +173,7 @@ client.on('threadUpdate', async (oldThread, newThread) => {
 client.on('messageUpdate', async (oldMsg, newMsg) => {
   if (!newMsg.channel || !newMsg.channel.parentId) return;
   if (!isOurChannel(newMsg.channel.parentId)) return;
+  if (!isCurrentSeason(newMsg.channel.createdAt)) return; // ignore old season
 
   // Only care about the first message in the thread
   try {
@@ -174,6 +199,7 @@ client.on('messageUpdate', async (oldMsg, newMsg) => {
 /* ── THREAD DELETED ─────────────────────── */
 client.on('threadDelete', async (thread) => {
   if (!isOurChannel(thread.parentId)) return;
+  if (!isCurrentSeason(thread.createdAt)) return; // don't auto-delete old season archives
   try {
     const url = `https://discord.com/channels/${thread.guildId}/${thread.id}`;
     await deleteFromAirtable(url);
