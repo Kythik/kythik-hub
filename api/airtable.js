@@ -3,10 +3,10 @@
    Blob-cached. Airtable only hit every 6hrs.
    ═══════════════════════════════════════════ */
 
-import { put, head } from '@vercel/blob';
+import { put, list } from '@vercel/blob';
 
-const CACHE_KEY     = 'strategies-cache.json';
-const CACHE_TTL_MS  = 6 * 60 * 60 * 1000; // 6 hours
+const CACHE_KEY    = 'strategies-cache.json';
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -15,18 +15,25 @@ export default async function handler(req, res) {
   try {
     // ── Try Blob cache first ──────────────────
     try {
-      const blobMeta = await head(CACHE_KEY, { token: process.env.BLOB_READ_WRITE_TOKEN });
-      if (blobMeta) {
-        const age = Date.now() - new Date(blobMeta.uploadedAt).getTime();
+      const { blobs } = await list({
+        prefix: CACHE_KEY,
+        token:  process.env.BLOB_READ_WRITE_TOKEN,
+      });
+
+      if (blobs.length > 0) {
+        const blob = blobs[0];
+        const age  = Date.now() - new Date(blob.uploadedAt).getTime();
+
         if (age < CACHE_TTL_MS) {
-          // Cache is fresh — serve it
-          const blobRes  = await fetch(blobMeta.url);
-          const cached   = await blobRes.json();
+          const cacheRes = await fetch(blob.url);
+          const cached   = await cacheRes.json();
           cached.fromCache = true;
           return res.status(200).json(cached);
         }
       }
-    } catch(e) { /* cache miss or expired — fall through to Airtable */ }
+    } catch(e) {
+      console.warn('Cache read failed:', e.message);
+    }
 
     // ── Cache miss — fetch from Airtable ──────
     const TOKEN = process.env.AIRTABLE_TOKEN;
@@ -35,7 +42,6 @@ export default async function handler(req, res) {
 
     if (!TOKEN || !BASE) throw new Error('Missing Airtable credentials.');
 
-    // Load season config
     let SEASON_START = '2026-04-16T19:00:00-07:00';
     let SEASON_NAME  = 'SS12: Lunaria';
     try {
@@ -72,9 +78,9 @@ export default async function handler(req, res) {
     // ── Write to Blob cache ───────────────────
     try {
       await put(CACHE_KEY, JSON.stringify(payload), {
-        access:      'private',
-        token:       process.env.BLOB_READ_WRITE_TOKEN,
-        contentType: 'application/json',
+        access:         'public',
+        token:          process.env.BLOB_READ_WRITE_TOKEN,
+        contentType:    'application/json',
         allowOverwrite: true,
       });
     } catch(e) {
