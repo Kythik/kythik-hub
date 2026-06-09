@@ -1,22 +1,41 @@
 /* ═══════════════════════════════════════════
    api/airtable.js — Vercel serverless function
-   6hr cache. Season filtered. 
+   Blob-cached. Airtable only hit every 6hrs.
    ═══════════════════════════════════════════ */
+
+import { put, head, get } from '@vercel/blob';
+
+const CACHE_KEY     = 'strategies-cache.json';
+const CACHE_TTL_MS  = 6 * 60 * 60 * 1000; // 6 hours
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Cache-Control', 's-maxage=21600, stale-while-revalidate=3600');
-
-  const TOKEN = process.env.AIRTABLE_TOKEN;
-  const BASE  = process.env.AIRTABLE_BASE;
-  const TABLE = 'Strategies';
-
-  if (!TOKEN || !BASE) {
-    return res.status(500).json({ error: 'Missing Airtable credentials.' });
-  }
+  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=60');
 
   try {
-    // Fetch season config from repo
+    // ── Try Blob cache first ──────────────────
+    try {
+      const blobMeta = await head(CACHE_KEY, { token: process.env.BLOB_READ_WRITE_TOKEN });
+      if (blobMeta) {
+        const age = Date.now() - new Date(blobMeta.uploadedAt).getTime();
+        if (age < CACHE_TTL_MS) {
+          // Cache is fresh — serve it
+          const blobRes  = await fetch(blobMeta.url);
+          const cached   = await blobRes.json();
+          cached.fromCache = true;
+          return res.status(200).json(cached);
+        }
+      }
+    } catch(e) { /* cache miss or expired — fall through to Airtable */ }
+
+    // ── Cache miss — fetch from Airtable ──────
+    const TOKEN = process.env.AIRTABLE_TOKEN;
+    const BASE  = process.env.AIRTABLE_BASE;
+    const TABLE = 'Strategies';
+
+    if (!TOKEN || !BASE) throw new Error('Missing Airtable credentials.');
+
+    // Load season config
     let SEASON_START = '2026-04-16T19:00:00-07:00';
     let SEASON_NAME  = 'SS12: Lunaria';
     try {
@@ -26,9 +45,7 @@ export default async function handler(req, res) {
     } catch(e) { /* use defaults */ }
 
     const seasonISO = new Date(SEASON_START).toISOString();
-
-    // Fall back to Created if PostedAt is empty
-    const formula = encodeURIComponent(
+    const formula   = encodeURIComponent(
       `OR(IS_AFTER({PostedAt}, '${seasonISO}'), AND({PostedAt}='', IS_AFTER({Created}, '${seasonISO}')))`
     );
 
@@ -38,24 +55,36 @@ export default async function handler(req, res) {
       headers: { Authorization: `Bearer ${TOKEN}` }
     });
 
-    if (!airtableRes.ok) {
-      const err = await airtableRes.text();
-      throw new Error(`Airtable ${airtableRes.status}: ${err}`);
-    }
+    if (!airtableRes.ok) throw new Error(`Airtable ${airtableRes.status}`);
 
     const data    = await airtableRes.json();
     const records = (data.records || []).map(r => ({ id: r.id, ...r.fields }));
 
-    return res.status(200).json({
+    const payload = {
       records,
       season:      SEASON_NAME,
       seasonStart: SEASON_START,
       lastUpdated: new Date().toISOString(),
       count:       records.length,
-    });
+      fromCache:   false,
+    };
+
+    // ── Write to Blob cache ───────────────────
+    try {
+      await put(CACHE_KEY, JSON.stringify(payload), {
+        access:      'private',
+        token:       process.env.BLOB_READ_WRITE_TOKEN,
+        contentType: 'application/json',
+        allowOverwrite: true,
+      });
+    } catch(e) {
+      console.warn('Blob write failed:', e.message);
+    }
+
+    return res.status(200).json(payload);
 
   } catch (err) {
-    console.error('Airtable fetch error:', err.message);
+    console.error('airtable.js error:', err.message);
     return res.status(500).json({ error: err.message });
   }
 }
