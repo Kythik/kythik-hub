@@ -256,14 +256,7 @@ select:focus{border-color:var(--gold-muted)}
         <option value="7">7 gears (SSS ×1.6)</option>
       </select>
     </div>
-    <div class="ctrl-group">
-      <label>Collection Doll Astrolabe</label>
-      <select id="doll">
-        <option value="none">None (base rate)</option>
-        <option value="regular">Collection Doll Astrolabe</option>
-        <option value="artifact">Collection Doll Astrolabe (Artifact)</option>
-      </select>
-    </div>
+
     <div class="ctrl-group">
       <label>Alice tier</label>
       <select id="alice">
@@ -290,9 +283,11 @@ select:focus{border-color:var(--gold-muted)}
         <option value="highrarity">High rarity (observed)</option>
       </select>
     </div>
-    <div class="ctrl-group">
-      <label>Show zero-EV</label>
-      <select id="showz"><option value="yes">Yes</option><option value="no">No</option></select>
+    <div class="ctrl-group" style="display:flex;align-items:flex-end;padding-bottom:8px">
+      <label class="chk-row">
+        <input type="checkbox" id="showz" onchange="render()">
+        <span style="font-size:12px;color:var(--text-muted)">Show zero-value services</span>
+      </label>
     </div>
   </div>
 
@@ -440,7 +435,7 @@ function updateVerdict(){
     return;
   }
   document.getElementById('reroll-decision-panel').style.display='block';
-  noRerolls.style.display='none';
+  if(noRerolls)noRerolls.style.display='none';
   hasRerolls.style.display='block';
   const aliceVal=document.getElementById('alice').value;
   aliceNote.textContent=rerolls+' reroll'+(rerolls>1?'s':'')+' available (Alice '+aliceVal.replace('lv','Lv')+')';
@@ -610,10 +605,8 @@ const S12_SVCS=[
 
 function render(){
   const gearsVal=document.getElementById('gears').value;
-  const dollKey=document.getElementById('doll').value;
   const alice=ALICE[document.getElementById('alice').value];
   const sort=document.getElementById('sort').value;
-  const showz=document.getElementById('showz').value;
   const rdist=document.getElementById('rdist').value==='highrarity'?RDIST_HIGH:RDIST_EXP;
   // base removed — using theorBase for relative scaling
   const cf=AVG_CF;
@@ -642,7 +635,7 @@ function render(){
 
 
   // ── Service table — lookup from pre-computed rankings ────────────────
-  const rkey=`${gearsVal}|${dollKey}|${document.getElementById('alice').value}|${nodeIndulgent?1:0}|${nodeVain?1:0}|${nodeWasteful?1:0}|${nodeOstentatious?1:0}|${nodeCb59?1:0}|${document.getElementById('rdist').value}`;
+  const rkey=`${gearsVal}|artifact|${document.getElementById('alice').value}|${nodeIndulgent?1:0}|${nodeVain?1:0}|${nodeWasteful?1:0}|${nodeOstentatious?1:0}|${nodeCb59?1:0}|${document.getElementById('rdist').value}`;
   if(!RANKINGS){return;} // wait for JSON to load
   const ridx=RANKINGS.k[rkey];
   const ranked=ridx!==undefined?RANKINGS.r[ridx]:null;
@@ -650,7 +643,8 @@ function render(){
     const entry=ranked?ranked.find(r=>r[0]===s.id):null;
     return {...s,tier:entry?entry[1]:'F',pct:entry?entry[2]:0,rank:ranked?ranked.findIndex(r=>r[0]===s.id):999};
   });
-  if(showz==='no')svcs=svcs.filter(s=>s.tier!=='F'||s.tag==='conditional'||s.tag==='builddep'||s.isRoulette||s.isID23);
+  const showCombat=document.getElementById('showz')&&document.getElementById('showz').checked;
+  if(!showCombat)svcs=svcs.filter(s=>s.tier!=='F'||s.tag==='conditional'||s.tag==='builddep'||s.isRoulette||s.isID23);
   if(sort==='ev'||sort==='tier')svcs.sort((a,b)=>a.rank-b.rank);
   else if(sort==='rarity')svcs.sort((a,b)=>(RORD[a.rarity]||9)-(RORD[b.rarity]||9)||a.rank-b.rank);
   const maxEV=1; // unused in lookup mode
@@ -686,7 +680,7 @@ function render(){
 
 }
 
-['gears','doll','alice','sort','showz','rdist','node-indulgent','node-vain','node-wasteful','node-cb59'].forEach(id=>{
+['gears','alice','sort','rdist','node-indulgent','node-vain','node-wasteful','node-cb59'].forEach(id=>{
   const el=document.getElementById(id);
   if(el)el.addEventListener('change',render);
 });
