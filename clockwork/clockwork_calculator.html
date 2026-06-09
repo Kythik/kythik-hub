@@ -646,7 +646,15 @@ function id23Block(gearsVal,base,nodeWasteful,nodeOstentatious,nodeCb59){
     const rcol=k<=3?'var(--red-loss)':k<=5?'var(--orange-fire)':'var(--green-recording)';
     const evK=id23CogEV(k,n,base);
     const ec=evK>0?'var(--green-recording)':'var(--red-loss)';
-    const evQualK=evK>0?'above baseline':'below baseline';
+    let podiumBonus=0;
+    if(k===n){
+      const theorBaseK=bge()*n*MULT[n];
+      if(nodeWasteful) podiumBonus+=(0.10*ege({gold:0.70,red:0.25,rainbow:0.05})+0.30*theorBaseK)/theorBaseK*base;
+      if(nodeOstentatious) podiumBonus+=(0.03*ege({gold:0.70,red:0.25,rainbow:0.05})+0.10*theorBaseK)/theorBaseK*base;
+      if(nodeCb59) podiumBonus+=ege(DIST)/theorBaseK*base*0.13;
+    }
+    const evKTotal=evK+podiumBonus;
+    const evQualK=evKTotal>0?'above baseline':'below baseline';
     const podiumNote=k===n&&podiumBonus>0?' (+podium nodes)':'';
     h+=`<div class="id23-row"><span class="id23-outcome">${label}</span><span class="id23-prob">${(p*100).toFixed(1)}%</span><span class="id23-ev" style="color:${ec}">${evQualK}${podiumNote}</span><span class="id23-rating" style="color:${rcol}">${rating}</span></div>`;
   }
