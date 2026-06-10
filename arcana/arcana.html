@@ -220,8 +220,8 @@ const qW={life:.14,mapping_card:.17,upgrade_random:.17,upgrade_all:.06,add_chest
 let rngSeed=1,state=null,originalTiles=null,selected=null,suggested=null;
 
 function $(id){return document.getElementById(id)}
-function getSeedValue(){return (getSeedValue())||'kythik'}
-function getLifeValue(){return +(getLifeValue()||3)}
+function getSeedValue(){return 'kythik'}
+function getLifeValue(){return 3}
 function getStartingHandValue(){return +($('handInput')?.value||4)}
 function hashStr(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 function initRng(s){rngSeed=hashStr(String(s||'kythik'))||1}
