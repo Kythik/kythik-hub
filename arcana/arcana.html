@@ -4,14 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link rel="stylesheet" href="/styles.css" />
-<link rel="stylesheet" href="arcana.css?v=acd68faa0e" />
-<style id="arcana-critical-guard">
-  .arcana-page .strategyModalOverlay,
-  .arcana-page .strategyLightbox[hidden],
-  .arcana-page .strategyLightbox:not(.isOpen){
-    display:none !important;
-  }
-</style>
+<link rel="stylesheet" href="arcana.css" />
 <title>Arcana Tarot Minigame</title>
 </head>
 <body class="arcana-page">
@@ -31,8 +24,34 @@
   </div>
 </section>
 
+<div class="strategyModalOverlay" id="strategyModal" onclick="if(event.target.id==='strategyModal')closeStrategyLightbox()">
+  <div class="strategyModalBox">
+    <div class="strategyModalHead">
+      <div><div class="strategyModalKicker" id="strategyModalKicker">Strategy</div><h2 id="strategyModalTitle">Strategy</h2></div>
+      <button class="strategyClose" onclick="closeStrategyLightbox()">Close</button>
+    </div>
+    <div class="strategyModalGrid">
+      <div class="strategyModalPanel"><h3>Profile</h3><div id="strategyModalPlay"></div></div>
+      <div class="strategyModalPanel"><h3>Board notes</h3><div id="strategyModalResult"></div></div>
+      <div class="strategyModalPanel"><h3>Expected value model</h3><div class="mathBlock">Chest EV = UF ticket EV + rarity loot EV
 
-<div class="strategyLightbox" id="strategyLightbox" aria-hidden="true" hidden style="display:none">
+UF ticket EV = P(UF drop) × UF market value
+
+Run EV ≈ Σ(chest EV) + Σ(? value) - path/trap/opportunity costs</div><p class="strategyFine">Chest cap is 7, but the run only ends when you manually end it or lose all life.</p></div>
+      <div class="strategyModalPanel"><h3>Natural rarity distribution</h3><table class="strategyTable"><tr><th>Rarity</th><th>Chance</th><th>EV role</th></tr><tr><td>Green</td><td>27.5544%</td><td>Low loot, still one UF check.</td></tr><tr><td>Blue</td><td>41.3316%</td><td>Low loot, better upgrade base.</td></tr><tr><td>Purple</td><td>25.295%</td><td>Known value starts mattering.</td></tr><tr><td>Gold</td><td>5.399%</td><td>Primary premium target.</td></tr><tr><td>Red</td><td>0.38%</td><td>High premium target.</td></tr><tr><td>Rainbow</td><td>0.02%</td><td>Top natural result.</td></tr></table></div>
+      <div class="strategyModalPanel wide"><h3>Chest quantity distribution and expected EV</h3><p>Chest quantity mainly controls how many Undetermined Fate checks you receive. Normal board generation places 10–13 total chests before filling the remaining tiles with non-chest outcomes. Rarity controls the normal loot side of the EV model.</p><div class="mathBlock">Expected UF checks = E[collected chest count]
+
+Expected UF value = E[chest count] × P(UF drop) × UF market value
+
+Expected rarity value = Σ rarity_weight × loot_value(rarity)
+
+Total route EV = UF value + rarity value + ? value - movement/trap/opportunity costs</div><table class="strategyTable" id="strategyModalDist"></table></div>
+    </div>
+  </div>
+</div>
+
+
+<div class="strategyLightbox" id="strategyLightbox" aria-hidden="true">
   <div class="strategyLightboxPanel" role="dialog" aria-modal="true" aria-labelledby="strategyLightboxTitle">
     <div class="strategyLightboxHeader">
       <div>
@@ -114,7 +133,7 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
       </div>
       <div class="autoplayControls">
         <label>Strategy <select id="strategyInput" onchange="suggested=null;render()"><option value="Strategy1" selected>Strategy1</option><option value="Strategy2">Strategy2</option><option value="Strategy3">Strategy3</option><option value="Strategy4">Strategy4</option></select></label>
-        <label>Combo <select id="comboDepthInput"><option value="2" selected>2-card</option><option value="3">3-card</option></select></label>
+        <label>Combo <select id="comboDepthInput"><option value="2" selected>2-card</option><option value="3">3-card safer</option><option value="4">4-card survival</option></select></label>
         <label>Backtrack <select id="backtrackModeInput"><option value="value" selected>value recovery</option><option value="tile80">final tile only</option></select></label>
       </div>
     </div>
@@ -208,7 +227,6 @@ function $(id){return document.getElementById(id)}
 function getSeedValue(){return 'kythik'}
 function getLifeValue(){return 3}
 function getStartingHandValue(){return +($('handInput')?.value||4)}
-function rarityLabel(r){return r==='orange'?'Gold':(r?String(r).charAt(0).toUpperCase()+String(r).slice(1):'')}
 function hashStr(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 function initRng(s){rngSeed=hashStr(String(s||'kythik'))||1}
 function rng(){rngSeed=(Math.imul(1664525,rngSeed)+1013904223)>>>0;return rngSeed/4294967296}
@@ -340,17 +358,40 @@ function useUtility(idx){
   else if(c.type==='risky_question'){log('Used Force ? Roll.');applyQuestion();state.hand.splice(idx,1)}
   render();
 }
-function tileScore(i){
-  let t=state.tiles[i],dist=Math.abs(i-state.pos),score=-dist*.25,why=[];
+function tileScore(i, ctx=null){
+  const sim=ctx||{pos:state.pos,life:state.life,collected:state.collected.length};
+  let t=state.tiles[i],dist=Math.abs(i-sim.pos),score=-dist*.25,why=[];
+  if(!t)return{score:-999,why:['invalid tile']};
   if(t.used)return{score:-8-dist*.25,why:['already-used tile; pathing only']};
-  if(t.type==='chest'){let r=t.rarity;score+=V[r]+0.8;why.push(r+' chest known value');if(['orange','red','rainbow'].includes(r)){score+=10;why.push('gold+ is premium/paycheck')}else if(r==='purple'){score+=4;why.push('purple+ is known value')}else{score-=4;why.push('green/blue is mostly filler but still a UF ticket')}}
-  else if(t.type==='question'){score+=(state.pos<25?8:state.pos<45?5:state.pos<60?2:-1);why.push('? is random variance; better early')}
+  if(sim.collected>=maxChests && t.type==='chest')return{score:-30-dist*.25,why:['chest cap reached; chest has no collection value']};
+
+  if(t.type==='chest'){
+    let r=t.rarity;
+    score+=V[r]+0.8;
+    why.push(r+' chest known value');
+    if(['orange','red','rainbow'].includes(r)){score+=10;why.push('gold+ is premium/paycheck')}
+    else if(r==='purple'){score+=4;why.push('purple+ is known value')}
+    else{score-=4;why.push('green/blue is mostly filler but still a UF ticket')}
+  }
+  else if(t.type==='question'){
+    score+=(sim.pos<25?7:sim.pos<45?4:sim.pos<60?1:-3);
+    why.push('? is variance; safer early, worse late');
+  }
   else if(t.type==='upgrade'){score+=5;why.push('upgrade card can improve future chests')}
   else if(t.type==='movement'){score+=3;why.push('mapping card pickup improves hand')}
-  else if(t.type==='life'){score+=state.life<=2?5:2;why.push('life/safety')}
-  else if(t.type==='trap'){score-=state.life<=1?20:5;why.push('trap risk')}
+  else if(t.type==='life'){score+=sim.life<=2?7:2;why.push('life/safety')}
+  else if(t.type==='trap'){
+    const projected=sim.life-1;
+    if(projected<=0){
+      score-=999;
+      why.push('LETHAL trap; rejected');
+    }else{
+      score-=sim.life<=2?45:16;
+      why.push('trap costs life; survival penalty');
+    }
+  }
   else{score-=6;why.push('empty is pathing cost only')}
-  if(state.collected.length>=maxChests)score=-999;
+
   return{score,why};
 }
 function actionName(sel){
@@ -371,36 +412,125 @@ function movableActions(){
   state.hand.forEach((c,idx)=>{if(c.type==='move'||c.type==='back')a.push({type:'hand',idx})});
   return a;
 }
-function seqScore(seq){
-  let pos=state.pos,total=0,why=[],tiles=[];
-  for(let step=0;step<seq.length;step++){
-    let sel=seq[step],idx=actionTargetFrom(pos,sel); if(idx<0)continue;
-    let sc=tileScore(idx); total+=sc.score-(step*.6); tiles.push(idx+1);
-    why.push((step+1)+'. '+actionName(sel)+' to tile '+(idx+1)+': '+sc.why.join('; '));
-    if(state.tiles[idx].type==='trap'&&state.life<=1) total-=50;
-    pos=idx;
-  }
-  if(seq.length>1){
-    let last=state.tiles[tiles[tiles.length-1]-1];
-    if(seq.some(s=>s.type==='hand'&&state.hand[s.idx]?.type==='back') && last && (last.type==='chest'||last.type==='question')) total+=5;
-  }
-  return{score:total,why,tiles};
+function projectedTileResult(i,ctx){
+  let t=state.tiles[i],next={...ctx};
+  if(!t||t.used)return next;
+  if(t.type==='trap')next.life--;
+  else if(t.type==='life')next.life+=(t.fixedN||1);
+  else if(t.type==='chest'&&next.collected<maxChests)next.collected++;
+  return next;
 }
-function buildSequences(depth){
-  let acts=movableActions(),out=[];
-  for(const a of acts){
-    let s1=seqScore([a]); out.push({first:a,seq:[a],name:actionName(a),idx:s1.tiles[0]-1,score:s1.score,why:s1.why,tiles:s1.tiles});
-    for(const b of acts){
-      if(a.type==='hand'&&b.type==='hand'&&a.idx===b.idx)continue;
-      let s2=seqScore([a,b]); out.push({first:a,seq:[a,b],name:actionName(a)+' → '+actionName(b),idx:s2.tiles[0]-1,finalIdx:s2.tiles.at(-1)-1,score:s2.score,why:s2.why,tiles:s2.tiles});
-      if(depth>=3)for(const c of acts){
-        let used=[a,b].filter(x=>x.type==='hand').map(x=>x.idx); if(c.type==='hand'&&used.includes(c.idx))continue;
-        let s3=seqScore([a,b,c]); out.push({first:a,seq:[a,b,c],name:actionName(a)+' → '+actionName(b)+' → '+actionName(c),idx:s3.tiles[0]-1,finalIdx:s3.tiles.at(-1)-1,score:s3.score,why:s3.why,tiles:s3.tiles});
-      }
+function actionKey(sel){return sel.type==='current'?'current':'hand:'+sel.idx}
+function usedHandIndexes(seq){return seq.filter(x=>x.type==='hand').map(x=>x.idx)}
+function comboDepthValue(){
+  return Math.max(2,Math.min(4,+($('comboDepthInput')?.value||2)));
+}
+function seqScore(seq){
+  let ctx={pos:state.pos,life:state.life,collected:state.collected.length};
+  let total=0,why=[],tiles=[],trapCount=0,death=false,used=new Set();
+  for(let step=0;step<seq.length;step++){
+    let sel=seq[step];
+    if(sel.type==='hand'){
+      if(used.has(sel.idx))return{score:-9999,why:['illegal: repeated stored card'],tiles};
+      used.add(sel.idx);
+    }
+    let idx=actionTargetFrom(ctx.pos,sel);
+    if(idx<0)return{score:-9999,why:['illegal target'],tiles};
+
+    let sc=tileScore(idx,ctx);
+    let t=state.tiles[idx];
+    tiles.push(idx+1);
+
+    if(t?.type==='trap'&&!t.used)trapCount++;
+    let stepPenalty=step*.9;
+    let backPenalty=(sel.type==='hand'&&state.hand[sel.idx]?.type==='back')?1.2:0;
+    total+=sc.score-stepPenalty-backPenalty;
+    why.push((step+1)+'. '+actionName(sel)+' to tile '+(idx+1)+': '+sc.why.join('; '));
+
+    ctx=projectedTileResult(idx,ctx);
+    ctx.pos=idx;
+
+    if(ctx.life<=0){
+      death=true;
+      total-=9999;
+      why.push('Line rejected: projected death before combo ends.');
+      break;
     }
   }
-  return out.filter(o=>Number.isFinite(o.score)&&o.idx>=0);
+
+  if(trapCount>=2){
+    total-=trapCount*28;
+    why.push('Heavy penalty: multiple traps in planned combo.');
+  }else if(trapCount===1 && state.life<=2){
+    total-=24;
+    why.push('Heavy penalty: trap while low life.');
+  }
+
+  if(ctx.life===1){
+    total-=18;
+    why.push('Penalty: leaves run at 1 life.');
+  }
+
+  if(seq.length>=3){
+    total-=trapCount*18;
+    if(ctx.life<=2)total-=10;
+  }
+  if(seq.length>=4){
+    total-=trapCount*28;
+    if(ctx.life<=2)total-=18;
+  }
+
+  if(seq.length>1 && tiles.length){
+    let last=state.tiles[tiles[tiles.length-1]-1];
+    if(seq.some(s=>s.type==='hand'&&state.hand[s.idx]?.type==='back') && last && !last.used && (last.type==='chest'||last.type==='question')) total+=4;
+  }
+
+  return{score:total,why,tiles,life:ctx.life,trapCount,death};
 }
+function buildSequences(depth){
+  const acts=movableActions();
+  const out=[];
+  function rec(seq,maxDepth){
+    if(seq.length){
+      const s=seqScore(seq);
+      const first=seq[0];
+      out.push({
+        first,
+        seq:[...seq],
+        name:seq.map(actionName).join(' → '),
+        idx:(s.tiles[0]||0)-1,
+        finalIdx:(s.tiles.at(-1)||0)-1,
+        score:s.score,
+        why:s.why,
+        tiles:s.tiles,
+        life:s.life,
+        trapCount:s.trapCount,
+        death:s.death
+      });
+      if(s.death)return;
+    }
+    if(seq.length>=maxDepth)return;
+    const used=usedHandIndexes(seq);
+    for(const a of acts){
+      if(a.type==='hand'&&used.includes(a.idx))continue;
+      rec([...seq,a],maxDepth);
+    }
+  }
+  rec([],depth);
+
+  // Survival filter for deeper combo modes. A 3/4-card recommendation should not choose a death line
+  // or a trap chain just because the final tile has shiny EV.
+  let filtered=out.filter(o=>Number.isFinite(o.score)&&o.idx>=0&&!o.death);
+  if(depth>=3){
+    filtered=filtered.filter(o=>!(o.trapCount>=2));
+    if(state.life<=2)filtered=filtered.filter(o=>o.trapCount===0);
+  }
+  if(depth>=4){
+    filtered=filtered.filter(o=>o.life>1);
+  }
+  return filtered;
+}
+
 function isRecoverable(i){
   let t=state.tiles[i];
   return t&&!t.used&&(t.type==='chest'||t.type==='question');
@@ -426,7 +556,7 @@ function finalTileRecoveryPlan(){
   return best;
 }
 function suggestMove(){
-  let depth=Math.max(2,Math.min(3,+($('comboDepthInput').value||2)));
+  let depth=comboDepthValue();
   let plan=finalTileRecoveryPlan();
   if(plan){
     if(state.currentMove===plan.need){
@@ -500,7 +630,7 @@ function autoPlay(limit=300){
     }
     suggestMove();
     if(!suggested){state.autoStatus='Auto stopped: no suggestion.';log(state.autoStatus);break}
-    if(suggested.score<-20){state.autoStatus='Auto stopped: best move score too low.';log(state.autoStatus);break}
+    if(suggested.score<-12){state.autoStatus='Auto stopped: best move score too low / unsafe.';log(state.autoStatus);break}
     takeSuggestion();
   }
   render();
@@ -509,7 +639,7 @@ function endRun(){state.done=true;state.autoStatus='Manually ended at tile '+(st
 function icon(t){
   if(t.type==='start')return 'START';
   if(t.type==='chest'){
-    const label=rarityLabel(t.rarity);
+    const label=t.rarity==='orange'?'Gold':cap(t.rarity);
     return '<span class="chestIcon" aria-hidden="true">▰</span><span class="chestText">'+label+'</span>';
   }
   if(t.type==='trap')return '⚠';
@@ -539,7 +669,7 @@ function render(){
   $('log').innerHTML=state.log.map(x=>'<div>'+x+'</div>').join('');
   if(suggested){
     let rows=(suggested.tiles||[]).join(' → ');
-    $('routeNotes').innerHTML='<b>Recommended:</b> '+actionName(suggested.first)+'<br><b>Line:</b> '+suggested.name+'<br><b>Tiles:</b> '+rows+'<br><b>Score:</b> '+suggested.score.toFixed(1)+'<br>'+suggested.why.join('<br>');
+    $('routeNotes').innerHTML='<b>Recommended:</b> '+actionName(suggested.first)+'<br><b>Line:</b> '+suggested.name+'<br><b>Tiles:</b> '+rows+'<br><b>Score:</b> '+suggested.score.toFixed(1)+(suggested.life!==undefined?'<br><b>Projected life:</b> '+suggested.life:'')+(suggested.trapCount?'<br><b>Trap count in line:</b> '+suggested.trapCount:'')+'<br>'+suggested.why.join('<br>');
   }else{
     $('routeNotes').innerHTML='Click <b>Recommend Next Move</b>. Recommendations use 2-card route logic by default; 3-card is advanced.';
   }
@@ -547,6 +677,26 @@ function render(){
 function openInfoModal(){$('infoModal').classList.add('open')}
 function closeInfoModal(){$('infoModal').classList.remove('open')}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeInfoModal()});
+
+const STRATEGY_DETAILS={
+  Strategy1:{kicker:'Default / Balanced',title:'Strategy1',play:`Strategy1 is the baseline profile. It preserves known value without becoming too greedy, prioritizes gold/red/rainbow, and treats green/blue as lower-value Undetermined Fate tickets unless the route cost is low.`,result:`Observed behavior: balanced profile. Use it when the board pattern is unclear or you want fewer extreme recommendations.`,dist:[['Normal','Rerun needed after 10–13 chest change'],['Special 1','Close to conservative known-value routing'],['Special 2','Usually behind ticket-leaning profile'],['Special 3','Very close to top profiles']]},
+  Strategy2:{kicker:'Gold Focus',title:'Strategy2',play:`Strategy2 weights gold+ value more heavily. It is more willing to pay pathing cost when the route can convert into premium chest value.`,result:`Observed behavior: strongest when premium targets are visible and reachable. Can be too greedy if the board is low-value or card-starved.`,dist:[['Normal','Rerun needed after 10–13 chest change'],['Special 1','Close when premium upgrades/chests are reachable'],['Special 2','Less favored than quantity routing'],['Special 3','Strong on rarity-ladder patterns']]},
+  Strategy3:{kicker:'Purple Safe',title:'Strategy3',play:`Strategy3 is the conservative known-value profile. It values purple more heavily, is more cautious around traps, and is less likely to skip solid value while chasing gold+ spikes.`,result:`Observed behavior: strong when purple+ density is high or survival/pathing matters.`,dist:[['Normal','Rerun needed after 10–13 chest change'],['Special 1','Strong on upgrade-heavy patterns'],['Special 2','Close when safe value is available'],['Special 3','Competitive on rarity-ladder patterns']]},
+  Strategy4:{kicker:'UF Ticket Lean',title:'Strategy4',play:`Strategy4 leans into chest quantity. Green/blue remain low normal-loot EV, but each collected chest is still an Undetermined Fate ticket check when route cost is reasonable.`,result:`Observed behavior: strongest when board shape rewards volume or premium conversion is less reliable than capped chest count.`,dist:[['Normal','Rerun needed after 10–13 chest change'],['Special 1','Close when chest access is efficient'],['Special 2','Strong on chest-volume patterns'],['Special 3','Usually behind premium/known-value profiles']]}
+};
+function openStrategyLightbox(id){
+  const d=STRATEGY_DETAILS[id]||STRATEGY_DETAILS.Strategy1;
+  $('strategyModalKicker').textContent=d.kicker;
+  $('strategyModalTitle').textContent=d.title;
+  $('strategyModalPlay').innerHTML='<p>'+d.play+'</p>';
+  $('strategyModalResult').innerHTML='<p>'+d.result+'</p>';
+  $('strategyModalDist').innerHTML='<tr><th>Board</th><th>Board note</th></tr>'+d.dist.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('');
+  $('strategyModal').classList.add('open');
+}
+function closeStrategyLightbox(){
+  $('strategyModal').classList.remove('open');
+}
+
 
 const STRATEGY_LIGHTBOX_DATA={
   Strategy1:{kicker:'Default / Balanced',title:'Strategy1',profile:'Strategy1 is the baseline profile. It preserves known value without becoming too greedy, prioritizes gold/red/rainbow, and treats green/blue as lower-value Undetermined Fate tickets unless the route cost is low.',notes:[['Normal','Rerun needed after the 10–13 chest change.'],['Special 1','Close to conservative known-value routing.'],['Special 2','Usually behind ticket-leaning routing.'],['Special 3','Generally close to the top profiles.']]},
@@ -556,24 +706,16 @@ const STRATEGY_LIGHTBOX_DATA={
 };
 function openStrategyLightbox(id){
   const data=STRATEGY_LIGHTBOX_DATA[id]||STRATEGY_LIGHTBOX_DATA.Strategy1;
-  const box=$('strategyLightbox');
-  if(!box)return;
   $('strategyLightboxKicker').textContent=data.kicker;
   $('strategyLightboxTitle').textContent=data.title;
   $('strategyProfileText').textContent=data.profile;
   $('strategyBoardNotes').innerHTML='<table class="strategyTable"><tr><th>Board</th><th>Note</th></tr>'+data.notes.map(row=>'<tr><td>'+row[0]+'</td><td>'+row[1]+'</td></tr>').join('')+'</table>';
-  box.hidden=false;
-  box.style.display='block';
-  box.classList.add('isOpen');
-  box.setAttribute('aria-hidden','false');
+  $('strategyLightbox').classList.add('isOpen');
+  $('strategyLightbox').setAttribute('aria-hidden','false');
 }
 function closeStrategyLightbox(){
-  const box=$('strategyLightbox');
-  if(!box)return;
-  box.classList.remove('isOpen');
-  box.setAttribute('aria-hidden','true');
-  box.style.display='none';
-  box.hidden=true;
+  $('strategyLightbox').classList.remove('isOpen');
+  $('strategyLightbox').setAttribute('aria-hidden','true');
 }
 function wireStrategyCards(){
   document.querySelectorAll('.strategyCard[data-strategy]').forEach(btn=>{
@@ -582,13 +724,7 @@ function wireStrategyCards(){
   const closeBtn=$('strategyLightboxClose');
   if(closeBtn)closeBtn.addEventListener('click',closeStrategyLightbox);
   const lightbox=$('strategyLightbox');
-  if(lightbox){
-    lightbox.hidden=true;
-    lightbox.style.display='none';
-    lightbox.classList.remove('isOpen');
-    lightbox.setAttribute('aria-hidden','true');
-    lightbox.addEventListener('click',e=>{if(e.target===lightbox)closeStrategyLightbox()});
-  }
+  if(lightbox)lightbox.addEventListener('click',e=>{if(e.target===lightbox)closeStrategyLightbox()});
 }
 
 window.addEventListener('load',()=>{newGame(false);wireStrategyCards();});
