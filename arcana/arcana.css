@@ -565,3 +565,9 @@ body.arcana-page .board {
   font-weight:800;
   letter-spacing:.02em;
 }
+
+
+.strategyWalkthrough{margin:14px 0 18px;padding:12px 14px;border:1px solid rgba(200,164,93,.22);border-radius:14px;background:rgba(4,8,15,.34)}
+.strategyWalkthrough h4{margin:0 0 8px;color:var(--gold,#c8a45d);font-size:1rem}
+.strategyWalkthrough ol{margin:0;padding-left:1.25rem}
+.strategyWalkthrough li{margin:6px 0;line-height:1.45}
