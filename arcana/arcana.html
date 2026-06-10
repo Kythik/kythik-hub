@@ -138,7 +138,7 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
         <div class="boardLegend">
           <span class="legendPill"><span class="legendDot" style="background:#fff"></span>Current</span>
           <span class="legendPill"><span class="legendDot"></span>Preview</span>
-          <span class="legendPill"><span class="legendDot" style="background:#E9EDF5"></span>Landing #</span>
+          <span class="legendPill"><span class="legendDot" style="background:#E9EDF5"></span>Landing #</span><span class="legendPill"><span class="legendDot rowWrapDot"></span>Row wrap</span>
         </div>
       </div>
       <div class="board" id="board"></div>
@@ -676,7 +676,8 @@ function render(){
   let tgt=targetFor(selected);
   $('board').innerHTML=state.tiles.map((t,i)=>{
     let visit=state.path.indexOf(i+1),land=visit>=0?`<span class="land">${visit+1}</span>`:'';
-    return `<button class="tile ${t.type} ${t.type==='chest'?'chest chest-'+t.rarity:''} ${t.rarity||''} ${i<state.pos?'done':''} ${visit>=0?'landed':''} ${i===state.pos?'pos':''} ${i===tgt?'reach':''} ${suggested&&i===suggested.idx?'suggest':''}" onclick="clickTile(${i})"><span class="n">${i+1}</span><span class="c">${icon(t)}</span>${land}</button>`;
+    let rowLink=((i+1)%4===0 && i<state.tiles.length-1)?`<span class="rowLink" title="Next row continues at tile ${i+2}">↵ ${i+2}</span>`:'';
+    return `<button class="tile ${t.type} ${t.type==='chest'?'chest chest-'+t.rarity:''} ${t.rarity||''} ${i<state.pos?'done':''} ${visit>=0?'landed':''} ${i===state.pos?'pos':''} ${i===tgt?'reach':''} ${suggested&&i===suggested.idx?'suggest':''}" onclick="clickTile(${i})"><span class="n">${i+1}</span><span class="c">${icon(t)}</span>${land}${rowLink}</button>`;
   }).join('');
   $('log').innerHTML=state.log.map(x=>'<div>'+x+'</div>').join('');
   if(suggested){
