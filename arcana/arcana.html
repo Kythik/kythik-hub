@@ -4,9 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link rel="stylesheet" href="/styles.css" />
-<link rel="stylesheet" href="arcana.css?v=e4af7db1dd" />
+<link rel="stylesheet" href="arcana.css?v=28cd067301" />
 <style id="arcana-critical-guard">
-  .arcana-page .strategyModalOverlay,
   .arcana-page .strategyLightbox[hidden],
   .arcana-page .strategyLightbox:not(.isOpen){
     display:none !important;
@@ -124,7 +123,7 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
       </div>
       <div class="autoplayControls">
         <label>Strategy <select id="strategyInput" onchange="suggested=null;render()"><option value="Strategy1" selected>Strategy1</option><option value="Strategy2">Strategy2</option><option value="Strategy3">Strategy3</option><option value="Strategy4">Strategy4</option></select></label>
-        <label>Combo <select id="comboDepthInput"><option value="2" selected>2-card</option><option value="3">3-card</option></select></label>
+        <label>Combo <select id="comboDepthInput"><option value="2" selected>2-card</option><option value="3">3-card safe</option><option value="4">4-card survival</option></select></label>
         <label>Backtrack <select id="backtrackModeInput"><option value="value" selected>value recovery</option><option value="tile80">final tile only</option></select></label>
       </div>
     </div>
@@ -208,9 +207,10 @@ const maxChests=7;
 let totalTiles=80;
 const tileW={empty:.25,chest:.24,trap:.12,movement:.12,upgrade:.10,life:.07,question:.10};
 const NORMAL_CHEST_MIN=10;
-const NORMAL_CHEST_MAX=13;
+const NORMAL_CHEST_MAX=12;
 const chestW={green:.275544,blue:.413316,purple:.25295,orange:.05399,red:.0038,rainbow:.0002};
-const qW={life:.14,mapping_card:.17,upgrade_random:.17,upgrade_all:.06,add_chest:.13,add_high:.08,rainbow_all:.005,remove_traps:.08,nothing:.075};
+const upgradeCardW={blue:.54,purple:.35,orange:.107,red:.008};
+const qW={life:.14,mapping_card:.17,upgrade_random_owned:.085,upgrade_random_map:.085,upgrade_all_owned:.03,upgrade_all_map:.03,add_chest:.13,add_high:.08,rainbow_all:.005,remove_traps:.08};
 
 let rngSeed=1,state=null,originalTiles=null,selected=null,suggested=null;
 
@@ -270,26 +270,85 @@ function makeBoard(){
   if(bt==='special3')return makeSpecialBoard3();
 
   totalTiles=80;
-  let a=Array.from({length:totalTiles},()=>null);
+  let a=Array.from({length:totalTiles},()=>({type:'empty'}));
   a[0]={type:'start'};
 
-  // Normal boards use a capped random chest count so the board does not flood with free value.
-  // Place chests first, then fill the remaining tiles with non-chest outcomes.
-  let chestCount=NORMAL_CHEST_MIN+Math.floor(rng()*(NORMAL_CHEST_MAX-NORMAL_CHEST_MIN+1));
-  let positions=[];
-  for(let i=1;i<totalTiles;i++)positions.push(i);
-
-  for(let n=0;n<chestCount&&positions.length;n++){
-    let pick=Math.floor(rng()*positions.length);
-    let idx=positions.splice(pick,1)[0];
-    a[idx]={type:'chest',rarity:wc(chestW)};
+  function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){let j=randint(0,i+1);[arr[i],arr[j]]=[arr[j],arr[i]]}
+    return arr;
+  }
+  function chooseOne(arr){return arr.splice(randint(0,arr.length),1)[0]}
+  function upgradeAtOrAbove(r){
+    let min=Math.min(R.indexOf('red'),Math.max(1,R.indexOf(r))); // no green upgrade cards; red is highest upgrade-card tier.
+    let pool={};
+    for(const [k,v] of Object.entries(upgradeCardW))if(R.indexOf(k)>=min)pool[k]=v;
+    return wc(pool);
   }
 
-  let nonChestW={empty:.25,trap:.12,movement:.12,upgrade:.10,life:.07,question:.10};
-  for(let i=1;i<totalTiles;i++){
-    if(a[i])continue;
-    a[i]={type:wc(nonChestW)};
+  // Rows 1–2 opener:
+  // Tile 1 Start, then guaranteed 1 chest, 1 upgrade tile at/above that chest rarity,
+  // 1 life tile, and 1–2 movement/card tiles. No traps and no ? tiles.
+  let opener=[1,2,3,4,5,6,7];
+  shuffle(opener);
+  let openerCardCount=randint(1,3); // 1–2
+  let openerChestRarity=wc(chestW);
+  a[chooseOne(opener)]={type:'chest',rarity:openerChestRarity};
+  a[chooseOne(opener)]={type:'upgrade',fixedFrom:upgradeAtOrAbove(openerChestRarity)};
+  a[chooseOne(opener)]={type:'life',fixedN:randint(1,4)};
+  for(let i=0;i<openerCardCount&&opener.length;i++)a[chooseOne(opener)]={type:'movement'};
+
+  // Row 3 / tiles 9–12: empty buffer row.
+  for(let i=8;i<=11;i++)a[i]={type:'empty'};
+
+  // Rows 4+ count-based random section.
+  // Full-board targets:
+  // Start 1, Chest 10–12, Empty 15–25, Trap 10–13, Card 8–11,
+  // Upgrade 8–10, Life 6–9, ? 6–9.
+  let targets=null;
+  for(let attempt=0;attempt<500;attempt++){
+    let chest=randint(10,13);
+    let trap=randint(10,14);
+    let movement=randint(8,12);
+    let upgradeCt=randint(8,11);
+    let lifeCt=randint(6,10);
+    let question=randint(6,10);
+    let empty=80-(1+chest+trap+movement+upgradeCt+lifeCt+question);
+    if(empty>=15&&empty<=25){
+      targets={chest,trap,movement,upgrade:upgradeCt,life:lifeCt,question,empty};
+      break;
+    }
   }
+  if(!targets)targets={chest:11,trap:12,movement:9,upgrade:9,life:8,question:8,empty:22};
+
+  let remaining={
+    chest:targets.chest-1,
+    trap:targets.trap,
+    movement:targets.movement-openerCardCount,
+    upgrade:targets.upgrade-1,
+    life:targets.life-1,
+    question:targets.question
+  };
+
+  let spots=[];
+  for(let i=12;i<totalTiles;i++)spots.push(i);
+  shuffle(spots);
+
+  function place(type,count){
+    for(let n=0;n<count&&spots.length;n++){
+      let idx=spots.pop();
+      if(type==='chest')a[idx]={type:'chest',rarity:wc(chestW)};
+      else if(type==='upgrade')a[idx]={type:'upgrade',fixedFrom:wc(upgradeCardW)};
+      else if(type==='life')a[idx]={type:'life',fixedN:randint(1,4)};
+      else a[idx]={type};
+    }
+  }
+
+  place('chest',remaining.chest);
+  place('trap',remaining.trap);
+  place('movement',remaining.movement);
+  place('upgrade',remaining.upgrade);
+  place('life',remaining.life);
+  place('question',remaining.question);
 
   return a;
 }
@@ -303,7 +362,7 @@ function drawMappingCard(){
   if(t==='move_even')return{type:'move_even',name:'Choose Even'};
   if(t==='move_odd')return{type:'move_odd',name:'Choose Odd'};
   if(t==='back_any')return{type:'back_any',name:'Choose 1–3 Back'};
-  let from=wc({green:.01,blue:.54,purple:.35,orange:.10,red:.005});
+  let from=wc(upgradeCardW);
   return{type:'upgrade',from,name:''};
 }
 function normalizeCard(c){
@@ -422,67 +481,185 @@ function movableActions(){
   });
   return a;
 }
-function tileScore(i){
-  let t=state.tiles[i],dist=Math.abs(i-state.pos),score=-dist*.25,why=[];
+function tileScore(i,ctx=null,mode='normal'){
+  const sim=ctx||{pos:state.pos,life:state.life,collected:state.collected.length};
+  let t=state.tiles[i],dist=Math.abs(i-sim.pos),score=-dist*.25,why=[];
+  if(!t)return{score:-9999,why:['invalid tile']};
   if(t.used)return{score:-8-dist*.25,why:['already-used tile; pathing only']};
-  if(t.type==='chest'){let r=t.rarity;score+=V[r]+0.8;why.push(r+' chest known value');if(['orange','red','rainbow'].includes(r)){score+=10;why.push('gold+ is premium/paycheck')}else if(r==='purple'){score+=4;why.push('purple+ is known value')}else{score-=4;why.push('green/blue is mostly filler but still a UF ticket')}}
-  else if(t.type==='question'){score+=(state.pos<25?8:state.pos<45?5:state.pos<60?2:-1);why.push('? is random variance; better early')}
-  else if(t.type==='upgrade'){score+=5;why.push('upgrade card can improve future chests')}
-  else if(t.type==='movement'){score+=3;why.push('mapping card pickup improves hand')}
-  else if(t.type==='life'){score+=state.life<=2?5:2;why.push('life/safety')}
-  else if(t.type==='trap'){score-=state.life<=1?20:5;why.push('trap risk')}
-  else{score-=6;why.push('empty is pathing cost only')}
-  if(state.collected.length>=maxChests)score=-999;
-  return{score,why};
-}
-function actionName(sel){
-  if(sel.type==='current')return 'current refill Move '+state.currentMove;
-  let c=state.hand[sel.idx]; if(!c)return 'missing card';
-  if(c.type==='move'||c.type==='back')return 'stored '+c.name;
-  return c.name;
-}
-function actionTargetFrom(pos,sel){
-  if(sel.type==='current')return clampTarget(pos+state.currentMove);
-  let c=state.hand[sel.idx]; if(!c)return -1;
-  if(c.type==='move')return clampTarget(pos+c.n);
-  if(c.type==='back')return clampTarget(pos-c.n);
-  return -1;
-}
-function movableActions(){
-  let a=[{type:'current'}];
-  state.hand.forEach((c,idx)=>{if(c.type==='move'||c.type==='back')a.push({type:'hand',idx})});
-  return a;
-}
-function seqScore(seq){
-  let pos=state.pos,total=0,why=[],tiles=[];
-  for(let step=0;step<seq.length;step++){
-    let sel=seq[step],idx=actionTargetFrom(pos,sel); if(idx<0)continue;
-    let sc=tileScore(idx); total+=sc.score-(step*.6); tiles.push(idx+1);
-    why.push((step+1)+'. '+actionName(sel)+' to tile '+(idx+1)+': '+sc.why.join('; '));
-    if(state.tiles[idx].type==='trap'&&state.life<=1) total-=50;
-    pos=idx;
-  }
-  if(seq.length>1){
-    let last=state.tiles[tiles[tiles.length-1]-1];
-    if(seq.some(s=>s.type==='hand'&&state.hand[s.idx]?.type==='back') && last && (last.type==='chest'||last.type==='question')) total+=5;
-  }
-  return{score:total,why,tiles};
-}
-function buildSequences(depth){
-  let acts=movableActions(),out=[];
-  for(const a of acts){
-    let s1=seqScore([a]); out.push({first:a,seq:[a],name:actionName(a),idx:s1.tiles[0]-1,score:s1.score,why:s1.why,tiles:s1.tiles});
-    for(const b of acts){
-      if(a.type==='hand'&&b.type==='hand'&&a.idx===b.idx)continue;
-      let s2=seqScore([a,b]); out.push({first:a,seq:[a,b],name:actionName(a)+' → '+actionName(b),idx:s2.tiles[0]-1,finalIdx:s2.tiles.at(-1)-1,score:s2.score,why:s2.why,tiles:s2.tiles});
-      if(depth>=3)for(const c of acts){
-        let used=[a,b].filter(x=>x.type==='hand').map(x=>x.idx); if(c.type==='hand'&&used.includes(c.idx))continue;
-        let s3=seqScore([a,b,c]); out.push({first:a,seq:[a,b,c],name:actionName(a)+' → '+actionName(b)+' → '+actionName(c),idx:s3.tiles[0]-1,finalIdx:s3.tiles.at(-1)-1,score:s3.score,why:s3.why,tiles:s3.tiles});
-      }
+
+  if(t.type==='chest'){
+    if(sim.collected>=maxChests){
+      score-=30;
+      why.push('chest cap reached; no extra chest value');
+    }else{
+      let r=t.rarity;
+      score+=V[r]+0.8;
+      why.push(r+' chest known value');
+      if(['orange','red','rainbow'].includes(r)){score+=10;why.push('gold+ is premium/paycheck')}
+      else if(r==='purple'){score+=4;why.push('purple+ is known value')}
+      else{score-=4;why.push('green/blue is mostly filler but still a UF ticket')}
     }
   }
-  return out.filter(o=>Number.isFinite(o.score)&&o.idx>=0);
+  else if(t.type==='question'){
+    const latePenalty=mode==='survival'?2:0;
+    score+=(sim.pos<25?7:sim.pos<45?4:sim.pos<60?1:-3)-latePenalty;
+    why.push('? is variance; safer early, worse late');
+  }
+  else if(t.type==='upgrade'){score+=5;why.push('upgrade card can improve future chests')}
+  else if(t.type==='movement'){score+=3;why.push('mapping card pickup improves hand')}
+  else if(t.type==='life'){score+=sim.life<=2?8:2;why.push('life/safety')}
+  else if(t.type==='trap'){
+    const projected=sim.life-1;
+    if(projected<=0){
+      score-=9999;
+      why.push('LETHAL trap; rejected');
+    }else{
+      const base=mode==='normal'?8:mode==='safe'?24:38;
+      const low=sim.life<=2?(mode==='normal'?16:55):0;
+      score-=base+low;
+      why.push('trap costs life; survival penalty');
+    }
+  }
+  else{score-=6;why.push('empty is pathing cost only')}
+
+  return{score,why};
 }
+function projectedTileResult(i,ctx){
+  let t=state.tiles[i],next={...ctx};
+  if(!t||t.used)return next;
+  if(t.type==='trap')next.life--;
+  else if(t.type==='life')next.life+=(t.fixedN||1);
+  else if(t.type==='chest'&&next.collected<maxChests)next.collected++;
+  return next;
+}
+function usedHandIndexes(seq){
+  return seq.filter(x=>x.type==='hand').map(x=>x.idx);
+}
+function seqScore(seq,depth=2){
+  const mode=plannerMode(depth);
+  let ctx={pos:state.pos,life:state.life,collected:state.collected.length};
+  let total=0,why=[],tiles=[],trapCount=0,death=false,used=new Set();
+  let premiumHit=false,valueHit=false;
+
+  for(let step=0;step<seq.length;step++){
+    let sel=seq[step];
+
+    if(sel.type==='hand'){
+      if(used.has(sel.idx))return{score:-9999,why:['illegal: repeated stored card'],tiles,life:ctx.life,trapCount,death:true,mode};
+      used.add(sel.idx);
+    }
+
+    let idx=actionTargetFrom(ctx.pos,sel);
+    if(idx<0)return{score:-9999,why:['illegal target'],tiles,life:ctx.life,trapCount,death:true,mode};
+
+    let t=state.tiles[idx];
+    let sc=tileScore(idx,ctx,mode);
+    tiles.push(idx+1);
+
+    if(t?.type==='trap'&&!t.used)trapCount++;
+    if(t?.type==='chest'&&!t.used){
+      valueHit=true;
+      if(['orange','red','rainbow'].includes(t.rarity))premiumHit=true;
+    }
+    if(t?.type==='question'&&!t.used)valueHit=true;
+
+    const stepPenalty=step*(mode==='normal'?.6:mode==='safe'?1.0:1.35);
+    const backPenalty=(sel.type==='hand'&&state.hand[sel.idx]?.type==='back')?(mode==='normal'?1:1.8):0;
+
+    total+=sc.score-stepPenalty-backPenalty;
+    why.push((step+1)+'. '+actionName(sel)+' to tile '+(idx+1)+': '+sc.why.join('; '));
+
+    ctx=projectedTileResult(idx,ctx);
+    ctx.pos=idx;
+
+    if(ctx.life<=0){
+      death=true;
+      total-=9999;
+      why.push('Line rejected: projected death before combo ends.');
+      break;
+    }
+  }
+
+  if(trapCount>=2){
+    total-=mode==='normal'?35:mode==='safe'?140:240;
+    why.push('Heavy penalty: multiple traps in planned combo.');
+  }
+  if(trapCount>=1 && state.life<=2){
+    total-=mode==='normal'?24:mode==='safe'?120:220;
+    why.push('Heavy penalty: trap while low life.');
+  }
+  if(ctx.life===1){
+    total-=mode==='normal'?18:mode==='safe'?70:140;
+    why.push('Penalty: leaves run at 1 life.');
+  }
+  if(mode==='safe' && trapCount>0 && !premiumHit){
+    total-=55;
+    why.push('Safe mode penalty: trap without premium payoff.');
+  }
+  if(mode==='survival' && trapCount>0){
+    total-=110;
+    why.push('Survival mode penalty: any trap in 4-card line.');
+  }
+  if(mode==='survival' && ctx.life<=2){
+    total-=70;
+    why.push('Survival mode penalty: projected low-life finish.');
+  }
+
+  if(seq.length>1 && valueHit)total+=3;
+  if(seq.length>1 && premiumHit)total+=4;
+
+  return{score:total,why,tiles,life:ctx.life,trapCount,death,mode};
+}
+function buildSequences(depth){
+  const acts=movableActions();
+  const mode=plannerMode(depth);
+  const out=[];
+
+  function rec(seq){
+    if(seq.length){
+      const s=seqScore(seq,depth);
+      const first=seq[0];
+      out.push({
+        first,
+        seq:[...seq],
+        name:seq.map(actionName).join(' → '),
+        idx:(s.tiles[0]||0)-1,
+        finalIdx:(s.tiles.at(-1)||0)-1,
+        score:s.score,
+        why:s.why,
+        tiles:s.tiles,
+        life:s.life,
+        trapCount:s.trapCount,
+        death:s.death,
+        mode:s.mode
+      });
+      if(s.death)return;
+    }
+    if(seq.length>=depth)return;
+    const used=usedHandIndexes(seq);
+    for(const a of acts){
+      if(a.type==='hand'&&used.includes(a.idx))continue;
+      rec([...seq,a]);
+    }
+  }
+
+  rec([]);
+
+  let filtered=out.filter(o=>Number.isFinite(o.score)&&o.idx>=0&&!o.death);
+
+  if(mode==='safe'){
+    filtered=filtered.filter(o=>o.trapCount<2);
+    if(state.life<=2)filtered=filtered.filter(o=>o.trapCount===0);
+  }
+
+  if(mode==='survival'){
+    filtered=filtered.filter(o=>o.trapCount<2 && o.life>1);
+    if(state.life<=2)filtered=filtered.filter(o=>o.trapCount===0);
+  }
+
+  return filtered;
+}
+
 function isRecoverable(i){
   let t=state.tiles[i];
   return t&&!t.used&&(t.type==='chest'||t.type==='question');
@@ -508,13 +685,13 @@ function finalTileRecoveryPlan(){
   return best;
 }
 function suggestMove(){
-  let depth=Math.max(2,Math.min(3,+($('comboDepthInput').value||2)));
+  let depth=comboDepthValue();
   let plan=finalTileRecoveryPlan();
   if(plan){
     if(state.currentMove===plan.need){
-      suggested={first:{type:'hand',idx:plan.backIdx},idx:plan.backPos,score:plan.score,why:[plan.why],name:'stored Back '+plan.backN+' → current refill Move '+plan.need,tiles:[plan.backPos+1,plan.target+1]};
+      suggested={first:{type:'hand',idx:plan.backIdx},idx:plan.backPos,score:plan.score,why:[plan.why],name:'stored Back '+plan.backN+' → current refill Move '+plan.need,tiles:[plan.backPos+1,plan.target+1],life:state.life,trapCount:0,mode:'recovery'};
     }else{
-      suggested={first:{type:'current'},idx:state.pos,score:plan.score-1,why:['Cycle current move at final tile until Move '+plan.need+' appears. '+plan.why],name:'Cycle for Move '+plan.need,tiles:[state.pos+1]};
+      suggested={first:{type:'current'},idx:state.pos,score:plan.score-1,why:['Cycle current move at final tile until Move '+plan.need+' appears. '+plan.why],name:'Cycle for Move '+plan.need,tiles:[state.pos+1],life:state.life,trapCount:0,mode:'recovery'};
     }
     render(); return;
   }
@@ -553,7 +730,7 @@ function clickTile(i){
     }
     else if(t.type==='trap'){state.life--;t.used=true;log('Trap at tile '+(i+1)+'. Lost 1 life.');if(state.life<=0){state.dead=true;state.done=true;log('Run bricked at tile '+(i+1)+'.')}}
     else if(t.type==='movement'){let c=normalizeCard(t.fixedN?{type:'move',n:t.fixedN,name:'Move '+t.fixedN}:drawMappingCard());state.hand.push(c);t.used=true;log('Mapping-card tile gained: '+c.name+'.')}
-    else if(t.type==='upgrade'){let c=normalizeCard({type:'upgrade',from:t.fixedFrom||wc({green:.01,blue:.54,purple:.35,orange:.10,red:.005})});state.hand.push(c);t.used=true;log('Picked '+c.name+' card.')}
+    else if(t.type==='upgrade'){let c=normalizeCard({type:'upgrade',from:t.fixedFrom||wc(upgradeCardW)});state.hand.push(c);t.used=true;log('Picked '+c.name+' card.')}
     else if(t.type==='life'){let n=t.fixedN||1;state.life+=n;t.used=true;log('Gained '+n+' life.')}
     else if(t.type==='question'){t.used=true;log('Hit ? at tile '+(i+1)+'.');applyQuestion()}
     else if(t.type==='start'){}
@@ -564,16 +741,83 @@ function clickTile(i){
   if(state.collected.length>=maxChests){state.autoStatus='Chest cap reached at tile '+(state.pos+1)+'. Run remains active until manual end or 0 life.';log(state.autoStatus)}
   render();
 }
+function collectedUpgradeableIndexes(){
+  let a=[];
+  for(let i=0;i<state.collected.length;i++)if(state.collected[i]!=='rainbow')a.push(i);
+  return a;
+}
+function futureChestIndexes(){
+  let a=[];
+  for(let i=state.pos+1;i<totalTiles;i++)if(state.tiles[i].type==='chest'&&!state.tiles[i].used&&state.tiles[i].rarity!=='rainbow')a.push(i);
+  return a;
+}
+function pickSome(arr,minN=1,maxN=3){
+  let pool=arr.slice();
+  for(let i=pool.length-1;i>0;i--){let j=randint(0,i+1);[pool[i],pool[j]]=[pool[j],pool[i]]}
+  return pool.slice(0,Math.min(pool.length,randint(minN,maxN+1)));
+}
+function gainQuestionCards(){
+  let n=randint(1,4);
+  for(let i=0;i<n;i++)state.hand.push(normalizeCard(drawMappingCard()));
+  log('? gained '+n+' stored card'+(n>1?'s':'')+'.');
+}
+function upgradeCollectedRandom(){
+  let picks=pickSome(collectedUpgradeableIndexes(),1,3);
+  if(!picks.length){log('? rolled owned-chest upgrades but no obtained chest could upgrade.');return}
+  for(const i of picks)state.collected[i]=upgrade(state.collected[i]);
+  log('? upgraded '+picks.length+' obtained chest'+(picks.length>1?'s':'')+'.');
+}
+function upgradeAllCollected(){
+  let picks=collectedUpgradeableIndexes();
+  if(!picks.length){log('? rolled all-owned upgrade but no obtained chest could upgrade.');return}
+  for(const i of picks)state.collected[i]=upgrade(state.collected[i]);
+  log('? upgraded all obtained chests.');
+}
+function upgradeMapRandom(){
+  let picks=pickSome(futureChestIndexes(),1,3);
+  if(!picks.length){log('? rolled map-chest upgrades but no map chest could upgrade.');return}
+  for(const i of picks)state.tiles[i].rarity=upgrade(state.tiles[i].rarity);
+  log('? upgraded '+picks.length+' map chest'+(picks.length>1?'s':'')+'.');
+}
+function upgradeAllMap(){
+  let picks=futureChestIndexes();
+  if(!picks.length){log('? rolled all-map upgrade but no map chest could upgrade.');return}
+  for(const i of picks)state.tiles[i].rarity=upgrade(state.tiles[i].rarity);
+  state.futureUpgrade++;
+  log('? upgraded all future map chests.');
+}
 function applyQuestion(){
   let e=wc(qW);
-  if(e==='life'){let n=rng()<.75?1:2;state.life+=n;log('? gained '+n+' life.')}
-  else if(e==='mapping_card'){let c=normalizeCard(drawMappingCard());state.hand.push(c);log('? gained mapping card: '+c.name+'.')}
-  else if(e==='upgrade_random'){let ch=[];for(let i=state.pos+1;i<Math.min(totalTiles,state.pos+21);i++)if(state.tiles[i].type==='chest')ch.push(i);if(ch.length){let i=ch[randint(0,ch.length)],old=state.tiles[i].rarity;state.tiles[i].rarity=upgrade(old,rng()<.8?1:2);log('? upgraded chest tile '+(i+1)+': '+old+' → '+state.tiles[i].rarity+'.')}}
-  else if(e==='upgrade_all'){state.futureUpgrade++;for(let i=state.pos+1;i<totalTiles;i++)if(state.tiles[i].type==='chest')state.tiles[i].rarity=upgrade(state.tiles[i].rarity);log('? upgraded all succeeding chests.')}
-  else if(e==='add_chest'||e==='add_high'){let spots=[];for(let i=state.pos+1;i<totalTiles;i++)if(state.tiles[i].type!=='chest'&&state.tiles[i].type!=='start')spots.push(i);if(spots.length){let i=spots[randint(0,spots.length)],r=e==='add_high'?wc({purple:.45,orange:.38,red:.14,rainbow:.03}):wc(chestW);state.tiles[i]={type:'chest',rarity:upgrade(r,state.futureUpgrade)};log('? added '+state.tiles[i].rarity+' chest at tile '+(i+1)+'.')}}
-  else if(e==='rainbow_all'){for(let i=state.pos+1;i<totalTiles;i++)if(state.tiles[i].type==='chest')state.tiles[i].rarity='rainbow';log('? turned remaining chests rainbow.')}
-  else if(e==='remove_traps'){let n=0;for(let i=state.pos+1;i<totalTiles;i++)if(state.tiles[i].type==='trap'){state.tiles[i]={type:'empty'};n++}log('? removed '+n+' traps.')}
-  else log('? small/no meaningful effect.');
+  if(e==='life'){
+    let n=randint(1,4);
+    state.life+=n;
+    log('? gained '+n+' life.');
+  }
+  else if(e==='mapping_card')gainQuestionCards();
+  else if(e==='upgrade_random_owned')upgradeCollectedRandom();
+  else if(e==='upgrade_all_owned')upgradeAllCollected();
+  else if(e==='upgrade_random_map')upgradeMapRandom();
+  else if(e==='upgrade_all_map')upgradeAllMap();
+  else if(e==='add_chest'||e==='add_high'){
+    let spots=[];
+    for(let i=state.pos+1;i<totalTiles;i++)if(state.tiles[i].type!=='chest'&&state.tiles[i].type!=='start')spots.push(i);
+    if(spots.length){
+      let i=spots[randint(0,spots.length)],r=e==='add_high'?wc({purple:.45,orange:.38,red:.14,rainbow:.03}):wc(chestW);
+      state.tiles[i]={type:'chest',rarity:upgrade(r,state.futureUpgrade)};
+      log('? added '+rarityLabel(state.tiles[i].rarity)+' chest at tile '+(i+1)+'.');
+    }else log('? rolled add-chest but no open map tile was available.');
+  }
+  else if(e==='rainbow_all'){
+    let ch=futureChestIndexes();
+    if(ch.length){for(const i of ch)state.tiles[i].rarity='rainbow';log('? turned '+ch.length+' remaining map chest'+(ch.length>1?'s':'')+' rainbow.');}
+    else log('? rolled rainbow map chests but no map chest was available.');
+  }
+  else if(e==='remove_traps'){
+    let n=0;
+    for(let i=state.pos+1;i<totalTiles;i++)if(state.tiles[i].type==='trap'){state.tiles[i]={type:'empty'};n++}
+    if(n)log('? removed '+n+' future trap'+(n>1?'s':'')+'.');
+    else log('? rolled remove traps but no future traps were available.');
+  }
 }
 function autoPlay(limit=300){
   for(let step=0;step<limit;step++){
@@ -584,7 +828,7 @@ function autoPlay(limit=300){
     }
     suggestMove();
     if(!suggested){state.autoStatus='Auto stopped: no suggestion.';log(state.autoStatus);break}
-    if(suggested.score<-20){state.autoStatus='Auto stopped: best move score too low.';log(state.autoStatus);break}
+    if(suggested.death||suggested.score<-12||(suggested.trapCount&&state.life<=2)){state.autoStatus='Auto stopped: best move score too low / unsafe.';log(state.autoStatus);break}
     takeSuggestion();
   }
   render();
@@ -615,7 +859,7 @@ function render(){
   $('currentMoveBtn').textContent='Preview current refill Move '+state.currentMove;
   $('currentMoveBtn').className='arc-card '+(selected&&selected.type==='current'?'selected':'');
   $('hand').innerHTML=state.hand.map((c,i)=>`<button class="arc-card ${selected&&selected.type==='hand'&&selected.idx===i?'selected':''}" onclick="selectHand(${i})">${c.name}</button>`).join('')||'<span class="small">No stored cards.</span>';
-  let targets=targetOptionsFor(selected);
+    let targets=targetOptionsFor(selected);
   let rows=[];
   for(let r=0;r<Math.ceil(state.tiles.length/4);r++){
     let start=r*4;
@@ -637,11 +881,17 @@ function render(){
   $('log').innerHTML=state.log.map(x=>'<div>'+x+'</div>').join('');
   if(suggested){
     let rows=(suggested.tiles||[]).join(' → ');
-    $('routeNotes').innerHTML='<b>Recommended:</b> '+actionName(suggested.first)+'<br><b>Line:</b> '+suggested.name+'<br><b>Tiles:</b> '+rows+'<br><b>Score:</b> '+suggested.score.toFixed(1)+'<br>'+suggested.why.join('<br>');
+    $('routeNotes').innerHTML='<b>Recommended:</b> '+actionName(suggested.first)
+      +'<br><b>Line:</b> '+suggested.name
+      +'<br><b>Tiles:</b> '+rows
+      +'<br><b>Score:</b> '+suggested.score.toFixed(1)
+      +(suggested.mode?'<br><b>Planner:</b> '+suggested.mode:'')
+      +(suggested.life!==undefined?'<br><b>Projected life:</b> '+suggested.life:'')
+      +(suggested.trapCount?'<br><b>Trap count in line:</b> '+suggested.trapCount:'')
+      +'<br>'+suggested.why.join('<br>');
   }else{
-    $('routeNotes').innerHTML='Click <b>Recommend Next Move</b>. Recommendations use 2-card route logic by default; 3-card is advanced.';
-  }
-}
+    $('routeNotes').innerHTML='Click <b>Recommend Next Move</b>. Recommendations use 2-card route logic by default; 3-card is safe; 4-card is survival-first.';
+  }}
 function openInfoModal(){$('infoModal').classList.add('open')}
 function closeInfoModal(){$('infoModal').classList.remove('open')}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeInfoModal()});
