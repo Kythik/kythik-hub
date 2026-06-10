@@ -930,32 +930,38 @@ function suggestionTarget(){
   if(!suggested||!suggested.first)return -1;
   return targetFor(suggested.first);
 }
+function suggestionFirstTile(){
+  const idx=suggestionTarget();
+  return idx>=0?state.tiles[idx]:null;
+}
+function suggestionFirstMoveWouldKill(){
+  const t=suggestionFirstTile();
+  return !!(t&&t.type==='trap'&&!t.used&&state.life<=1);
+}
+function suggestionFirstMoveIsNonLethalTrap(){
+  const t=suggestionFirstTile();
+  return !!(t&&t.type==='trap'&&!t.used&&state.life>1);
+}
 function suggestionIsEndgameMove(){
   let idx=suggestionTarget();
   return idx>=totalTiles-1 || (suggested&&suggested.tiles&&suggested.tiles.some(t=>t>=totalTiles));
 }
 function suggestionIsQuestionMove(){
-  let idx=suggestionTarget();
-  let t=idx>=0?state.tiles[idx]:null;
+  const t=suggestionFirstTile();
   return !!(t&&t.type==='question'&&!t.used);
 }
 function suggestionIsUnsafeMove(){
-  let idx=suggestionTarget();
-  let t=idx>=0?state.tiles[idx]:null;
-  return !!(suggested&&(suggested.death||suggested.score<-12||(suggested.trapCount&&state.life<=2)||(t&&t.type==='trap'&&state.life<=1)));
-}
-function suggestionTarget(){
-  if(!suggested||!suggested.first)return -1;
-  return targetFor(suggested.first);
-}
-function suggestionIsEndgameMove(){
-  let idx=suggestionTarget();
-  return idx>=totalTiles-1 || (suggested&&suggested.tiles&&suggested.tiles.some(t=>t>=totalTiles));
-}
-function suggestionIsUnsafeMove(){
-  let idx=suggestionTarget();
-  let t=idx>=0?state.tiles[idx]:null;
-  return !!(suggested&&(suggested.death||suggested.score<-12||(suggested.trapCount&&state.life<=2)||(t&&t.type==='trap'&&state.life<=1)));
+  if(!suggested)return false;
+  if(suggestionFirstMoveWouldKill())return true;
+
+  /*
+    A planned multi-step line can contain a later trap/death and score badly.
+    Autoplay only executes the first move, then replans.
+    So a first trap at 2+ life is legal and should not be treated as death.
+  */
+  if(suggestionFirstMoveIsNonLethalTrap())return false;
+
+  return suggested.score<-12;
 }
 function autoPlay(limit=300){
   for(let step=0;step<limit;step++){
