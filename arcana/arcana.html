@@ -4,8 +4,9 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link rel="stylesheet" href="/styles.css" />
-<link rel="stylesheet" href="arcana.css?v=28cd067301" />
+<link rel="stylesheet" href="arcana.css?v=e4af7db1dd" />
 <style id="arcana-critical-guard">
+  .arcana-page .strategyModalOverlay,
   .arcana-page .strategyLightbox[hidden],
   .arcana-page .strategyLightbox:not(.isOpen){
     display:none !important;
@@ -18,10 +19,9 @@
   .arcana-page .board{display:flex!important;flex-direction:column!important;gap:7px!important;align-items:center!important;width:max-content!important}
   .arcana-page .boardRow{display:flex;gap:7px}
   .arcana-page .boardRow.reverse{flex-direction:row-reverse}
-  .arcana-page .rowJoin{width:100%;height:24px;display:grid;grid-template-columns:1fr auto 1fr auto;align-items:center;gap:8px;color:#E6C77A;pointer-events:none}
-  .arcana-page .rowJoin span{display:block;height:2px;background:linear-gradient(90deg,rgba(230,199,122,0),rgba(230,199,122,.82),rgba(230,199,122,0))}
-  .arcana-page .rowJoin b{font-size:9px;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap}
-  .arcana-page .rowJoin em{font-style:normal;font-size:10px;font-weight:900;color:#07111F;background:#E6C77A;border-radius:999px;padding:3px 7px;white-space:nowrap}
+  .arcana-page .tile{overflow:visible}
+  .arcana-page .rowEndLink{position:absolute;right:-18px;top:50%;transform:translateY(-50%);z-index:8;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(230,199,122,.75);background:rgba(4,8,15,.96);color:#E6C77A;border-radius:999px;padding:3px 6px;font-size:10px;font-weight:900;line-height:1;white-space:nowrap;box-shadow:0 0 12px rgba(230,199,122,.28),0 8px 16px rgba(0,0,0,.35);pointer-events:none}
+  .arcana-page .rowEndLink.left{left:-18px;right:auto}
 </style>
 </head>
 <body class="arcana-page">
@@ -124,7 +124,7 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
       </div>
       <div class="autoplayControls">
         <label>Strategy <select id="strategyInput" onchange="suggested=null;render()"><option value="Strategy1" selected>Strategy1</option><option value="Strategy2">Strategy2</option><option value="Strategy3">Strategy3</option><option value="Strategy4">Strategy4</option></select></label>
-        <label>Combo <select id="comboDepthInput"><option value="2" selected>2-card</option><option value="3">3-card safe</option><option value="4">4-card survival</option></select></label>
+        <label>Combo <select id="comboDepthInput"><option value="2" selected>2-card</option><option value="3">3-card</option></select></label>
         <label>Backtrack <select id="backtrackModeInput"><option value="value" selected>value recovery</option><option value="tile80">final tile only</option></select></label>
       </div>
     </div>
@@ -149,7 +149,7 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
         <div class="boardLegend">
           <span class="legendPill"><span class="legendDot" style="background:#fff"></span>Current</span>
           <span class="legendPill"><span class="legendDot"></span>Preview</span>
-          <span class="legendPill"><span class="legendDot" style="background:#E9EDF5"></span>Landing #</span><span class="legendPill"><span class="legendDot rowWrapDot"></span>Row connector</span>
+          <span class="legendPill"><span class="legendDot" style="background:#E9EDF5"></span>Landing #</span><span class="legendPill"><span class="legendDot rowWrapDot"></span>Row link</span>
         </div>
       </div>
       <div class="board" id="board" style="margin-left:auto;margin-right:auto;"></div>
@@ -294,11 +294,8 @@ function makeBoard(){
   return a;
 }
 function drawMappingCard(){
-  // Stored mapping-card pool:
-  // Fixed forward/back: Move X, Back X
-  // Choice forward: Choose 1–6, Choose Even, Choose Odd
-  // Choice back: Choose 1–3 Back
-  // Utility: Upgrade rarity → rarity
+  // Stored hand cards:
+  // Move X, Back X, Choose 1–6, Choose Even, Choose Odd, Choose 1–3 Back, Upgrade.
   let t=wc({move_fixed:.24,back_fixed:.10,move_any:.13,move_even:.08,move_odd:.08,back_any:.09,upgrade:.28});
   if(t==='move_fixed'){let n=rollMove();return{type:'move',n,name:'Move '+n}}
   if(t==='back_fixed'){let n=rollMove();return{type:'back',n,name:'Back '+n}}
@@ -425,185 +422,67 @@ function movableActions(){
   });
   return a;
 }
-function tileScore(i,ctx=null,mode='normal'){
-  const sim=ctx||{pos:state.pos,life:state.life,collected:state.collected.length};
-  let t=state.tiles[i],dist=Math.abs(i-sim.pos),score=-dist*.25,why=[];
-  if(!t)return{score:-9999,why:['invalid tile']};
+function tileScore(i){
+  let t=state.tiles[i],dist=Math.abs(i-state.pos),score=-dist*.25,why=[];
   if(t.used)return{score:-8-dist*.25,why:['already-used tile; pathing only']};
-
-  if(t.type==='chest'){
-    if(sim.collected>=maxChests){
-      score-=30;
-      why.push('chest cap reached; no extra chest value');
-    }else{
-      let r=t.rarity;
-      score+=V[r]+0.8;
-      why.push(r+' chest known value');
-      if(['orange','red','rainbow'].includes(r)){score+=10;why.push('gold+ is premium/paycheck')}
-      else if(r==='purple'){score+=4;why.push('purple+ is known value')}
-      else{score-=4;why.push('green/blue is mostly filler but still a UF ticket')}
-    }
-  }
-  else if(t.type==='question'){
-    const latePenalty=mode==='survival'?2:0;
-    score+=(sim.pos<25?7:sim.pos<45?4:sim.pos<60?1:-3)-latePenalty;
-    why.push('? is variance; safer early, worse late');
-  }
+  if(t.type==='chest'){let r=t.rarity;score+=V[r]+0.8;why.push(r+' chest known value');if(['orange','red','rainbow'].includes(r)){score+=10;why.push('gold+ is premium/paycheck')}else if(r==='purple'){score+=4;why.push('purple+ is known value')}else{score-=4;why.push('green/blue is mostly filler but still a UF ticket')}}
+  else if(t.type==='question'){score+=(state.pos<25?8:state.pos<45?5:state.pos<60?2:-1);why.push('? is random variance; better early')}
   else if(t.type==='upgrade'){score+=5;why.push('upgrade card can improve future chests')}
   else if(t.type==='movement'){score+=3;why.push('mapping card pickup improves hand')}
-  else if(t.type==='life'){score+=sim.life<=2?8:2;why.push('life/safety')}
-  else if(t.type==='trap'){
-    const projected=sim.life-1;
-    if(projected<=0){
-      score-=9999;
-      why.push('LETHAL trap; rejected');
-    }else{
-      const base=mode==='normal'?8:mode==='safe'?24:38;
-      const low=sim.life<=2?(mode==='normal'?16:55):0;
-      score-=base+low;
-      why.push('trap costs life; survival penalty');
-    }
-  }
+  else if(t.type==='life'){score+=state.life<=2?5:2;why.push('life/safety')}
+  else if(t.type==='trap'){score-=state.life<=1?20:5;why.push('trap risk')}
   else{score-=6;why.push('empty is pathing cost only')}
-
+  if(state.collected.length>=maxChests)score=-999;
   return{score,why};
 }
-function projectedTileResult(i,ctx){
-  let t=state.tiles[i],next={...ctx};
-  if(!t||t.used)return next;
-  if(t.type==='trap')next.life--;
-  else if(t.type==='life')next.life+=(t.fixedN||1);
-  else if(t.type==='chest'&&next.collected<maxChests)next.collected++;
-  return next;
+function actionName(sel){
+  if(sel.type==='current')return 'current refill Move '+state.currentMove;
+  let c=state.hand[sel.idx]; if(!c)return 'missing card';
+  if(c.type==='move'||c.type==='back')return 'stored '+c.name;
+  return c.name;
 }
-function usedHandIndexes(seq){
-  return seq.filter(x=>x.type==='hand').map(x=>x.idx);
+function actionTargetFrom(pos,sel){
+  if(sel.type==='current')return clampTarget(pos+state.currentMove);
+  let c=state.hand[sel.idx]; if(!c)return -1;
+  if(c.type==='move')return clampTarget(pos+c.n);
+  if(c.type==='back')return clampTarget(pos-c.n);
+  return -1;
 }
-function seqScore(seq,depth=2){
-  const mode=plannerMode(depth);
-  let ctx={pos:state.pos,life:state.life,collected:state.collected.length};
-  let total=0,why=[],tiles=[],trapCount=0,death=false,used=new Set();
-  let premiumHit=false,valueHit=false;
-
+function movableActions(){
+  let a=[{type:'current'}];
+  state.hand.forEach((c,idx)=>{if(c.type==='move'||c.type==='back')a.push({type:'hand',idx})});
+  return a;
+}
+function seqScore(seq){
+  let pos=state.pos,total=0,why=[],tiles=[];
   for(let step=0;step<seq.length;step++){
-    let sel=seq[step];
-
-    if(sel.type==='hand'){
-      if(used.has(sel.idx))return{score:-9999,why:['illegal: repeated stored card'],tiles,life:ctx.life,trapCount,death:true,mode};
-      used.add(sel.idx);
-    }
-
-    let idx=actionTargetFrom(ctx.pos,sel);
-    if(idx<0)return{score:-9999,why:['illegal target'],tiles,life:ctx.life,trapCount,death:true,mode};
-
-    let t=state.tiles[idx];
-    let sc=tileScore(idx,ctx,mode);
-    tiles.push(idx+1);
-
-    if(t?.type==='trap'&&!t.used)trapCount++;
-    if(t?.type==='chest'&&!t.used){
-      valueHit=true;
-      if(['orange','red','rainbow'].includes(t.rarity))premiumHit=true;
-    }
-    if(t?.type==='question'&&!t.used)valueHit=true;
-
-    const stepPenalty=step*(mode==='normal'?.6:mode==='safe'?1.0:1.35);
-    const backPenalty=(sel.type==='hand'&&state.hand[sel.idx]?.type==='back')?(mode==='normal'?1:1.8):0;
-
-    total+=sc.score-stepPenalty-backPenalty;
+    let sel=seq[step],idx=actionTargetFrom(pos,sel); if(idx<0)continue;
+    let sc=tileScore(idx); total+=sc.score-(step*.6); tiles.push(idx+1);
     why.push((step+1)+'. '+actionName(sel)+' to tile '+(idx+1)+': '+sc.why.join('; '));
-
-    ctx=projectedTileResult(idx,ctx);
-    ctx.pos=idx;
-
-    if(ctx.life<=0){
-      death=true;
-      total-=9999;
-      why.push('Line rejected: projected death before combo ends.');
-      break;
-    }
+    if(state.tiles[idx].type==='trap'&&state.life<=1) total-=50;
+    pos=idx;
   }
-
-  if(trapCount>=2){
-    total-=mode==='normal'?35:mode==='safe'?140:240;
-    why.push('Heavy penalty: multiple traps in planned combo.');
+  if(seq.length>1){
+    let last=state.tiles[tiles[tiles.length-1]-1];
+    if(seq.some(s=>s.type==='hand'&&state.hand[s.idx]?.type==='back') && last && (last.type==='chest'||last.type==='question')) total+=5;
   }
-  if(trapCount>=1 && state.life<=2){
-    total-=mode==='normal'?24:mode==='safe'?120:220;
-    why.push('Heavy penalty: trap while low life.');
-  }
-  if(ctx.life===1){
-    total-=mode==='normal'?18:mode==='safe'?70:140;
-    why.push('Penalty: leaves run at 1 life.');
-  }
-  if(mode==='safe' && trapCount>0 && !premiumHit){
-    total-=55;
-    why.push('Safe mode penalty: trap without premium payoff.');
-  }
-  if(mode==='survival' && trapCount>0){
-    total-=110;
-    why.push('Survival mode penalty: any trap in 4-card line.');
-  }
-  if(mode==='survival' && ctx.life<=2){
-    total-=70;
-    why.push('Survival mode penalty: projected low-life finish.');
-  }
-
-  if(seq.length>1 && valueHit)total+=3;
-  if(seq.length>1 && premiumHit)total+=4;
-
-  return{score:total,why,tiles,life:ctx.life,trapCount,death,mode};
+  return{score:total,why,tiles};
 }
 function buildSequences(depth){
-  const acts=movableActions();
-  const mode=plannerMode(depth);
-  const out=[];
-
-  function rec(seq){
-    if(seq.length){
-      const s=seqScore(seq,depth);
-      const first=seq[0];
-      out.push({
-        first,
-        seq:[...seq],
-        name:seq.map(actionName).join(' → '),
-        idx:(s.tiles[0]||0)-1,
-        finalIdx:(s.tiles.at(-1)||0)-1,
-        score:s.score,
-        why:s.why,
-        tiles:s.tiles,
-        life:s.life,
-        trapCount:s.trapCount,
-        death:s.death,
-        mode:s.mode
-      });
-      if(s.death)return;
-    }
-    if(seq.length>=depth)return;
-    const used=usedHandIndexes(seq);
-    for(const a of acts){
-      if(a.type==='hand'&&used.includes(a.idx))continue;
-      rec([...seq,a]);
+  let acts=movableActions(),out=[];
+  for(const a of acts){
+    let s1=seqScore([a]); out.push({first:a,seq:[a],name:actionName(a),idx:s1.tiles[0]-1,score:s1.score,why:s1.why,tiles:s1.tiles});
+    for(const b of acts){
+      if(a.type==='hand'&&b.type==='hand'&&a.idx===b.idx)continue;
+      let s2=seqScore([a,b]); out.push({first:a,seq:[a,b],name:actionName(a)+' → '+actionName(b),idx:s2.tiles[0]-1,finalIdx:s2.tiles.at(-1)-1,score:s2.score,why:s2.why,tiles:s2.tiles});
+      if(depth>=3)for(const c of acts){
+        let used=[a,b].filter(x=>x.type==='hand').map(x=>x.idx); if(c.type==='hand'&&used.includes(c.idx))continue;
+        let s3=seqScore([a,b,c]); out.push({first:a,seq:[a,b,c],name:actionName(a)+' → '+actionName(b)+' → '+actionName(c),idx:s3.tiles[0]-1,finalIdx:s3.tiles.at(-1)-1,score:s3.score,why:s3.why,tiles:s3.tiles});
+      }
     }
   }
-
-  rec([]);
-
-  let filtered=out.filter(o=>Number.isFinite(o.score)&&o.idx>=0&&!o.death);
-
-  if(mode==='safe'){
-    filtered=filtered.filter(o=>o.trapCount<2);
-    if(state.life<=2)filtered=filtered.filter(o=>o.trapCount===0);
-  }
-
-  if(mode==='survival'){
-    filtered=filtered.filter(o=>o.trapCount<2 && o.life>1);
-    if(state.life<=2)filtered=filtered.filter(o=>o.trapCount===0);
-  }
-
-  return filtered;
+  return out.filter(o=>Number.isFinite(o.score)&&o.idx>=0);
 }
-
 function isRecoverable(i){
   let t=state.tiles[i];
   return t&&!t.used&&(t.type==='chest'||t.type==='question');
@@ -629,13 +508,13 @@ function finalTileRecoveryPlan(){
   return best;
 }
 function suggestMove(){
-  let depth=comboDepthValue();
+  let depth=Math.max(2,Math.min(3,+($('comboDepthInput').value||2)));
   let plan=finalTileRecoveryPlan();
   if(plan){
     if(state.currentMove===plan.need){
-      suggested={first:{type:'hand',idx:plan.backIdx},idx:plan.backPos,score:plan.score,why:[plan.why],name:'stored Back '+plan.backN+' → current refill Move '+plan.need,tiles:[plan.backPos+1,plan.target+1],life:state.life,trapCount:0,mode:'recovery'};
+      suggested={first:{type:'hand',idx:plan.backIdx},idx:plan.backPos,score:plan.score,why:[plan.why],name:'stored Back '+plan.backN+' → current refill Move '+plan.need,tiles:[plan.backPos+1,plan.target+1]};
     }else{
-      suggested={first:{type:'current'},idx:state.pos,score:plan.score-1,why:['Cycle current move at final tile until Move '+plan.need+' appears. '+plan.why],name:'Cycle for Move '+plan.need,tiles:[state.pos+1],life:state.life,trapCount:0,mode:'recovery'};
+      suggested={first:{type:'current'},idx:state.pos,score:plan.score-1,why:['Cycle current move at final tile until Move '+plan.need+' appears. '+plan.why],name:'Cycle for Move '+plan.need,tiles:[state.pos+1]};
     }
     render(); return;
   }
@@ -688,7 +567,7 @@ function clickTile(i){
 function applyQuestion(){
   let e=wc(qW);
   if(e==='life'){let n=rng()<.75?1:2;state.life+=n;log('? gained '+n+' life.')}
-  else if(e==='mapping_card'){let c=normalizeCard(drawMappingCard());state.hand.push(c);log('? gained stored card: '+c.name+'.')}
+  else if(e==='mapping_card'){let c=normalizeCard(drawMappingCard());state.hand.push(c);log('? gained mapping card: '+c.name+'.')}
   else if(e==='upgrade_random'){let ch=[];for(let i=state.pos+1;i<Math.min(totalTiles,state.pos+21);i++)if(state.tiles[i].type==='chest')ch.push(i);if(ch.length){let i=ch[randint(0,ch.length)],old=state.tiles[i].rarity;state.tiles[i].rarity=upgrade(old,rng()<.8?1:2);log('? upgraded chest tile '+(i+1)+': '+old+' → '+state.tiles[i].rarity+'.')}}
   else if(e==='upgrade_all'){state.futureUpgrade++;for(let i=state.pos+1;i<totalTiles;i++)if(state.tiles[i].type==='chest')state.tiles[i].rarity=upgrade(state.tiles[i].rarity);log('? upgraded all succeeding chests.')}
   else if(e==='add_chest'||e==='add_high'){let spots=[];for(let i=state.pos+1;i<totalTiles;i++)if(state.tiles[i].type!=='chest'&&state.tiles[i].type!=='start')spots.push(i);if(spots.length){let i=spots[randint(0,spots.length)],r=e==='add_high'?wc({purple:.45,orange:.38,red:.14,rainbow:.03}):wc(chestW);state.tiles[i]={type:'chest',rarity:upgrade(r,state.futureUpgrade)};log('? added '+state.tiles[i].rarity+' chest at tile '+(i+1)+'.')}}
@@ -705,7 +584,7 @@ function autoPlay(limit=300){
     }
     suggestMove();
     if(!suggested){state.autoStatus='Auto stopped: no suggestion.';log(state.autoStatus);break}
-    if(suggested.death||suggested.score<-12||(suggested.trapCount&&state.life<=2)){state.autoStatus='Auto stopped: best move score too low / unsafe.';log(state.autoStatus);break}
+    if(suggested.score<-20){state.autoStatus='Auto stopped: best move score too low.';log(state.autoStatus);break}
     takeSuggestion();
   }
   render();
@@ -720,7 +599,7 @@ function icon(t){
   if(t.type==='trap')return '⚠';
   if(t.type==='movement')return t.fixedN?'Move '+t.fixedN:'Card';
   if(t.type==='upgrade')return 'Up '+(t.fixedFrom||'?');
-  if(t.type==='life')return t.fixedN?('+'+t.fixedN+' Life'):'Life tile';
+  if(t.type==='life')return t.fixedN?('+'+t.fixedN+' Life'):'+Life';
   if(t.type==='question')return '?';
   return '·';
 }
@@ -740,34 +619,29 @@ function render(){
   let rows=[];
   for(let r=0;r<Math.ceil(state.tiles.length/4);r++){
     let start=r*4;
+    let rowEnd=Math.min(start+3,state.tiles.length-1);
     let items=state.tiles.slice(start,start+4);
     let tileHtml=items.map((t,off)=>{
       let i=start+off;
       let visit=state.path.indexOf(i+1),land=visit>=0?`<span class="land">${visit+1}</span>`:'';
-      return `<button class="tile ${t.type} ${t.type==='chest'?'chest chest-'+t.rarity:''} ${t.rarity||''} ${i<state.pos?'done':''} ${visit>=0?'landed':''} ${i===state.pos?'pos':''} ${targets.includes(i)?'reach':''} ${suggested&&i===suggested.idx?'suggest':''}" onclick="clickTile(${i})"><span class="n">${i+1}</span><span class="c">${icon(t)}</span>${land}</button>`;
+      let link='';
+      if(rowEnd<state.tiles.length-1){
+        if(r%2===0 && i===rowEnd)link=`<span class="rowEndLink" title="Continues to tile ${rowEnd+2}">${i+1} ↴ ${rowEnd+2}</span>`;
+        if(r%2===1 && i===start)link=`<span class="rowEndLink left" title="Continues to tile ${rowEnd+2}">${i+1} ↵ ${rowEnd+2}</span>`;
+      }
+      return `<button class="tile ${t.type} ${t.type==='chest'?'chest chest-'+t.rarity:''} ${t.rarity||''} ${i<state.pos?'done':''} ${visit>=0?'landed':''} ${i===state.pos?'pos':''} ${targets.includes(i)?'reach':''} ${suggested&&i===suggested.idx?'suggest':''}" onclick="clickTile(${i})"><span class="n">${i+1}</span><span class="c">${icon(t)}</span>${land}${link}</button>`;
     }).join('');
     rows.push(`<div class="boardRow ${r%2?'reverse':'forward'}">${tileHtml}</div>`);
-    if(start+4<state.tiles.length){
-      let from=r%2?start+1:start+4;
-      let to=start+5;
-      rows.push(`<div class="rowJoin ${r%2?'leftJoin':'rightJoin'}" aria-hidden="true"><span></span><b>ROW CONTINUES</b><span></span><em>${from} → ${to}</em></div>`);
-    }
   }
   $('board').innerHTML=rows.join('');
   $('log').innerHTML=state.log.map(x=>'<div>'+x+'</div>').join('');
   if(suggested){
     let rows=(suggested.tiles||[]).join(' → ');
-    $('routeNotes').innerHTML='<b>Recommended:</b> '+actionName(suggested.first)
-      +'<br><b>Line:</b> '+suggested.name
-      +'<br><b>Tiles:</b> '+rows
-      +'<br><b>Score:</b> '+suggested.score.toFixed(1)
-      +(suggested.mode?'<br><b>Planner:</b> '+suggested.mode:'')
-      +(suggested.life!==undefined?'<br><b>Projected life:</b> '+suggested.life:'')
-      +(suggested.trapCount?'<br><b>Trap count in line:</b> '+suggested.trapCount:'')
-      +'<br>'+suggested.why.join('<br>');
+    $('routeNotes').innerHTML='<b>Recommended:</b> '+actionName(suggested.first)+'<br><b>Line:</b> '+suggested.name+'<br><b>Tiles:</b> '+rows+'<br><b>Score:</b> '+suggested.score.toFixed(1)+'<br>'+suggested.why.join('<br>');
   }else{
-    $('routeNotes').innerHTML='Click <b>Recommend Next Move</b>. Recommendations use 2-card route logic by default; 3-card is safe; 4-card is survival-first.';
-  }}
+    $('routeNotes').innerHTML='Click <b>Recommend Next Move</b>. Recommendations use 2-card route logic by default; 3-card is advanced.';
+  }
+}
 function openInfoModal(){$('infoModal').classList.add('open')}
 function closeInfoModal(){$('infoModal').classList.remove('open')}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeInfoModal()});
