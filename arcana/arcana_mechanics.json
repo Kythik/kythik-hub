@@ -197,5 +197,13 @@
       "totalTiles": 96,
       "note": "Legacy special board 3 remains code-defined."
     }
+  },
+  "targeting": {
+    "upgradeCard": "highest_eligible_rarity_random_within_bucket",
+    "questionUpgrade": "random_chest_target",
+    "notes": {
+      "upgradeCard": "Upgrade cards check the highest eligible rarity tier first, then lower tiers; target is random within the first eligible tier found.",
+      "questionUpgrade": "? upgrade effects randomly choose eligible chests; they do not highest-tier-prioritize."
+    }
   }
 }

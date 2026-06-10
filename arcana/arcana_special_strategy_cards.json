@@ -7,7 +7,7 @@
       "title": "Special 1: Rainbow Wall",
       "kicker": "Recommended",
       "meta": "Board 1 value route",
-      "cardSummary": "Chest slots first, solve the wall only when payoff beats trap cost, then convert owned chests with red upgrades.",
+      "cardSummary": "Chest slots first, solve the wall when payoff beats trap cost, then use highest-tier-priority red upgrades on owned chests.",
       "profile": "Special Board 1 starts with chests, then a trap wall, then red upgrades. This route treats early chests as upgradeable slots and uses the wall solver to decide whether crossing is worth it.",
       "notes": [
         [
@@ -29,6 +29,10 @@
         [
           "Offset logic",
           "Softly protects the final correction card; it does not forbid spending it."
+        ],
+        [
+          "Targeting correction",
+          "Upgrade cards highest-tier-prioritize, then randomly pick inside that tier."
         ]
       ],
       "useWhen": "Use when you have several owned chest slots, enough life/card reach to cross, and red upgrades still available after the wall.",
@@ -54,7 +58,7 @@
           "heading": "After wall",
           "steps": [
             "Use red upgrades on owned chests.",
-            "Prefer the upgrades with the highest conversion gain.",
+            "Upgrade cards target the highest eligible owned rarity tier, then random within that tier.",
             "Keep routing simple; do not over-chase empty pathing."
           ]
         }
@@ -83,9 +87,9 @@
     {
       "id": "Special2_Bank_And_Cross",
       "title": "Special 2: Bank & Cross",
-      "kicker": "Recommended",
-      "meta": "Board 2 value route",
-      "cardSummary": "Bank red upgrades first, preserve enough life/movement to cross, then spend upgrades on the late chest zone.",
+      "kicker": "Stable value",
+      "meta": "Board 2 bank route",
+      "cardSummary": "Banks more red upgrades before crossing. Slightly behind Aggro Cross in corrected value test, but has higher wall success.",
       "profile": "Special Board 2 is the reverse of Board 1: upgrades first, trap wall second, chests last. This route values banked red upgrades and then uses wall logic to reach the chest zone.",
       "notes": [
         [
@@ -105,11 +109,15 @@
           "Banked red upgrade cards are used on future chest tiles in the late chest zone."
         ],
         [
+          "Upgrade targeting",
+          "Banked red upgrades target the highest eligible future chest rarity tier, random within that tier."
+        ],
+        [
           "Validation",
-          "Best value in the 2,000-run Special Board 2 test."
+          "Corrected targeting test: strong value route, but Aggro Cross narrowly ranked higher by average value."
         ]
       ],
-      "useWhen": "Use as the default Special Board 2 route when you want the highest tested value.",
+      "useWhen": "Use when you want a steadier Bank & Cross line with more wall success.",
       "avoidWhen": "Avoid if you only care about filling all seven chest slots instead of upgrade value.",
       "walkthrough": [
         {
@@ -132,7 +140,7 @@
           "heading": "Chest zone",
           "steps": [
             "Use banked red upgrades on future chest tiles as they enter range.",
-            "Every late chest is a conversion target.",
+            "Upgrade cards highest-tier-prioritize; within the top eligible tier, the target is random.",
             "Value route prioritizes upgraded chest quality over raw 7-chest completion."
           ]
         }
@@ -165,9 +173,9 @@
     {
       "id": "Special2_Aggro_Cross",
       "title": "Special 2: Aggro Cross",
-      "kicker": "Faster cross",
-      "meta": "Board 2 faster route",
-      "cardSummary": "Crosses with fewer banked upgrades. Slightly lower tested value, but less waiting in the upgrade zone.",
+      "kicker": "Recommended",
+      "meta": "Board 2 corrected-value route",
+      "cardSummary": "Crosses with fewer banked upgrades. Narrowly highest average value after corrected upgrade targeting.",
       "profile": "An aggressive Board 2 option that crosses with fewer upgrades banked. It can be useful when the early zone is awkward or wall access is already strong.",
       "notes": [
         [
@@ -181,9 +189,13 @@
         [
           "Use case",
           "Good when the wall package is strong but upgrade-zone routing is poor."
+        ],
+        [
+          "Validation",
+          "Corrected targeting test: ranked #1 by average value in the 2,000-run Board 2 retest."
         ]
       ],
-      "useWhen": "Use when you already have a strong wall line and do not want to over-harvest the early upgrade zone.",
+      "useWhen": "Use as the current default Board 2 route when you want the highest corrected-test value.",
       "avoidWhen": "Avoid when safe red upgrade tiles are still easy to collect."
     }
   ]

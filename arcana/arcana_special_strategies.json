@@ -3,7 +3,7 @@
   "updated": "2026-06-10",
   "defaultByBoard": {
     "special1": "Special1_Rainbow_Wall",
-    "special2": "Special2_Bank_And_Cross"
+    "special2": "Special2_Aggro_Cross"
   },
   "boards": {
     "special1": {
@@ -91,7 +91,18 @@
                 "Keep recommendations simple: target high upgrade gain, reachable red upgrades, and avoid pointless empty pathing."
               ]
             }
-          ]
+          ],
+          "metrics": {
+            "runs": 2000,
+            "targetingModel": "highest eligible rarity first, random within bucket",
+            "avgValue": 34.4639,
+            "completion7Rate": 0.109,
+            "avgChests": 5.069,
+            "avgRainbow": 0.0635,
+            "wallSuccessRate": 0.0525,
+            "avgOwnedUpgradesUsed": 1.827,
+            "rankByValue": 1
+          }
         },
         {
           "id": "Special1_Safer_Wall",
@@ -106,6 +117,17 @@
             "crossScoreThreshold": 30,
             "trapWallBlockedPenalty": 110,
             "preWallEnterBlockedPenalty": 100
+          },
+          "metrics": {
+            "runs": 2000,
+            "targetingModel": "highest eligible rarity first, random within bucket",
+            "avgValue": 33.8772,
+            "completion7Rate": 0.138,
+            "avgChests": 5.1735,
+            "avgRainbow": 0.058,
+            "wallSuccessRate": 0.047,
+            "avgOwnedUpgradesUsed": 1.817,
+            "rankByValue": 2
           }
         }
       ]
@@ -159,15 +181,15 @@
           },
           "metrics": {
             "runs": 2000,
-            "avgValue": 60.9232,
-            "completion7Rate": 0.0515,
-            "avgChests": 3.3605,
-            "avgRainbow": 0.4085,
-            "wallSuccessRate": 0.8205,
-            "avgUpgradeTilesTaken": 5.026,
-            "avgMapUpgradesUsed": 5.5885,
-            "rankByValue": 1,
-            "rankByCompletion": 3
+            "targetingModel": "highest eligible rarity first, random within bucket",
+            "avgValue": 59.4569,
+            "completion7Rate": 0.05,
+            "avgChests": 3.3555,
+            "avgRainbow": 0.397,
+            "wallSuccessRate": 0.822,
+            "avgUpgradeTilesTaken": 4.9715,
+            "avgMapUpgradesUsed": 5.553,
+            "rankByValue": 2
           },
           "walkthrough": [
             {
@@ -220,15 +242,15 @@
           },
           "metrics": {
             "runs": 2000,
-            "avgValue": 52.9893,
-            "completion7Rate": 0.1115,
-            "avgChests": 4.179,
-            "avgRainbow": 0.2875,
-            "wallSuccessRate": 0.94,
-            "avgUpgradeTilesTaken": 2.439,
-            "avgMapUpgradesUsed": 3.932,
-            "rankByValue": 4,
-            "rankByCompletion": 1
+            "targetingModel": "highest eligible rarity first, random within bucket",
+            "avgValue": 52.1698,
+            "completion7Rate": 0.115,
+            "avgChests": 4.2215,
+            "avgRainbow": 0.276,
+            "wallSuccessRate": 0.9505,
+            "avgUpgradeTilesTaken": 2.432,
+            "avgMapUpgradesUsed": 3.9085,
+            "rankByValue": 4
           }
         },
         {
@@ -249,13 +271,15 @@
           },
           "metrics": {
             "runs": 2000,
-            "avgValue": 58.7168,
-            "completion7Rate": 0.0645,
-            "avgChests": 3.2015,
-            "avgRainbow": 0.3935,
-            "wallSuccessRate": 0.7645,
-            "rankByValue": 2,
-            "rankByCompletion": 2
+            "targetingModel": "highest eligible rarity first, random within bucket",
+            "avgValue": 60.1087,
+            "completion7Rate": 0.05,
+            "avgChests": 3.1865,
+            "avgRainbow": 0.4075,
+            "wallSuccessRate": 0.762,
+            "avgUpgradeTilesTaken": 4.95,
+            "avgMapUpgradesUsed": 5.0045,
+            "rankByValue": 1
           }
         }
       ]
