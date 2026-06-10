@@ -283,11 +283,11 @@ function makeBoard(){
   return a;
 }
 function drawMappingCard(){
-  let t=wc({move:.43,back:.12,upgrade:.25,life:.10,remove_traps:.06,risky_question:.04});
+  // Mapping cards do not include +Life. Life exists only as an instant tile reward.
+  let t=wc({move:.48,back:.14,upgrade:.28,remove_traps:.06,risky_question:.04});
   if(t==='move'){let n=rollMove();return{type:'move',n,name:'Move '+n}}
   if(t==='back'){let n=rollMove();return{type:'back',n,name:'Back '+n}}
   if(t==='upgrade'){let from=wc({green:.01,blue:.54,purple:.35,orange:.10,red:.005});return{type:'upgrade',from,name:''}}
-  if(t==='life')return{type:'life',name:'+1 Life'};
   if(t==='remove_traps')return{type:'remove_traps',name:'Remove Traps'};
   return{type:'risky_question',name:'Force ? Roll'};
 }
@@ -325,8 +325,7 @@ function selectCurrentMove(){selected={type:'current'};suggested=null;render()}
 function selectHand(idx){let c=state.hand[idx];if(!c)return;if(c.type==='move'||c.type==='back'){selected={type:'hand',idx};suggested=null;render();return}useUtility(idx)}
 function useUtility(idx){
   let c=state.hand[idx];if(!c||state.done)return;
-  if(c.type==='life'){state.life++;log('Used +1 Life card.');state.hand.splice(idx,1)}
-  else if(c.type==='remove_traps'){let n=0;for(let i=state.pos+1;i<Math.min(totalTiles,state.pos+17);i++)if(state.tiles[i].type==='trap'){state.tiles[i]={type:'empty'};n++}log('Used Remove Traps: cleared '+n+' nearby traps.');state.hand.splice(idx,1)}
+  if(c.type==='remove_traps'){let n=0;for(let i=state.pos+1;i<Math.min(totalTiles,state.pos+17);i++)if(state.tiles[i].type==='trap'){state.tiles[i]={type:'empty'};n++}log('Used Remove Traps: cleared '+n+' nearby traps.');state.hand.splice(idx,1)}
   else if(c.type==='upgrade'){
     let best=-1,bv=-1,cap=R.indexOf(c.from);
     for(let i=state.pos+1;i<Math.min(totalTiles,state.pos+13);i++){
