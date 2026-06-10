@@ -372,11 +372,6 @@ select:focus{border-color:var(--gold-muted)}
 
   
 
-<div id="compass-probe-metric" style="display:none;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px">
-  <div style="font-size:10px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Compass Probe — Flat Per-Run Bonus</div>
-  <div style="font-size:18px;font-weight:600;color:var(--gold-bright)" id="compass-probe-val">—</div>
-  <div style="font-size:11px;color:var(--text-faint);margin-top:3px">7% × 2 Compass Goblins per run. Each goblin ≈ All Tabs On Me EV. Does not affect service rankings.</div>
-</div>
 <div id="reroll-decision-panel" class="reroll-panel">
   <div class="reroll-panel-title">
     <span>Reroll Decision</span>
@@ -412,6 +407,99 @@ select:focus{border-color:var(--gold-muted)}
 
 </div>
 
+
+<!-- ID10 Lightbox -->
+<div id="id10-lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;padding:20px">
+  <div onclick="event.stopPropagation()" style="background:var(--bg-panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);max-width:520px;width:100%;padding:28px;position:relative;max-height:85vh;overflow-y:auto">
+    <button onclick="document.getElementById('id10-lightbox').style.display='none';document.body.style.overflow='';" style="position:absolute;top:16px;right:16px;background:transparent;border:none;color:var(--text-faint);font-size:18px;cursor:pointer">✕</button>
+    <h2 style="font-family:var(--font-display);font-size:18px;color:var(--gold-primary);margin-bottom:6px">ID10 — Remove &amp; Upgrade</h2>
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.7;display:flex;flex-direction:column;gap:12px">
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">The Mechanic</div>
+        Randomly removes 1 or 2 cogs from the stage (50/50) and upgrades all remaining cogs by +1 rarity. Fewer cogs = lower rating at turnin, but every remaining cog gives better vouchers.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Why It Ranks High</div>
+        The upgrade value on all remaining cogs exceeds the loss from fewer cogs. On a 6-gear run: remove 1 → 5 upgraded cogs at S rating (1.3×). Remove 2 → 4 upgraded cogs at A rating (1.25×). Both outcomes beat a normal 6-cog SS run in expected voucher value.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">EV Model</div>
+        <div style="background:var(--bg-card);border-radius:var(--radius);padding:10px;font-size:12px;font-family:monospace">50% × (5 upgraded cogs × S rating − base)<br>+ 50% × (4 upgraded cogs × A rating − base)</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ID11 Lightbox -->
+<div id="id11-lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;padding:20px">
+  <div onclick="event.stopPropagation()" style="background:var(--bg-panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);max-width:520px;width:100%;padding:28px;position:relative;max-height:85vh;overflow-y:auto">
+    <button onclick="document.getElementById('id11-lightbox').style.display='none';document.body.style.overflow='';" style="position:absolute;top:16px;right:16px;background:transparent;border:none;color:var(--text-faint);font-size:18px;cursor:pointer">✕</button>
+    <h2 style="font-family:var(--font-display);font-size:18px;color:var(--gold-primary);margin-bottom:6px">ID11 — 6 Cog SSS Stage</h2>
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.7;display:flex;flex-direction:column;gap:12px">
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">The Mechanic</div>
+        6 cogwheels in stage. Rating starts below B and won't progress until cog 3 completes, which triggers a jump to SSS. cb_55 (+1 rating at turnin) is baked in — SSS is the cap so cb_55 has no further effect here.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">SSS Multipliers</div>
+        <div style="background:var(--bg-card);border-radius:var(--radius);padding:10px;font-size:12px">
+          <div>SSS rating: <span style="color:var(--gold-bright)">1.6× Drop Quantity</span></div>
+          <div>clockwork_51: <span style="color:var(--gold-bright)">+18% additional DQ at SSS</span></div>
+          <div style="margin-top:4px;color:var(--text-faint)">Combined: 6 cogs × 1.6 × 1.18 = <span style="color:var(--gold-bright)">11.33× base cog value</span></div>
+        </div></div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Why It's Mid Without Probe</div>
+        Without a probe, ID11's raw voucher EV is modest (~30% of base). Its real value is the SSS rating during the stage — which matters significantly for the Compass Probe (goblins inherit SSS multiplier) and the In-Map Season Mechanic (cb_47 scales with rating). With Compass Probe + Season Mechanic active, ID11 becomes one of the best picks.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">EV Model</div>
+        <div style="background:var(--bg-card);border-radius:var(--radius);padding:10px;font-size:12px;font-family:monospace">bge(cr) × 6 × 1.6 × 1.18 − theorBase</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ID29 Lightbox -->
+<div id="id29-lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;padding:20px">
+  <div onclick="event.stopPropagation()" style="background:var(--bg-panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);max-width:520px;width:100%;padding:28px;position:relative;max-height:85vh;overflow-y:auto">
+    <button onclick="document.getElementById('id29-lightbox').style.display='none';document.body.style.overflow='';" style="position:absolute;top:16px;right:16px;background:transparent;border:none;color:var(--text-faint);font-size:18px;cursor:pointer">✕</button>
+    <h2 style="font-family:var(--font-display);font-size:18px;color:var(--gold-primary);margin-bottom:6px">ID29 — Hunting Ground</h2>
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.7;display:flex;flex-direction:column;gap:12px">
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">The Mechanic</div>
+        Time gained per cog is doubled. 50% chance per cog completion for 1 extra Cogwheel Voucher (up to Orange). Default rating is S (1.3×).</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">EV Model</div>
+        Two separate components combined:
+        <div style="background:var(--bg-card);border-radius:var(--radius);padding:10px;font-size:12px;font-family:monospace;margin-top:6px">Base pool × S rating (1.3×) − theorBase<br>+ n cogs × 50% × avg extra voucher value × S rating</div>
+        The doubled time is not directly modeled in EV — it affects survivability and timing-conditional services (ID26/27) but not base voucher output.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ID32 Lightbox -->
+<div id="id32-lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;padding:20px">
+  <div onclick="event.stopPropagation()" style="background:var(--bg-panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);max-width:520px;width:100%;padding:28px;position:relative;max-height:85vh;overflow-y:auto">
+    <button onclick="document.getElementById('id32-lightbox').style.display='none';document.body.style.overflow='';" style="position:absolute;top:16px;right:16px;background:transparent;border:none;color:var(--text-faint);font-size:18px;cursor:pointer">✕</button>
+    <h2 style="font-family:var(--font-display);font-size:18px;color:var(--gold-primary);margin-bottom:6px">ID32 — Bloody Mary</h2>
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.7;display:flex;flex-direction:column;gap:12px">
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">The Mechanic</div>
+        Immediately grants 3–5 Purple+ vouchers (avg 4). Default rating upgraded to SS (1.45×). Bloody Mary starts chasing you after 3s — failure to submit vouchers causes you to lose the challenge and forfeit rewards.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">EV Model</div>
+        <div style="background:var(--bg-card);border-radius:var(--radius);padding:10px;font-size:12px;font-family:monospace">4 avg vouchers × SS rating (Purple/Gold 50/50)<br>+ base pool × SS rating (1.45×) − theorBase</div>
+        The Bloody Mary mechanic is not modeled — it adds time pressure but if you submit successfully, EV is as above. The 3s timer is tight; builds that can clear fast benefit more.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ID35 Lightbox -->
+<div id="id35-lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;padding:20px">
+  <div onclick="event.stopPropagation()" style="background:var(--bg-panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);max-width:520px;width:100%;padding:28px;position:relative;max-height:85vh;overflow-y:auto">
+    <button onclick="document.getElementById('id35-lightbox').style.display='none';document.body.style.overflow='';" style="position:absolute;top:16px;right:16px;background:transparent;border:none;color:var(--text-faint);font-size:18px;cursor:pointer">✕</button>
+    <h2 style="font-family:var(--font-display);font-size:18px;color:var(--gold-primary);margin-bottom:6px">ID35 — Nut Trick</h2>
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.7;display:flex;flex-direction:column;gap:12px">
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">The Mechanic</div>
+        Player controls which cogwheels to complete. If you complete 3 of the same rarity in a row, all 3 become Rainbow vouchers. Strategic — you choose the order to maximize proc chances.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Binomial Model (200k Monte Carlo)</div>
+        <div style="background:var(--bg-card);border-radius:var(--radius);padding:10px;font-size:12px">
+          <div style="margin-bottom:4px;color:var(--text-faint)">6 gears:</div>
+          <div>P(0 procs): 1.0% · P(1 proc): 77.6% · P(2 procs): 21.4%</div>
+          <div style="margin-top:6px;color:var(--text-faint)">7 gears:</div>
+          <div>P(0 procs): 0% · P(1 proc): 47.0% · P(2 procs): 53.0%</div>
+        </div></div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">EV Model</div>
+        <div style="background:var(--bg-card);border-radius:var(--radius);padding:10px;font-size:12px;font-family:monospace">P(1 proc) × 3 × (rainbow − avg_cog) × rating<br>+ P(2 procs) × 6 × (rainbow − avg_cog) × rating</div>
+        Each proc upgrades 3 cogs to Rainbow. The upgrade value is the difference between Rainbow and the average cog voucher value.</div>
+      <div style="font-size:11px;color:var(--text-faint);padding-top:8px;border-top:1px solid var(--border-blue)">
+        Nut Trick is player-skill dependent — a player who optimally sequences cog completions gets full value. Suboptimal play reduces procs.</div>
+    </div>
+  </div>
+</div>
 <!-- ID23 Lightbox -->
 <div id="id23-lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;padding:20px">
   <div onclick="event.stopPropagation()" style="background:var(--bg-panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);max-width:560px;width:100%;padding:28px;position:relative;max-height:85vh;overflow-y:auto">
@@ -503,9 +591,9 @@ select:focus{border-color:var(--gold-muted)}
         <div style="display:flex;flex-direction:column;gap:3px;font-size:12px">
           <div style="display:flex;gap:8px"><span style="width:40px;color:#ff9ef5;font-weight:700">S+</span><span>≥300% of base pool (Roses only)</span></div>
           <div style="display:flex;gap:8px"><span style="width:40px;color:var(--gold-bright);font-weight:700">S</span><span>100–300% (Nut Trick, Heist, Roulette, All Tabs, Bloody Mary)</span></div>
-          <div style="display:flex;gap:8px"><span style="width:40px;color:#a78bfa;font-weight:700">A</span><span>30–100% (ID20, ID9, ID23, Hunting Ground, ID19)</span></div>
-          <div style="display:flex;gap:8px"><span style="width:40px;color:#60a5fa;font-weight:700">B</span><span>19–30% (ID11, ID8, ID15/17, ID10, ID21, ID13)</span></div>
-          <div style="display:flex;gap:8px"><span style="width:40px;color:var(--text-faint);font-weight:700">C</span><span>5–19% (minor utility services)</span></div>
+          <div style="display:flex;gap:8px"><span style="width:40px;color:#a78bfa;font-weight:700">A</span><span>40–100% (ID23, ID10, ID20, ID9, Hunting Ground)</span></div>
+          <div style="display:flex;gap:8px"><span style="width:40px;color:#60a5fa;font-weight:700">B</span><span>20–40% (ID19, ID26, ID15, ID17)</span></div>
+          <div style="display:flex;gap:8px"><span style="width:40px;color:var(--text-faint);font-weight:700">C</span><span>5–20% (minor utility services)</span></div>
         </div></div>
       <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Caveats</div>
         <ul style="padding-left:16px;display:flex;flex-direction:column;gap:4px">
@@ -667,8 +755,8 @@ function getTier(ev,theorBase){
   const p=ev/theorBase*100;
   if(p>=300)return{l:'S+',c:'tier-sp'};
   if(p>=100)return{l:'S',c:'tier-s'};
-  if(p>=30) return{l:'A',c:'tier-a'};
-  if(p>=19) return{l:'B',c:'tier-b'};
+  if(p>=40) return{l:'A',c:'tier-a'};
+  if(p>=20) return{l:'B',c:'tier-b'};
   if(p>=5)  return{l:'C',c:'tier-c'};
   return{l:'F',c:'tier-f'};
 }
@@ -736,9 +824,7 @@ const S12_SVCS=[
   {id:14,rarity:'purple',effect:'1 Time Extender — touching drops extra rewards',note:'With Vain node: 2 extenders × 8% Runaway Dancer = 0.16 Orange vouchers avg'},
   {id:15,rarity:'purple',effect:'30% on completion: all vouchers +1 rarity + 10s'},
   {id:16,rarity:'purple',effect:'10% per completion → 1 extra higher-rarity voucher'},
-  {id:17,rarity:'purple',effect:'30% per completion → all vouchers +1 rarity'},
-  {id:18,rarity:'purple',effect:'Complete under 7s → 15% for 1 higher-rarity voucher',tag:'conditional',note:'Assumes consistent sub-7s clears'},
-  {id:19,rarity:'gold',effect:'15% chance → Runaway Dancer → 1 Orange Voucher'},
+  {id:17,rarity:'purple',effect:'30% per completion → all vouchers +1 rarity'},  {id:19,rarity:'gold',effect:'15% chance → Runaway Dancer → 1 Orange Voucher'},
   {id:20,rarity:'gold',effect:'3 completions in 30s → 2 Orange Vouchers',tag:'conditional'},
   {id:21,rarity:'gold',effect:'Best Doll Employee: 20% per completion → extra higher-rarity voucher'},
   {id:23,rarity:'gold',effect:'40%×+1 / 20%×+2 / 5%×+3 vouchers, 10% safe early end per cog',isID23:true},
@@ -818,9 +904,14 @@ function render(){
     const eff=`<div class="svc-effect">${(s.effect||s.desc||'').substring(0,100)}${(s.effect||s.desc||'').length>100?'…':''}${th}</div>`;
     const noteHtml=s.note?`<div class="svc-note">${s.note}</div>`:'';
     let extra='';
+    const lbBtn=(id,label)=>`<button onclick="document.getElementById('${id}-lightbox').style.display='flex';document.body.style.overflow='hidden'" style="background:transparent;border:none;color:var(--blue-light);font-size:10px;cursor:pointer;padding:0;margin-top:3px;display:block">${label} ↗</button>`;
+    if(s.id===10)extra=lbBtn('id10','how this is calculated');
+    if(s.id===11)extra=lbBtn('id11','why SSS matters here');
+    if(s.id===29)extra=lbBtn('id29','how this is calculated');
+    if(s.id===32)extra=lbBtn('id32','how this is calculated');
     if(s.isRoulette)extra=roulBlock(gearsVal,rdist,base);
     if(s.isID23)extra=id23Block(gearsVal,base,nodeWasteful,nodeOstentatious,nodeCb59);
-    if(s.id===35&&gearsVal!=='avg'){const nt=NUT[parseInt(gearsVal)]||NUT[6];extra=`<div class="svc-info">P(0 proc): ${(nt.p0*100).toFixed(1)}% · P(1 proc): ${(nt.p1*100).toFixed(1)}% · P(2 procs): ${(nt.p2*100).toFixed(1)}%</div>`;}
+    if(s.id===35){const nt=NUT[parseInt(gearsVal)]||NUT[6];extra=`<div class="svc-info">P(0 proc): ${(nt.p0*100).toFixed(1)}% · P(1 proc): ${(nt.p1*100).toFixed(1)}% · P(2 procs): ${(nt.p2*100).toFixed(1)}%</div>`+lbBtn('id35','how this is calculated');}
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td style="color:var(--text-faint);font-size:11px">${i+1}</td>
@@ -833,17 +924,7 @@ function render(){
   });
 
   // ── Reroll recommendation ──────────────────────────────────────────────
-  if(probeVal==='compass'){
-    const allTabsEV=1.5*gev('rainbow')*MULT[parseInt(gearsVal)];
-    const cgBase=0.07*2*allTabsEV*aliceMult;
-    const cgId11=0.07*2*1.5*gev('rainbow')*1.6*1.18*aliceMult; // ID11 always SSS
-    const cgPct=(cgBase/theorBase*100).toFixed(1);
-    const cgId11Pct=(cgId11/theorBase*100).toFixed(1);
-    document.getElementById('compass-probe-metric').style.display='block';
-    document.getElementById('compass-probe-val').textContent='+'+cgPct+'% of base per run'+'  — ID11 SSS boost: +'+cgId11Pct+'%';
-  } else {
-    document.getElementById('compass-probe-metric').style.display='none';
-  }
+
   updateVerdict();
   }catch(e){console.error('render() error:',e);}
 }
