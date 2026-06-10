@@ -227,6 +227,7 @@ function $(id){return document.getElementById(id)}
 function getSeedValue(){return 'kythik'}
 function getLifeValue(){return 3}
 function getStartingHandValue(){return +($('handInput')?.value||4)}
+function rarityLabel(r){return r==='orange'?'Gold':(r?String(r).charAt(0).toUpperCase()+String(r).slice(1):'')}
 function hashStr(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 function initRng(s){rngSeed=hashStr(String(s||'kythik'))||1}
 function rng(){rngSeed=(Math.imul(1664525,rngSeed)+1013904223)>>>0;return rngSeed/4294967296}
@@ -527,7 +528,7 @@ function endRun(){state.done=true;state.autoStatus='Manually ended at tile '+(st
 function icon(t){
   if(t.type==='start')return 'START';
   if(t.type==='chest'){
-    const label=t.rarity==='orange'?'Gold':cap(t.rarity);
+    const label=rarityLabel(t.rarity);
     return '<span class="chestIcon" aria-hidden="true">▰</span><span class="chestText">'+label+'</span>';
   }
   if(t.type==='trap')return '⚠';
