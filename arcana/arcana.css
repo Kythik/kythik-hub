@@ -546,3 +546,22 @@ body.arcana-page .board {
   .arcana-page .strategyLightboxBody{grid-template-columns:1fr}
   .arcana-page .strategyDeck{padding:10px 18px 18px}
 }
+
+.strategyMiniStats{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.45rem;
+  margin:.75rem 0 .2rem;
+}
+.strategyMiniStats span{
+  display:inline-flex;
+  align-items:center;
+  border:1px solid rgba(230,199,122,.22);
+  background:rgba(4,8,15,.36);
+  color:var(--gold-bright,#E6C77A);
+  border-radius:999px;
+  padding:.18rem .55rem;
+  font-size:.78rem;
+  font-weight:800;
+  letter-spacing:.02em;
+}

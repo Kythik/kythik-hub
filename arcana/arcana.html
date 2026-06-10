@@ -880,6 +880,11 @@ function suggestionIsEndgameMove(){
   let idx=suggestionTarget();
   return idx>=totalTiles-1 || (suggested&&suggested.tiles&&suggested.tiles.some(t=>t>=totalTiles));
 }
+function suggestionIsQuestionMove(){
+  let idx=suggestionTarget();
+  let t=idx>=0?state.tiles[idx]:null;
+  return !!(t&&t.type==='question'&&!t.used);
+}
 function suggestionIsUnsafeMove(){
   let idx=suggestionTarget();
   let t=idx>=0?state.tiles[idx]:null;
@@ -930,6 +935,10 @@ function autoPlay(limit=300){
 
     if(suggestionIsEndgameMove()){
       if(playBestUpgradeCard('autoplay before final/endgame move')){render();continue}
+    }
+
+    if(suggestionIsQuestionMove()){
+      if(playBestUpgradeCard('autoplay before ? tile')){render();continue}
     }
 
     takeSuggestion();
