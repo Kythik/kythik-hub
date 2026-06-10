@@ -109,9 +109,7 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
     <div class="sub">
       Clean rebuild after the preview issue. Arcana minigame route testing, upgrade timing, final-tile cycling, and special board setup support.</div>
     <div class="controls">
-      <label>Seed <input id="seedInput" value="kythik"></label>
       <label>Starting hand <input id="handInput" type="number" min="0" max="12" value="4"></label>
-      <label>Life <input id="lifeInput" type="number" min="1" max="20" value="3"></label>
       <label>Board <select id="boardTypeInput">
         <option value="normal" selected>Normal 80: 10–13 chests</option>
         <option value="special1">Special 1: Chest → Traps → Upgrades</option>
@@ -316,14 +314,14 @@ function newGame(same=false){
   if(!same){initRng(($('seedInput').value||'kythik')+'-'+Date.now());originalTiles=makeBoard()}
   let hand=[];for(let i=0;i<(+$('handInput').value||4);i++)hand.push(normalizeCard(drawMappingCard()));
   let initialMove=rollMove();
-  state={tiles:clone(originalTiles),pos:0,currentMove:initialMove,hand,life:+$('lifeInput').value||3,collected:[],dead:false,done:false,futureUpgrade:0,path:[1],log:[],autoStatus:'Ready on tile 1'};
+  state={tiles:clone(originalTiles),pos:0,currentMove:initialMove,hand,life:+($('lifeInput')?.value||3),collected:[],dead:false,done:false,futureUpgrade:0,path:[1],log:[],autoStatus:'Ready on tile 1'};
   selected=null;suggested=null;log('Current refilling move rolled: '+initialMove+'.');log('New board. Starting on tile 1.');render();
 }
 function resetSame(){
   if(!originalTiles){newGame(false);return}
   let hand=[];for(let i=0;i<(+$('handInput').value||4);i++)hand.push(normalizeCard(drawMappingCard()));
   let initialMove=rollMove();
-  state={tiles:clone(originalTiles),pos:0,currentMove:initialMove,hand,life:+$('lifeInput').value||3,collected:[],dead:false,done:false,futureUpgrade:0,path:[1],log:['Current refilling move rolled: '+initialMove+'.','Reset same board. Starting on tile 1.'],autoStatus:'Ready on tile 1'};
+  state={tiles:clone(originalTiles),pos:0,currentMove:initialMove,hand,life:+($('lifeInput')?.value||3),collected:[],dead:false,done:false,futureUpgrade:0,path:[1],log:['Current refilling move rolled: '+initialMove+'.','Reset same board. Starting on tile 1.'],autoStatus:'Ready on tile 1'};
   selected=null;suggested=null;render();
 }
 function clampTarget(raw){return Math.min(Math.max(0,raw),totalTiles-1)}
