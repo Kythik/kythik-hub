@@ -215,8 +215,10 @@ applyMechanicsData(FALLBACK_MECHANICS_DATA);
 
 const FALLBACK_STRATEGY_DATA={"schemaVersion":5,"updated":"2026-06-10","defaultStrategy":"Kythiks","source":{"summary":"arcana_final4_strategy_validation_10000_summary_by_value.csv","nuancedSevenSummary":"arcana_nuanced_7chest_policy_1000_summary_by_completion.csv","note":"Three public strategies. Display copy lives in arcana_strategy_cards.json."},"strategies":[{"id":"Kythiks","label":"Kythik\u2019s","weights":{"q":10,"chest":1.0,"low_chest_penalty":6,"purple_bonus":12,"gold_bonus":18,"upgrade":7,"card":3,"life":2,"low_life":8,"trap":20,"empty":-6,"q_after4":4,"q_late":-1,"upgrade_bias":1.45,"chest_count_bias":0.5,"value_target_min_rank":2,"value_target_count":4,"target_before_tile":60,"target_bonus":9,"target_deficit_bonus":1.25,"q_before_target":3,"q_after_target":10,"low_chest_extra_penalty_after_target":2},"policy":{"name":"Kythiks","early_chest_default_bonus":6,"purple_plus_bonus":10,"gold_plus_bonus":4,"orange_red_upgrade_bonus":18,"purple_upgrade_bonus":5,"question_policy_bonus":6,"movement_tile_bonus":2,"avoid_low_chests_after":5,"soft_low_chest_after":4,"late_low_chest_penalty":34,"soft_low_chest_penalty":10,"hand_card_spend_penalty":4,"second_hand_card_penalty":3,"min_cards_to_keep":1,"low_remaining_hand_penalty":12,"low_hand_threshold":2,"movement_tile_exception_count":2,"movement_tile_exception_bonus":22,"premium_future_bonus":22,"premium_combo_allowance":10,"lookahead_depth":3,"minimum_action_score":-22},"metrics":{"runs":10000,"avgValue":67.103,"medianValue":45.2,"p25Value":27.0,"p75Value":74.4,"completion7Rate":0.1596,"deadRate":0.0,"avgChests":4.939,"avgQuestions":3.041,"avgPurplePlus":3.74,"avgGoldPlus":1.875,"avgUpgradeBeforeQuestion":4.258,"avgUpgradeCardsUsed":4.857,"avgHandMovementUses":7.229,"avgTrapsHit":1.576,"avgLifeEnd":6.798,"avgRainbow":0.17,"avgRed":0.454,"avgGold":1.251,"avgPurple":1.865,"rank":2,"rankByValue":2,"rankByCompletion":2},"validationSource":"final4_10000"},{"id":"Math_Says_Best","label":"Math Says Best","weights":{"q":10,"chest":1.0,"low_chest_penalty":6,"purple_bonus":12,"gold_bonus":18,"upgrade":7,"card":3,"life":2,"low_life":8,"trap":20,"empty":-6,"q_after4":4,"q_late":-1,"upgrade_bias":1.45,"chest_count_bias":0.5,"value_target_min_rank":2,"value_target_count":4,"target_before_tile":60,"target_bonus":9,"target_deficit_bonus":1.25,"q_before_target":3,"q_after_target":10,"low_chest_extra_penalty_after_target":2},"policy":{"name":"Math_Says_Best","early_chest_default_bonus":6,"purple_plus_bonus":10,"gold_plus_bonus":4,"orange_red_upgrade_bonus":18,"purple_upgrade_bonus":5,"question_policy_bonus":6,"movement_tile_bonus":2,"avoid_low_chests_after":5,"soft_low_chest_after":4,"late_low_chest_penalty":34,"soft_low_chest_penalty":10,"hand_card_spend_penalty":6.0,"second_hand_card_penalty":3,"min_cards_to_keep":1,"low_remaining_hand_penalty":20,"low_hand_threshold":2,"movement_tile_exception_count":2,"movement_tile_exception_bonus":0,"premium_future_bonus":22,"premium_combo_allowance":10,"lookahead_depth":3,"minimum_action_score":-35},"metrics":{"runs":10000,"avgValue":75.264,"medianValue":49.8,"p25Value":32.4,"p75Value":82.0,"completion7Rate":0.2439,"deadRate":0.0,"avgChests":5.348,"avgQuestions":3.074,"avgPurplePlus":4.114,"avgGoldPlus":2.116,"avgUpgradeBeforeQuestion":4.299,"avgUpgradeCardsUsed":4.732,"avgHandMovementUses":6.593,"avgTrapsHit":1.58,"avgLifeEnd":6.766,"avgRainbow":0.193,"avgRed":0.522,"avgGold":1.401,"avgPurple":1.998,"rank":1,"rankByValue":1,"rankByCompletion":1},"validationSource":"final4_10000"},{"id":"Seven_Chests_Rarity","label":"7 Chests \u2192 Rarity","weights":{"q":10,"chest":1.0,"low_chest_penalty":6,"purple_bonus":12,"gold_bonus":18,"upgrade":7,"card":3,"life":2,"low_life":8,"trap":20,"empty":-6,"q_after4":4,"q_late":-1,"upgrade_bias":1.45,"chest_count_bias":0.5,"value_target_min_rank":2,"value_target_count":4,"target_before_tile":60,"target_bonus":9,"target_deficit_bonus":1.25,"q_before_target":3,"q_after_target":10,"low_chest_extra_penalty_after_target":2},"policy":{"name":"Seven_Reserve1","early_chest_default_bonus":6,"purple_plus_bonus":10,"gold_plus_bonus":4,"orange_red_upgrade_bonus":18,"purple_upgrade_bonus":5,"question_policy_bonus":6,"movement_tile_bonus":2,"avoid_low_chests_after":5,"soft_low_chest_after":4,"late_low_chest_penalty":34,"soft_low_chest_penalty":10,"hand_card_spend_penalty":5.5,"second_hand_card_penalty":3,"min_cards_to_keep":1,"low_remaining_hand_penalty":18,"low_hand_threshold":2,"movement_tile_exception_count":99,"movement_tile_exception_bonus":0,"premium_future_bonus":22,"premium_combo_allowance":10,"lookahead_depth":3,"minimum_action_score":-35,"target_chests":7,"chest_count_goal_bonus":7,"soft_reserve_after_chests":6,"hard_reserve_after_chests":6,"reserve_until_tile":68,"late_finish_tile":68,"soft_reserve_low_chest_penalty":18,"hard_reserve_low_chest_penalty":38,"late_low_chest_finish_bonus":18,"late_premium_slot_bonus":12,"question_reserve_bonus_after":5,"question_with_reserved_slots_bonus":16,"question_after_full_chests_penalty":8,"late_upgrade_slot_bonus":8,"low_hand_movement_tile_bonus":8,"movement_for_late_routing_bonus":5},"metrics":{"runs":1000,"avgValue":73.574,"medianValue":47.6,"p25Value":31.2,"p75Value":77.6,"completion7Rate":0.398,"deadRate":0.0,"avgChests":5.799,"avgQuestions":2.917,"avgPurplePlus":4.046,"avgGoldPlus":1.964,"avgUpgradeBeforeQuestion":3.971,"avgUpgradeCardsUsed":4.297,"avgHandMovementUses":6.769,"avgTrapsHit":1.407,"avgLifeEnd":6.539,"avgRainbow":0.207,"avgRed":0.435,"avgGold":1.322,"avgPurple":2.082,"rank":5,"rankByValue":5,"rankByCompletion":1},"validationSource":"nuanced7_1000"}]};
 const FALLBACK_STRATEGY_CARD_DATA={"schemaVersion":1,"updated":"2026-06-10","cards":[{"id":"Kythiks","label":"Kythik\u2019s","kicker":"Recommended","title":"Kythik\u2019s","meta":"Best practical default","cardSummary":"A flexible route for real runs: take the early chest, chase purple+ value, use ? tiles, and avoid wasting late chest slots.","profile":"This is the default route. It follows the way Kythik plays the board: take the early chest unless a clearly better line is already visible, then build value through purple+ chests, strong upgrade cards, ? tiles, and smart movement-card use.","useWhen":"Use this when you want the safest all-around plan that is easy to follow during a run.","avoidWhen":"Switch away only when you want a tighter max-value route or a clear 7-chest completion route.","walkthrough":[{"heading":"Early board","steps":["Take the early chest by default.","Skip it only if a better chest or orange/red upgrade card is already reachable with the cards in hand.","Do not gamble on a line that needs a lucky future card."]},{"heading":"Main priority","steps":["Purple+ chest tiles come first.","Orange/red upgrade cards are next.","? tiles are strong because they can add chests, upgrade future chests, or improve the board.","Movement-card tiles are worth taking when they keep your route alive.","Green/blue chests are fine when efficient, but do not hard-path them."]},{"heading":"Late board","steps":["Around 5 chests, slow down on green/blue chests.","Try to keep 1\u20132 chest slots open if there is still a lot of board left.","Those open slots can turn into better loot if ? tiles upgrade or add future chests."]}],"notes":[["Goal","Best practical default for normal play."],["Simple rule","Value first, but do not throw away chest slots late."],["Result","Strong average value with better 7-chest completion than the older weight-only control."]]},{"id":"Math_Says_Best","label":"Math Says Best","kicker":"Highest tested value","title":"Math Says Best","meta":"Tightest tested route","cardSummary":"Highest tested value. Preserves movement cards harder and avoids spending cards unless the payoff is clearly worth it.","profile":"This route scored the highest in testing. It plays tighter than the default route: movement cards are protected, weak refill lines are ignored, and cards are spent only when the board gives a real payoff.","useWhen":"Use this when you can slow down, compare routes, and avoid spending movement cards just because they are available.","avoidWhen":"Avoid this when you want a simpler route or when you are likely to miss multi-step lines under pressure.","walkthrough":[{"heading":"Core idea","steps":["Do not spend movement cards casually.","A movement card should buy real value: purple+ chest access, a strong upgrade card, a valuable ? tile, or a safer future route.","Passing on a small pickup is often correct if it keeps your hand strong."]},{"heading":"What to take","steps":["Take purple+ chests when the route is reasonable.","Take orange/red upgrade cards when they can improve current or future chests.","Take ? tiles when they are reachable without draining your hand.","Take green/blue chests mostly when they are cheap or late."]},{"heading":"Common mistake","steps":["Do not use a card just to reach one movement-card tile.","Do not chase a small chest if it leaves you with no route tools.","This route wins by having options later."]}],"notes":[["Goal","Highest tested average value."],["Tradeoff","Requires tighter card discipline than the default route."],["Best habit","Protect movement cards unless the payoff is real."]]},{"id":"Seven_Chests_Rarity","label":"7 Chests \u2192 Rarity","kicker":"Completion focus","title":"7 Chests \u2192 Rarity","meta":"Fill slots, then improve them","cardSummary":"A clear completion route: get near 7 chests, reserve late slots, use ? tiles and upgrades, then finish the last chest slots late.","profile":"This route is for players who want a clearer chest-completion goal. It does not mean click every chest as soon as possible. The plan is to build toward 6 chests, keep space open while the board still has value left, then finish the last slot later.","useWhen":"Use this when your main goal is finishing all 7 chest slots without filling them too early with weak chests.","avoidWhen":"Avoid this when you only care about highest average value or when the board already gives an obvious premium route.","walkthrough":[{"heading":"Build toward 6","steps":["Take efficient early chests.","Prioritize purple+ chests and strong upgrade cards.","Use ? tiles because they can add or upgrade future chests.","Do not ignore movement-card tiles if they keep the route flexible."]},{"heading":"Reserve the last slot","steps":["At 5\u20136 chests, stop rushing green/blue chests if a lot of board remains.","Leave 1\u20132 chest slots open so future ? effects can create or improve better chests.","Purple+ chests are still worth taking; the warning is mostly about weak chests."]},{"heading":"Finish late","steps":["Once the board is running out, take the chest that finishes 7.","A late green/blue chest is fine if it completes the board.","The mistake is filling the final slot too early, not taking it late."]}],"notes":[["Goal","Best completion-focused route from the nuanced test."],["Rule of thumb","Get close to 7, keep slots open, then finish late."],["Warning","This is not a click-every-chest strategy."]]}]};
+const FALLBACK_SPECIAL_STRATEGY_DATA={"schemaVersion":1,"updated":"2026-06-10","defaultByBoard":{"special1":"Special1_Rainbow_Wall"},"boards":{"special1":{"label":"Special Board 1","summary":"Chest zone first, trap wall second, red-upgrade zone last. Strategy evaluates whether owned chest slots justify crossing the wall.","strategies":[{"id":"Special1_Rainbow_Wall","label":"Special 1: Rainbow Wall","kicker":"Recommended","summary":"Collect upgradeable chest slots, solve the wall only when the current hand/life can pay the trap cost, then convert owned chests with red upgrades.","rules":{"ownedChestUpgrades":true,"wallSolver":true,"minChestsBeforeWall":5,"minUpgradeTilesAhead":4,"wallLifeBuffer":0,"wallTrapLifeCost":18,"slotQualityValue":6,"crossScoreThreshold":25,"chestZoneUpgradeSlotValue":18,"chestZoneNoUpgradeSlotValue":8,"currentRarityMultiplierWithUpgrades":0.25,"currentRarityMultiplierNoUpgrades":1.0,"purpleChestBonus":5,"premiumChestBonus":10,"fillChestSlotBonus":5,"movementTileBase":8,"movementTilePreWallBonus":4,"lifeTileLowLifeValue":22,"lifeTileBase":6,"upgradeTileBase":20,"upgradeTileGainMultiplier":0.6,"upgradeTileGainCap":80,"trapWallTollBase":18,"trapWallBlockedPenalty":90,"trapWallNoCrossPenalty":60,"preWallEnterBlockedPenalty":80,"chestZoneEmptyScore":-1,"safeGapActiveScore":4,"safeGapInactiveScore":-6,"upgradeZonePathScore":6,"genericEmptyScore":-6,"handCardSpendPenalty":2,"offsetProtection":{"enabled":true,"protectUntilTile":36,"lastOffsetPenalty":18,"lastOffsetAllowedPenalty":2,"nonLastOffsetPenalty":1,"trueOffsetCards":["back_1_2_3","move_1_2_3","back_any","move_any","move_even","move_odd"]},"postWallAssessment":{"enabled":true}},"walkthrough":[{"heading":"Chest zone","steps":["Treat early chests as upgradeable slots, not just their current rarity.","Green and blue chests can be correct if the wall and red upgrades look reachable.","Take life and movement tiles that make the wall solve more realistic."]},{"heading":"Trap wall","steps":["Before crossing, solve the current hand to tile 37+.","Cross only when trap hits plus remaining life make sense.","Do not enter the wall just because it is reachable; owned upgrade payoff must justify it."]},{"heading":"Red upgrade zone","steps":["After the wall, red upgrade tiles convert owned chests toward rainbow.","Keep recommendations simple: target high upgrade gain, reachable red upgrades, and avoid pointless empty pathing."]}]},{"id":"Special1_Safer_Wall","label":"Special 1: Safer Wall","kicker":"Conservative","summary":"Same owned-upgrade plan, but requires more owned chests and a life buffer before crossing.","rules":{"extends":"Special1_Rainbow_Wall","minChestsBeforeWall":6,"minUpgradeTilesAhead":5,"wallLifeBuffer":1,"crossScoreThreshold":30,"trapWallBlockedPenalty":110,"preWallEnterBlockedPenalty":100}}]}}};
 let STRATEGY_DATA=null;
 let STRATEGY_CARD_DATA=null;
+let SPECIAL_STRATEGY_DATA=null;
 let STRATEGIES={};
 function mergeStrategyCards(){
   const cardMap={};
@@ -233,8 +235,49 @@ function applyStrategyData(data){
   if(!STRATEGY_CARD_DATA)STRATEGY_CARD_DATA=clone(FALLBACK_STRATEGY_CARD_DATA);
   mergeStrategyCards();
 }
+function applySpecialStrategyData(data){
+  SPECIAL_STRATEGY_DATA=data||clone(FALLBACK_SPECIAL_STRATEGY_DATA);
+}
+function specialBoardConfig(board=boardType()){
+  return SPECIAL_STRATEGY_DATA?.boards?.[board]||null;
+}
+function mergeSpecialRules(base,over){
+  let out=Object.assign({},base||{});
+  Object.keys(over||{}).forEach(k=>{
+    if(k==='extends')return;
+    if(out[k]&&typeof out[k]==='object'&&!Array.isArray(out[k])&&typeof over[k]==='object'&&!Array.isArray(over[k])){
+      out[k]=Object.assign({},out[k],over[k]);
+    }else out[k]=over[k];
+  });
+  return out;
+}
+function specialStrategyEntry(board=boardType()){
+  const cfg=specialBoardConfig(board);
+  if(!cfg)return null;
+  const list=cfg.strategies||[];
+  const desired=(SPECIAL_STRATEGY_DATA?.defaultByBoard||{})[board]||list[0]?.id;
+  let entry=list.find(s=>s.id===desired)||list[0]||null;
+  if(entry&&entry.rules&&entry.rules.extends){
+    const parent=list.find(s=>s.id===entry.rules.extends);
+    if(parent)entry=Object.assign({},parent,entry,{rules:mergeSpecialRules(parent.rules,entry.rules)});
+  }
+  return entry;
+}
+function specialRules(board=boardType()){
+  return specialStrategyEntry(board)?.rules||{};
+}
+function sr(k,d){
+  const r=specialRules();
+  const v=r?.[k];
+  return Number.isFinite(+v)?+v:d;
+}
+function srBool(k,d=false){
+  const v=specialRules()?.[k];
+  return v===undefined?d:!!v;
+}
 applyStrategyData(FALLBACK_STRATEGY_DATA);
 applyStrategyCards(FALLBACK_STRATEGY_CARD_DATA);
+applySpecialStrategyData(FALLBACK_SPECIAL_STRATEGY_DATA);
 
 let rngSeed=1,state=null,originalTiles=null,selected=null,suggested=null;
 
@@ -460,6 +503,24 @@ function selectHand(idx){
   if(isMovementCard(c)){selected={type:'hand',idx};suggested=null;render();return}
   useUtility(idx)
 }
+function isSpecialBoard1(){
+  return boardType()==='special1';
+}
+function rarityRank(r){return R.indexOf(r)}
+function ownedUpgradeTargetForCard(c){
+  if(!state||!state.collected||!state.collected.length)return null;
+  let cap=rarityRank(c.from),best=-1,bv=-1;
+  state.collected.forEach((r,idx)=>{
+    let rank=rarityRank(r);
+    if(rank<0||rank>cap||rank>=R.length-1)return;
+    let next=upgrade(r),val=V[next]-V[r];
+    if(r==='red')val+=25;
+    else if(r==='orange')val+=8;
+    else if(r==='purple')val+=3;
+    if(val>bv){bv=val;best=idx}
+  });
+  return best>=0?{idx:best,value:bv,old:state.collected[best],next:upgrade(state.collected[best])}:null;
+}
 function bestUpgradeTargetForCard(c){
   let best=-1,bv=-1,cap=R.indexOf(c.from);
   for(let i=state.pos+1;i<Math.min(totalTiles,state.pos+(MECHANICS?.cards?.upgradeCardSearchWindow??12)+1);i++){
@@ -471,9 +532,25 @@ function bestUpgradeTargetForCard(c){
   }
   return best;
 }
+function playOwnedUpgradeCard(idx,reason=''){
+  let c=state.hand[idx];
+  if(!c||c.type!=='upgrade'||state.done||state.dead)return false;
+  let owned=ownedUpgradeTargetForCard(c);
+  if(!owned)return false;
+  state.collected[owned.idx]=owned.next;
+  log('Used '+c.name+' on owned chest #'+(owned.idx+1)+': '+owned.old+' → '+owned.next+(reason?' ('+reason+')':'')+'.');
+  state.hand.splice(idx,1);
+  selected=null;
+  suggested=null;
+  return true;
+}
 function playUpgradeCard(idx,reason=''){
   let c=state.hand[idx];
   if(!c||c.type!=='upgrade'||state.done||state.dead)return false;
+
+  // Special Board 1: upgrade cards are valued as owned-chest conversion pieces.
+  if(isSpecialBoard1()&&playOwnedUpgradeCard(idx,reason||'Special 1 owned chest upgrade'))return true;
+
   let best=bestUpgradeTargetForCard(c);
   if(best<0)return false;
   let old=state.tiles[best].rarity;
@@ -485,14 +562,23 @@ function playUpgradeCard(idx,reason=''){
   return true;
 }
 function playBestUpgradeCard(reason='autoplay fallback'){
-  let bestIdx=-1,bestTile=-1,bestValue=-1;
+  let bestIdx=-1,bestKind='',bestTile=-1,bestValue=-1;
   state.hand.forEach((c,idx)=>{
     if(c.type!=='upgrade')return;
+
+    if(isSpecialBoard1()){
+      let owned=ownedUpgradeTargetForCard(c);
+      if(owned&&owned.value>bestValue){
+        bestValue=owned.value;bestIdx=idx;bestKind='owned';bestTile=-1;
+      }
+    }
+
     let tile=bestUpgradeTargetForCard(c);
-    if(tile<0)return;
-    let old=state.tiles[tile].rarity;
-    let val=V[upgrade(old)]-V[old]+R.indexOf(old)*.05;
-    if(val>bestValue){bestValue=val;bestIdx=idx;bestTile=tile}
+    if(tile>=0){
+      let old=state.tiles[tile].rarity;
+      let val=V[upgrade(old)]-V[old]+R.indexOf(old)*.05;
+      if(val>bestValue){bestValue=val;bestIdx=idx;bestKind='map';bestTile=tile}
+    }
   });
   if(bestIdx<0)return false;
   return playUpgradeCard(bestIdx,reason);
@@ -771,6 +857,278 @@ function isRecoverable(i){
   let t=state.tiles[i];
   return t&&!t.used&&(t.type==='chest'||t.type==='question');
 }
+
+function special1Zone(i){
+  if(i<=23)return 'chest-zone';
+  if(i>=24&&i<=35)return 'trap-wall';
+  if(i>=36&&i<=43)return 'safe-gap';
+  return 'upgrade-zone';
+}
+function special1UpgradeTilesAhead(){
+  if(!state)return 0;
+  let n=0;
+  for(let i=state.pos+1;i<totalTiles;i++){
+    let t=state.tiles[i];
+    if(t&&t.type==='upgrade'&&!t.used)n++;
+  }
+  return n;
+}
+function special1ChestTilesAhead(){
+  if(!state)return 0;
+  let n=0;
+  for(let i=state.pos+1;i<Math.min(totalTiles,24);i++){
+    let t=state.tiles[i];
+    if(t&&t.type==='chest'&&!t.used)n++;
+  }
+  return n;
+}
+function special1WallPlan(startPos=state.pos,maxSteps=8){
+  if(!isSpecialBoard1())return null;
+  if(startPos>=36)return {reachable:true,traps:0,steps:0,lifeNeeded:1,actions:[],tiles:[startPos+1],labels:[]};
+  let baseActions=[{sel:{type:'current'},n:state.currentMove,label:'current Move '+state.currentMove,bit:0}];
+  state.hand.forEach((c,idx)=>{
+    if(!isMovementCard(c))return;
+    for(const choice of cardChoices(c)){
+      if(choice.dir>0)baseActions.push({sel:{type:'hand',idx,choice},n:choice.n,label:'stored '+c.name+' ['+choice.label+']',bit:idx+1});
+    }
+  });
+  let best=null,stack=[{pos:startPos,mask:0,traps:0,steps:0,actions:[],tiles:[startPos+1],labels:[]}],seen={};
+  while(stack.length){
+    let cur=stack.pop();
+    if(cur.pos>=36){
+      if(!best||cur.traps<best.traps||(cur.traps===best.traps&&cur.steps<best.steps))best=cur;
+      continue;
+    }
+    if(cur.steps>=maxSteps)continue;
+    let key=cur.pos+'|'+cur.mask;
+    if(seen[key]!==undefined&&seen[key]<=cur.traps)continue;
+    seen[key]=cur.traps;
+    for(const a of baseActions){
+      if(cur.mask&(1<<a.bit))continue;
+      let next=clampTarget(cur.pos+a.n);
+      if(next<=cur.pos)continue;
+      let t=state.tiles[next];
+      let trapAdd=(t&&t.type==='trap'&&!t.used)?1:0;
+      stack.push({
+        pos:next,
+        mask:cur.mask|(1<<a.bit),
+        traps:cur.traps+trapAdd,
+        steps:cur.steps+1,
+        actions:cur.actions.concat([a.sel]),
+        tiles:cur.tiles.concat([next+1]),
+        labels:cur.labels.concat([a.label+' → tile '+(next+1)+(trapAdd?' (trap)':'')])
+      });
+    }
+  }
+  if(!best)return {reachable:false,traps:null,steps:null,lifeNeeded:null,actions:[],tiles:[startPos+1],labels:['No deterministic forward-card route through the wall.']};
+  return {reachable:true,traps:best.traps,steps:best.steps,lifeNeeded:best.traps+1,actions:best.actions,tiles:best.tiles,labels:best.labels};
+}
+function special1ExpectedOwnedUpgradeGain(){
+  if(!state||!state.collected.length)return 0;
+  let copy=state.collected.slice();
+  let upgrades=special1UpgradeTilesAhead()+state.hand.filter(c=>c.type==='upgrade').length;
+  let total=0;
+  for(let u=0;u<upgrades;u++){
+    let best=-1,bv=-1;
+    copy.forEach((r,idx)=>{
+      if(r==='rainbow')return;
+      let next=upgrade(r),val=V[next]-V[r];
+      if(r==='red')val+=25;
+      else if(r==='orange')val+=8;
+      else if(r==='purple')val+=3;
+      if(val>bv){bv=val;best=idx}
+    });
+    if(best<0)break;
+    let old=copy[best],next=upgrade(old);
+    total+=V[next]-V[old];
+    copy[best]=next;
+  }
+  return total;
+}
+function special1ShouldCrossWall(){
+  if(!isSpecialBoard1()||state.pos>=36)return {ok:false,reason:'not before wall'};
+  let plan=special1WallPlan();
+  if(!plan||!plan.reachable)return {ok:false,plan,reason:'no deterministic wall route'};
+  let lifeBuffer=sr('wallLifeBuffer',0);
+  if(state.life<plan.lifeNeeded+lifeBuffer)return {ok:false,plan,reason:'needs '+(plan.lifeNeeded+lifeBuffer)+' life, has '+state.life};
+  let minChests=sr('minChestsBeforeWall',5);
+  if(state.collected.length<minChests)return {ok:false,plan,reason:'wants at least '+minChests+' owned chests first'};
+  let minUpgrades=sr('minUpgradeTilesAhead',4);
+  if(special1UpgradeTilesAhead()<minUpgrades)return {ok:false,plan,reason:'not enough red upgrade tiles ahead'};
+  let gain=special1ExpectedOwnedUpgradeGain();
+  let lifeCost=plan.traps*sr('wallTrapLifeCost',18);
+  let slotQuality=state.collected.length*sr('slotQualityValue',6);
+  let score=gain+slotQuality-lifeCost;
+  let threshold=sr('crossScoreThreshold',25);
+  return {ok:score>threshold,plan,gain,score,reason:'upgrade gain '+gain.toFixed(1)+' vs wall cost '+lifeCost.toFixed(1)+' / threshold '+threshold};
+}
+
+function special1IsTrueOffsetCard(c){
+  if(!c)return false;
+  if(['back','back_any','move_any','move_even','move_odd'].includes(c.type))return true;
+  if(c.type==='move'&&c.n>=1&&c.n<=3)return true;
+  if(c.type==='back'&&c.n>=1&&c.n<=3)return true;
+  return false;
+}
+function special1TrueOffsetCount(){
+  return state.hand.filter(c=>special1IsTrueOffsetCard(c)).length;
+}
+function special1ActionUsesTrueOffset(sel){
+  return sel&&sel.type==='hand'&&special1IsTrueOffsetCard(state.hand[sel.idx]);
+}
+function special1OffsetSpendAllowed(sel,idx){
+  let t=state.tiles[idx];
+  if(!t)return false;
+  if(t.type==='trap')return true; // wall solver may need it
+  if(t.type==='upgrade')return true;
+  if(t.type==='movement'&&!t.used)return true;
+  if(t.type==='life'&&!t.used&&state.life<4)return true;
+  if(t.type==='chest'&&!t.used){
+    // Strong protection test: allow last offset freely for purple+,
+    // but make green/blue spend compete against preserving correction.
+    return ['purple','orange','red','rainbow'].includes(t.rarity);
+  }
+  return false;
+}
+function special1OffsetPenalty(sel,idx){
+  const cfg=specialRules()?.offsetProtection||{};
+  if(!isSpecialBoard1()||!cfg.enabled||state.pos>=(+cfg.protectUntilTile||36))return 0;
+  if(!special1ActionUsesTrueOffset(sel))return 0;
+  let count=special1TrueOffsetCount();
+  if(count>1)return +cfg.nonLastOffsetPenalty||0;
+  if(special1OffsetSpendAllowed(sel,idx))return +cfg.lastOffsetAllowedPenalty||0;
+  return +cfg.lastOffsetPenalty||0;
+}
+
+
+function special1BestOwnedUpgradeGain(){
+  let owned={value:0};
+  state.hand.forEach(c=>{
+    if(c.type==='upgrade'){
+      let tgt=ownedUpgradeTargetForCard(c);
+      if(tgt&&tgt.value>owned.value)owned=tgt;
+    }
+  });
+  if(state.collected.length){
+    state.collected.forEach((r,idx)=>{
+      if(r==='rainbow')return;
+      let next=upgrade(r),val=V[next]-V[r];
+      if(r==='red')val+=25;
+      else if(r==='orange')val+=8;
+      else if(r==='purple')val+=3;
+      if(val>owned.value)owned={idx,value:val,old:r,next};
+    });
+  }
+  return owned;
+}
+function special1ReachableUpgradeCountFrom(pos=state.pos){
+  let seen=new Set(),count=0;
+  function check(sel){
+    let idx=actionTargetFrom(pos,sel);
+    if(idx<0||seen.has(idx))return;
+    seen.add(idx);
+    let t=state.tiles[idx];
+    if(t&&t.type==='upgrade'&&!t.used)count++;
+  }
+  check({type:'current'});
+  state.hand.forEach((c,idx)=>{
+    if(!isMovementCard(c))return;
+    for(const choice of cardChoices(c))check({type:'hand',idx,choice});
+  });
+  return count;
+}
+function special1NearestUpgradeDistance(pos=state.pos){
+  let best=999;
+  for(let i=pos+1;i<totalTiles;i++){
+    let t=state.tiles[i];
+    if(t&&t.type==='upgrade'&&!t.used)best=Math.min(best,i-pos);
+  }
+  return best;
+}
+function special1PostWallAssessment(){
+  if(!isSpecialBoard1()||state.pos<36)return [];
+  let best=special1BestOwnedUpgradeGain();
+  let nearest=special1NearestUpgradeDistance();
+  return [
+    'Post-wall assessment: '+special1UpgradeTilesAhead()+' red upgrade tile(s) ahead',
+    'Reachable upgrade tiles from current hand: '+special1ReachableUpgradeCountFrom(),
+    'Nearest red upgrade distance: '+(nearest>=999?'none':nearest),
+    'Best owned-upgrade gain now: +'+Number(best.value||0).toFixed(1)+(best.old?' ('+best.old+' → '+best.next+')':'')
+  ];
+}
+
+function special1TileScore(i){
+  let t=state.tiles[i],z=special1Zone(i),dist=Math.abs(i-state.pos),score=-dist*.15,why=[];
+  if(!t)return {score:-9999,why:['invalid']};
+  if(t.used)return {score:-8-dist*.15,why:['already used']};
+  let cross=special1ShouldCrossWall();
+
+  if(t.type==='chest'){
+    if(state.collected.length>=maxChests){score-=80;why.push('chest cap reached')}
+    else{
+      let r=t.rarity;
+      let future=special1UpgradeTilesAhead()>0||state.hand.some(c=>c.type==='upgrade');
+      score+=future?sr('chestZoneUpgradeSlotValue',18):sr('chestZoneNoUpgradeSlotValue',8);
+      score+=V[r]*(future?sr('currentRarityMultiplierWithUpgrades',0.25):sr('currentRarityMultiplierNoUpgrades',1));
+      if(r==='purple')score+=sr('purpleChestBonus',5);
+      if(['orange','red','rainbow'].includes(r))score+=sr('premiumChestBonus',10);
+      if(['green','blue'].includes(r)&&future)why.push(r+' chest is an upgradeable owned slot');
+      else why.push(r+' chest');
+      if(state.collected.length<7)score+=sr('fillChestSlotBonus',5);
+    }
+  }else if(t.type==='movement'){
+    score+=sr('movementTileBase',8);why.push('movement card keeps chest/wall routing alive');
+    if(state.pos<24)score+=sr('movementTilePreWallBonus',4);
+  }else if(t.type==='life'){
+    score+=state.life<4?sr('lifeTileLowLifeValue',22):sr('lifeTileBase',6);why.push('life matters for wall crossing');
+  }else if(t.type==='upgrade'){
+    let bestOwned=special1BestOwnedUpgradeGain();
+    let gain=bestOwned.value||special1ExpectedOwnedUpgradeGain();
+    score+=sr('upgradeTileBase',20)+Math.min(sr('upgradeTileGainCap',80),gain*sr('upgradeTileGainMultiplier',0.6));
+    why.push('red upgrade for owned chest conversion');
+    why.push('best owned-upgrade gain: +'+Number(gain||0).toFixed(1));
+  }else if(t.type==='trap'){
+    if(state.life<=1)return {score:-9999,why:['lethal trap']};
+    if(cross.ok||state.pos>=24){score+=sr('trapWallTollBase',18)-state.life;why.push('wall-crossing trap toll')}
+    else{score-=sr('trapWallBlockedPenalty',90);why.push('trap wall blocked: '+cross.reason)}
+  }else{
+    if(z==='chest-zone'){score+=sr('chestZoneEmptyScore',-1);why.push('chest-zone reposition/reroll')}
+    else if(z==='safe-gap'){score+=cross.ok||state.pos>=24?sr('safeGapActiveScore',4):sr('safeGapInactiveScore',-6);why.push('safe gap after trap wall')}
+    else if(z==='upgrade-zone'){score+=sr('upgradeZonePathScore',6);why.push('upgrade-zone pathing')}
+    else{score+=sr('genericEmptyScore',-6);why.push('empty')}
+  }
+  if(z==='trap-wall'&&state.pos<24&&!cross.ok)score-=sr('trapWallNoCrossPenalty',60);
+  return {score,why};
+}
+function special1ChooseAction(){
+  let cross=special1ShouldCrossWall();
+  if(cross.ok&&state.pos<36&&cross.plan.actions.length){
+    let first=cross.plan.actions[0],idx=targetFor(first);
+    return {first,idx,score:cross.score,why:['Special 1 wall solver: '+cross.reason].concat(cross.plan.labels),name:'Wall solve to tile '+cross.plan.tiles[cross.plan.tiles.length-1],tiles:cross.plan.tiles,life:state.life-cross.plan.traps,trapCount:cross.plan.traps,mode:'special1-wall'};
+  }
+
+  let best=null;
+  for(const a of movableActions()){
+    let idx=targetFor(a);
+    if(idx<0)continue;
+    let sc=special1TileScore(idx);
+    let offsetPenalty=special1OffsetPenalty(a,idx);
+    let score=sc.score-(a.type==='hand'?sr('handCardSpendPenalty',2):0)-offsetPenalty;
+    if(idx>=24&&state.pos<24&&!cross.ok)score-=sr('preWallEnterBlockedPenalty',80);
+    if(!best||score>best.score)best={first:a,idx,score,why:sc.why.concat(offsetPenalty?['Offset protection penalty: -'+offsetPenalty]:[]),name:'Special 1 route',tiles:[idx+1],life:state.life,trapCount:state.tiles[idx]?.type==='trap'?1:0,mode:'special1'};
+  }
+  if(best){
+    let wall=special1WallPlan();
+    best.why=best.why.concat([
+      'Wall check: '+(wall.reachable?('reachable, '+wall.traps+' trap hit(s), needs '+wall.lifeNeeded+' life'):'not reachable with current hand'),
+      'Owned-upgrade estimate: +'+special1ExpectedOwnedUpgradeGain().toFixed(1)+' value if upgrades are reached',
+      'Special strategy: '+(specialStrategyEntry()?.label||'Special 1'),
+      'Offset cards in hand: '+special1TrueOffsetCount()+' (Back 1–3 / Move 1–3 / Choose 1–6 / Odd-Even)'
+    ]).concat(special1PostWallAssessment());
+  }
+  return best;
+}
+
 function finalTileRecoveryPlan(){
   if(state.pos!==totalTiles-1)return null;
   let backs=state.hand.map((c,idx)=>({c,idx})).filter(x=>x.c.type==='back');
@@ -792,6 +1150,12 @@ function finalTileRecoveryPlan(){
   return best;
 }
 function suggestMove(){
+  if(isSpecialBoard1()){
+    suggested=special1ChooseAction();
+    if(!suggested){$('routeNotes').innerHTML='No Special 1 legal move options.';render();return}
+    render(); return;
+  }
+
   let depth=comboDepthValue();
   let plan=finalTileRecoveryPlan();
   if(plan){
@@ -837,7 +1201,14 @@ function clickTile(i){
     }
     else if(t.type==='trap'){state.life--;t.used=true;log('Trap at tile '+(i+1)+'. Lost 1 life.');if(state.life<=0){state.dead=true;state.done=true;log('Run bricked at tile '+(i+1)+'.')}}
     else if(t.type==='movement'){let c=normalizeCard(t.fixedN?{type:'move',n:t.fixedN,name:'Move '+t.fixedN}:drawMappingCard());state.hand.push(c);t.used=true;log('Mapping-card tile gained: '+c.name+'.')}
-    else if(t.type==='upgrade'){let c=normalizeCard({type:'upgrade',from:t.fixedFrom||wc(upgradeCardW)});state.hand.push(c);t.used=true;log('Picked '+c.name+' card.')}
+    else if(t.type==='upgrade'){
+      let c=normalizeCard({type:'upgrade',from:t.fixedFrom||wc(upgradeCardW)});
+      state.hand.push(c);t.used=true;log('Picked '+c.name+' card.');
+      if(isSpecialBoard1()){
+        let idx=state.hand.length-1;
+        if(playUpgradeCard(idx,'Special 1 upgrade tile'))log('Applied Special 1 upgrade tile immediately.');
+      }
+    }
     else if(t.type==='life'){let n=t.fixedN||1;state.life+=n;t.used=true;log('Gained '+n+' life.')}
     else if(t.type==='question'){t.used=true;log('Hit ? at tile '+(i+1)+'.');applyQuestion()}
     else if(t.type==='start'){}
@@ -1152,6 +1523,17 @@ async function loadStrategyData(){
   }catch(err){
     applyStrategyCards(clone(FALLBACK_STRATEGY_CARD_DATA));
     console.warn('Using embedded strategy card fallback:',err);
+  }
+  try{
+    const res=await fetch('arcana_special_strategies.json',{cache:'no-store'});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    if(!data||!data.boards)throw new Error('Invalid special strategy JSON');
+    applySpecialStrategyData(data);
+    console.info('Loaded arcana_special_strategies.json');
+  }catch(err){
+    applySpecialStrategyData(clone(FALLBACK_SPECIAL_STRATEGY_DATA));
+    console.warn('Using embedded special strategy fallback:',err);
   }
   renderStrategyUI();
 }

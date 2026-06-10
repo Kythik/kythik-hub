@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "updated": "2026-06-10",
+  "defaultByBoard": {
+    "special1": "Special1_Rainbow_Wall"
+  },
+  "boards": {
+    "special1": {
+      "label": "Special Board 1",
+      "summary": "Chest zone first, trap wall second, red-upgrade zone last. Strategy evaluates whether owned chest slots justify crossing the wall.",
+      "strategies": [
+        {
+          "id": "Special1_Rainbow_Wall",
+          "label": "Special 1: Rainbow Wall",
+          "kicker": "Recommended",
+          "summary": "Collect upgradeable chest slots, solve the wall only when the current hand/life can pay the trap cost, then convert owned chests with red upgrades.",
+          "rules": {
+            "ownedChestUpgrades": true,
+            "wallSolver": true,
+            "minChestsBeforeWall": 5,
+            "minUpgradeTilesAhead": 4,
+            "wallLifeBuffer": 0,
+            "wallTrapLifeCost": 18,
+            "slotQualityValue": 6,
+            "crossScoreThreshold": 25,
+            "chestZoneUpgradeSlotValue": 18,
+            "chestZoneNoUpgradeSlotValue": 8,
+            "currentRarityMultiplierWithUpgrades": 0.25,
+            "currentRarityMultiplierNoUpgrades": 1.0,
+            "purpleChestBonus": 5,
+            "premiumChestBonus": 10,
+            "fillChestSlotBonus": 5,
+            "movementTileBase": 8,
+            "movementTilePreWallBonus": 4,
+            "lifeTileLowLifeValue": 22,
+            "lifeTileBase": 6,
+            "upgradeTileBase": 20,
+            "upgradeTileGainMultiplier": 0.6,
+            "upgradeTileGainCap": 80,
+            "trapWallTollBase": 18,
+            "trapWallBlockedPenalty": 90,
+            "trapWallNoCrossPenalty": 60,
+            "preWallEnterBlockedPenalty": 80,
+            "chestZoneEmptyScore": -1,
+            "safeGapActiveScore": 4,
+            "safeGapInactiveScore": -6,
+            "upgradeZonePathScore": 6,
+            "genericEmptyScore": -6,
+            "handCardSpendPenalty": 2,
+            "offsetProtection": {
+              "enabled": true,
+              "protectUntilTile": 36,
+              "lastOffsetPenalty": 18,
+              "lastOffsetAllowedPenalty": 2,
+              "nonLastOffsetPenalty": 1,
+              "trueOffsetCards": [
+                "back_1_2_3",
+                "move_1_2_3",
+                "back_any",
+                "move_any",
+                "move_even",
+                "move_odd"
+              ]
+            },
+            "postWallAssessment": {
+              "enabled": true
+            }
+          },
+          "walkthrough": [
+            {
+              "heading": "Chest zone",
+              "steps": [
+                "Treat early chests as upgradeable slots, not just their current rarity.",
+                "Green and blue chests can be correct if the wall and red upgrades look reachable.",
+                "Take life and movement tiles that make the wall solve more realistic."
+              ]
+            },
+            {
+              "heading": "Trap wall",
+              "steps": [
+                "Before crossing, solve the current hand to tile 37+.",
+                "Cross only when trap hits plus remaining life make sense.",
+                "Do not enter the wall just because it is reachable; owned upgrade payoff must justify it."
+              ]
+            },
+            {
+              "heading": "Red upgrade zone",
+              "steps": [
+                "After the wall, red upgrade tiles convert owned chests toward rainbow.",
+                "Keep recommendations simple: target high upgrade gain, reachable red upgrades, and avoid pointless empty pathing."
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Special1_Safer_Wall",
+          "label": "Special 1: Safer Wall",
+          "kicker": "Conservative",
+          "summary": "Same owned-upgrade plan, but requires more owned chests and a life buffer before crossing.",
+          "rules": {
+            "extends": "Special1_Rainbow_Wall",
+            "minChestsBeforeWall": 6,
+            "minUpgradeTilesAhead": 5,
+            "wallLifeBuffer": 1,
+            "crossScoreThreshold": 30,
+            "trapWallBlockedPenalty": 110,
+            "preWallEnterBlockedPenalty": 100
+          }
+        }
+      ]
+    }
+  }
+}
