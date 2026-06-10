@@ -12,6 +12,14 @@
   }
 </style>
 <title>Arcana Tarot Minigame</title>
+<style id="arcana-board-layout-guard">
+  .arcana-page .gamePanel{display:flex!important;justify-content:center!important;align-items:flex-start!important;overflow-x:auto}
+  .arcana-page .boardFrame,.arcana-page .board{margin-left:auto!important;margin-right:auto!important}
+  .arcana-page .rowJoin{grid-column:1/-1;height:22px;display:grid;grid-template-columns:1fr auto 1fr auto;align-items:center;gap:8px;color:#E6C77A;pointer-events:none}
+  .arcana-page .rowJoin span{display:block;height:2px;background:linear-gradient(90deg,rgba(230,199,122,0),rgba(230,199,122,.82),rgba(230,199,122,0))}
+  .arcana-page .rowJoin b{font-size:9px;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap}
+  .arcana-page .rowJoin em{font-style:normal;font-size:10px;font-weight:900;color:#07111F;background:#E6C77A;border-radius:999px;padding:3px 7px;white-space:nowrap}
+</style>
 </head>
 <body class="arcana-page">
 
@@ -131,17 +139,17 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
     <div class="log" id="log"></div>
   </div>
 
-  <div class="panel gamePanel">
-    <div class="boardFrame">
+  <div class="panel gamePanel" style="display:flex;justify-content:center;align-items:flex-start;overflow-x:auto;">
+    <div class="boardFrame" style="margin-left:auto;margin-right:auto;">
       <div class="boardHeader">
         <div class="boardTitle">Arcana Board</div>
         <div class="boardLegend">
           <span class="legendPill"><span class="legendDot" style="background:#fff"></span>Current</span>
           <span class="legendPill"><span class="legendDot"></span>Preview</span>
-          <span class="legendPill"><span class="legendDot" style="background:#E9EDF5"></span>Landing #</span><span class="legendPill"><span class="legendDot rowWrapDot"></span>Row wrap</span>
+          <span class="legendPill"><span class="legendDot" style="background:#E9EDF5"></span>Landing #</span><span class="legendPill"><span class="legendDot rowWrapDot"></span>Row connector</span>
         </div>
       </div>
-      <div class="board" id="board"></div>
+      <div class="board" id="board" style="margin-left:auto;margin-right:auto;"></div>
     </div>
   </div>
 </div>
@@ -676,8 +684,9 @@ function render(){
   let tgt=targetFor(selected);
   $('board').innerHTML=state.tiles.map((t,i)=>{
     let visit=state.path.indexOf(i+1),land=visit>=0?`<span class="land">${visit+1}</span>`:'';
-    let rowLink=((i+1)%4===0 && i<state.tiles.length-1)?`<span class="rowLink" title="Next row continues at tile ${i+2}">↵ ${i+2}</span>`:'';
-    return `<button class="tile ${t.type} ${t.type==='chest'?'chest chest-'+t.rarity:''} ${t.rarity||''} ${i<state.pos?'done':''} ${visit>=0?'landed':''} ${i===state.pos?'pos':''} ${i===tgt?'reach':''} ${suggested&&i===suggested.idx?'suggest':''}" onclick="clickTile(${i})"><span class="n">${i+1}</span><span class="c">${icon(t)}</span>${land}${rowLink}</button>`;
+    let tile=`<button class="tile ${t.type} ${t.type==='chest'?'chest chest-'+t.rarity:''} ${t.rarity||''} ${i<state.pos?'done':''} ${visit>=0?'landed':''} ${i===state.pos?'pos':''} ${i===tgt?'reach':''} ${suggested&&i===suggested.idx?'suggest':''}" onclick="clickTile(${i})"><span class="n">${i+1}</span><span class="c">${icon(t)}</span>${land}</button>`;
+    let join=((i+1)%4===0 && i<state.tiles.length-1)?`<div class="rowJoin" aria-hidden="true"><span></span><b>ROW CONTINUES</b><span></span><em>${i+1} → ${i+2}</em></div>`:'';
+    return tile+join;
   }).join('');
   $('log').innerHTML=state.log.map(x=>'<div>'+x+'</div>').join('');
   if(suggested){
