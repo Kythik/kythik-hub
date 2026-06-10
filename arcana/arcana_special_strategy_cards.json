@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "updated": "2026-06-10",
+  "cards": [
+    {
+      "id": "Special1_Rainbow_Wall",
+      "title": "Special 1: Rainbow Wall",
+      "kicker": "Recommended",
+      "meta": "Board 1 value route",
+      "cardSummary": "Chest slots first, solve the wall only when payoff beats trap cost, then convert owned chests with red upgrades.",
+      "profile": "Special Board 1 starts with chests, then a trap wall, then red upgrades. This route treats early chests as upgradeable slots and uses the wall solver to decide whether crossing is worth it.",
+      "notes": [
+        [
+          "Board shape",
+          "Chests first, trap wall second, red upgrades last."
+        ],
+        [
+          "Main question",
+          "Are the owned chest slots good enough to justify crossing the wall?"
+        ],
+        [
+          "Wall logic",
+          "Calculates actual hand route to tile 37+, trap hits, and life required."
+        ],
+        [
+          "Upgrade logic",
+          "Red upgrades can target already-collected chests on this board."
+        ],
+        [
+          "Offset logic",
+          "Softly protects the final correction card; it does not forbid spending it."
+        ]
+      ],
+      "useWhen": "Use when you have several owned chest slots, enough life/card reach to cross, and red upgrades still available after the wall.",
+      "avoidWhen": "Avoid crossing when the hand cannot reach past the wall, life cannot pay the trap toll, or the red upgrade payoff is weak.",
+      "walkthrough": [
+        {
+          "heading": "Chest zone",
+          "steps": [
+            "Collect enough chest bodies to make later red upgrades matter.",
+            "Do not dismiss green/blue automatically; they can become rainbow slots.",
+            "Take movement and life tiles when they improve the future wall solve."
+          ]
+        },
+        {
+          "heading": "Wall check",
+          "steps": [
+            "Solve the actual current hand to tile 37+.",
+            "Compare expected owned-upgrade gain against trap/life cost.",
+            "Cross only if the score clears the strategy threshold."
+          ]
+        },
+        {
+          "heading": "After wall",
+          "steps": [
+            "Use red upgrades on owned chests.",
+            "Prefer the upgrades with the highest conversion gain.",
+            "Keep routing simple; do not over-chase empty pathing."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Special1_Safer_Wall",
+      "title": "Special 1: Safer Wall",
+      "kicker": "Conservative",
+      "meta": "Board 1 safer route",
+      "cardSummary": "Requires more chest slots, more red upgrades ahead, and a life buffer before crossing.",
+      "profile": "A stricter version of Rainbow Wall for runs where you want fewer bad crosses.",
+      "notes": [
+        [
+          "Difference",
+          "Requires 6 owned chests, 5 upgrades ahead, and +1 life buffer."
+        ],
+        [
+          "Tradeoff",
+          "Fewer crosses, fewer disasters, but may miss some profitable aggressive routes."
+        ]
+      ],
+      "useWhen": "Use when the wall route looks sketchy or you want a safer recommendation.",
+      "avoidWhen": "Avoid when you need a faster cross and are willing to take a thinner wall line."
+    },
+    {
+      "id": "Special2_Bank_And_Cross",
+      "title": "Special 2: Bank & Cross",
+      "kicker": "Recommended",
+      "meta": "Board 2 value route",
+      "cardSummary": "Bank red upgrades first, preserve enough life/movement to cross, then spend upgrades on the late chest zone.",
+      "profile": "Special Board 2 is the reverse of Board 1: upgrades first, trap wall second, chests last. This route values banked red upgrades and then uses wall logic to reach the chest zone.",
+      "notes": [
+        [
+          "Board shape",
+          "Red upgrades first, trap wall second, chest zone last."
+        ],
+        [
+          "Main question",
+          "How many red upgrades can you bank before the wall without bricking movement?"
+        ],
+        [
+          "Crossing logic",
+          "Uses deterministic wall solve when available, but can use survival crossing after enough upgrades/life are banked."
+        ],
+        [
+          "Upgrade logic",
+          "Banked red upgrade cards are used on future chest tiles in the late chest zone."
+        ],
+        [
+          "Validation",
+          "Best value in the 2,000-run Special Board 2 test."
+        ]
+      ],
+      "useWhen": "Use as the default Special Board 2 route when you want the highest tested value.",
+      "avoidWhen": "Avoid if you only care about filling all seven chest slots instead of upgrade value.",
+      "walkthrough": [
+        {
+          "heading": "Upgrade zone",
+          "steps": [
+            "Bank red upgrade cards first.",
+            "Do not spend all movement just to grab one more upgrade.",
+            "Life and movement tiles matter because the chest zone is behind the wall."
+          ]
+        },
+        {
+          "heading": "Trap wall",
+          "steps": [
+            "Cross after enough upgrades are banked and life is high enough.",
+            "A perfect deterministic wall solve is good, but Board 2 can also use survival crossing.",
+            "Do not cross early if too many easy red upgrades remain before the wall."
+          ]
+        },
+        {
+          "heading": "Chest zone",
+          "steps": [
+            "Use banked red upgrades on future chest tiles as they enter range.",
+            "Every late chest is a conversion target.",
+            "Value route prioritizes upgraded chest quality over raw 7-chest completion."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Special2_Chest_Zone_Fill",
+      "title": "Special 2: Chest Zone Fill",
+      "kicker": "Completion focus",
+      "meta": "Board 2 7-chest route",
+      "cardSummary": "Crosses earlier and fills more chest slots. Lower value ceiling, better 7-chest rate in testing.",
+      "profile": "A completion-oriented Board 2 route. It sacrifices some red-upgrade banking to reach and fill the late chest zone more often.",
+      "notes": [
+        [
+          "Strength",
+          "Best 7-chest rate among the Board 2 tested strategies."
+        ],
+        [
+          "Weakness",
+          "Lower average value and lower rainbow rate than Bank & Cross."
+        ],
+        [
+          "Use case",
+          "Good when chest count matters more than upgrade value."
+        ]
+      ],
+      "useWhen": "Use when you want more 7-chest completions on Board 2.",
+      "avoidWhen": "Avoid when you want the highest expected value."
+    },
+    {
+      "id": "Special2_Aggro_Cross",
+      "title": "Special 2: Aggro Cross",
+      "kicker": "Faster cross",
+      "meta": "Board 2 faster route",
+      "cardSummary": "Crosses with fewer banked upgrades. Slightly lower tested value, but less waiting in the upgrade zone.",
+      "profile": "An aggressive Board 2 option that crosses with fewer upgrades banked. It can be useful when the early zone is awkward or wall access is already strong.",
+      "notes": [
+        [
+          "Difference",
+          "Lower upgrade banking requirement than Bank & Cross."
+        ],
+        [
+          "Tradeoff",
+          "Faster access to chests, slightly lower average value."
+        ],
+        [
+          "Use case",
+          "Good when the wall package is strong but upgrade-zone routing is poor."
+        ]
+      ],
+      "useWhen": "Use when you already have a strong wall line and do not want to over-harvest the early upgrade zone.",
+      "avoidWhen": "Avoid when safe red upgrade tiles are still easy to collect."
+    }
+  ]
+}

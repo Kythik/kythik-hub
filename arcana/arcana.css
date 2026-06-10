@@ -571,3 +571,14 @@ body.arcana-page .board {
 .strategyWalkthrough h4{margin:0 0 8px;color:var(--gold,#c8a45d);font-size:1rem}
 .strategyWalkthrough ol{margin:0;padding-left:1.25rem}
 .strategyWalkthrough li{margin:6px 0;line-height:1.45}
+
+
+.strategySpecialHeader{
+  grid-column:1/-1;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--gold);
+  opacity:.9;
+  margin:.25rem 0 .15rem;
+}
