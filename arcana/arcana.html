@@ -51,7 +51,7 @@ Total route EV = UF value + rarity value + ? value - movement/trap/opportunity c
 </div>
 
 
-<div class="strategyLightbox" id="strategyLightbox" aria-hidden="true">
+<div class="strategyLightbox" id="strategyLightbox" aria-hidden="true" style="display:none">
   <div class="strategyLightboxPanel" role="dialog" aria-modal="true" aria-labelledby="strategyLightboxTitle">
     <div class="strategyLightboxHeader">
       <div>
@@ -573,16 +573,21 @@ const STRATEGY_DETAILS={
   Strategy4:{kicker:'UF Ticket Lean',title:'Strategy4',play:`Strategy4 leans into chest quantity. Green/blue remain low normal-loot EV, but each collected chest is still an Undetermined Fate ticket check when route cost is reasonable.`,result:`Observed behavior: strongest when board shape rewards volume or premium conversion is less reliable than capped chest count.`,dist:[['Normal','Rerun needed after 10–13 chest change'],['Special 1','Close when chest access is efficient'],['Special 2','Strong on chest-volume patterns'],['Special 3','Usually behind premium/known-value profiles']]}
 };
 function openStrategyLightbox(id){
-  const d=STRATEGY_DETAILS[id]||STRATEGY_DETAILS.Strategy1;
-  $('strategyModalKicker').textContent=d.kicker;
-  $('strategyModalTitle').textContent=d.title;
-  $('strategyModalPlay').innerHTML='<p>'+d.play+'</p>';
-  $('strategyModalResult').innerHTML='<p>'+d.result+'</p>';
-  $('strategyModalDist').innerHTML='<tr><th>Board</th><th>Board note</th></tr>'+d.dist.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('');
-  $('strategyModal').classList.add('open');
+  const data=STRATEGY_LIGHTBOX_DATA[id]||STRATEGY_LIGHTBOX_DATA.Strategy1;
+  $('strategyLightboxKicker').textContent=data.kicker;
+  $('strategyLightboxTitle').textContent=data.title;
+  $('strategyProfileText').textContent=data.profile;
+  $('strategyBoardNotes').innerHTML='<table class="strategyTable"><tr><th>Board</th><th>Note</th></tr>'+data.notes.map(row=>'<tr><td>'+row[0]+'</td><td>'+row[1]+'</td></tr>').join('')+'</table>';
+  const box=$('strategyLightbox');
+  box.style.display='block';
+  box.classList.add('isOpen');
+  box.setAttribute('aria-hidden','false');
 }
 function closeStrategyLightbox(){
-  $('strategyModal').classList.remove('open');
+  const box=$('strategyLightbox');
+  box.classList.remove('isOpen');
+  box.setAttribute('aria-hidden','true');
+  box.style.display='none';
 }
 
 
