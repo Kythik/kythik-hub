@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="/styles.css" />
 <link rel="stylesheet" href="arcana.css?v=acd68faa0e" />
 <style id="arcana-critical-guard">
+  .arcana-page .strategyModalOverlay,
   .arcana-page .strategyLightbox[hidden],
   .arcana-page .strategyLightbox:not(.isOpen){
     display:none !important;
@@ -29,32 +30,6 @@
     <button class="strategyCard" onclick="openStrategyLightbox('Strategy4')"><div class="strategyKicker">Ticket Lean</div><h3>Strategy4</h3><p>Values chest quantity more when path cost is low or the board favors Undetermined Fate ticket volume.</p><div class="strategyMeta">Chest quantity bias</div></button>
   </div>
 </section>
-
-<div class="strategyModalOverlay" id="strategyModal" onclick="if(event.target.id==='strategyModal')closeStrategyLightbox()">
-  <div class="strategyModalBox">
-    <div class="strategyModalHead">
-      <div><div class="strategyModalKicker" id="strategyModalKicker">Strategy</div><h2 id="strategyModalTitle">Strategy</h2></div>
-      <button class="strategyClose" onclick="closeStrategyLightbox()">Close</button>
-    </div>
-    <div class="strategyModalGrid">
-      <div class="strategyModalPanel"><h3>Profile</h3><div id="strategyModalPlay"></div></div>
-      <div class="strategyModalPanel"><h3>Board notes</h3><div id="strategyModalResult"></div></div>
-      <div class="strategyModalPanel"><h3>Expected value model</h3><div class="mathBlock">Chest EV = UF ticket EV + rarity loot EV
-
-UF ticket EV = P(UF drop) × UF market value
-
-Run EV ≈ Σ(chest EV) + Σ(? value) - path/trap/opportunity costs</div><p class="strategyFine">Chest cap is 7, but the run only ends when you manually end it or lose all life.</p></div>
-      <div class="strategyModalPanel"><h3>Natural rarity distribution</h3><table class="strategyTable"><tr><th>Rarity</th><th>Chance</th><th>EV role</th></tr><tr><td>Green</td><td>27.5544%</td><td>Low loot, still one UF check.</td></tr><tr><td>Blue</td><td>41.3316%</td><td>Low loot, better upgrade base.</td></tr><tr><td>Purple</td><td>25.295%</td><td>Known value starts mattering.</td></tr><tr><td>Gold</td><td>5.399%</td><td>Primary premium target.</td></tr><tr><td>Red</td><td>0.38%</td><td>High premium target.</td></tr><tr><td>Rainbow</td><td>0.02%</td><td>Top natural result.</td></tr></table></div>
-      <div class="strategyModalPanel wide"><h3>Chest quantity distribution and expected EV</h3><p>Chest quantity mainly controls how many Undetermined Fate checks you receive. Normal board generation places 10–13 total chests before filling the remaining tiles with non-chest outcomes. Rarity controls the normal loot side of the EV model.</p><div class="mathBlock">Expected UF checks = E[collected chest count]
-
-Expected UF value = E[chest count] × P(UF drop) × UF market value
-
-Expected rarity value = Σ rarity_weight × loot_value(rarity)
-
-Total route EV = UF value + rarity value + ? value - movement/trap/opportunity costs</div><table class="strategyTable" id="strategyModalDist"></table></div>
-    </div>
-  </div>
-</div>
 
 
 <div class="strategyLightbox" id="strategyLightbox" aria-hidden="true" hidden style="display:none">
@@ -535,7 +510,7 @@ function icon(t){
   if(t.type==='start')return 'START';
   if(t.type==='chest'){
     const label=rarityLabel(t.rarity);
-    return '<span class="chestIcon" aria-hidden="true">▣</span><span class="chestText">'+label+'</span>';
+    return '<span class="chestIcon" aria-hidden="true">▰</span><span class="chestText">'+label+'</span>';
   }
   if(t.type==='trap')return '⚠';
   if(t.type==='movement')return t.fixedN?'Move '+t.fixedN:'Card';
@@ -573,33 +548,6 @@ function openInfoModal(){$('infoModal').classList.add('open')}
 function closeInfoModal(){$('infoModal').classList.remove('open')}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeInfoModal()});
 
-const STRATEGY_DETAILS={
-  Strategy1:{kicker:'Default / Balanced',title:'Strategy1',play:`Strategy1 is the baseline profile. It preserves known value without becoming too greedy, prioritizes gold/red/rainbow, and treats green/blue as lower-value Undetermined Fate tickets unless the route cost is low.`,result:`Observed behavior: balanced profile. Use it when the board pattern is unclear or you want fewer extreme recommendations.`,dist:[['Normal','Rerun needed after 10–13 chest change'],['Special 1','Close to conservative known-value routing'],['Special 2','Usually behind ticket-leaning profile'],['Special 3','Very close to top profiles']]},
-  Strategy2:{kicker:'Gold Focus',title:'Strategy2',play:`Strategy2 weights gold+ value more heavily. It is more willing to pay pathing cost when the route can convert into premium chest value.`,result:`Observed behavior: strongest when premium targets are visible and reachable. Can be too greedy if the board is low-value or card-starved.`,dist:[['Normal','Rerun needed after 10–13 chest change'],['Special 1','Close when premium upgrades/chests are reachable'],['Special 2','Less favored than quantity routing'],['Special 3','Strong on rarity-ladder patterns']]},
-  Strategy3:{kicker:'Purple Safe',title:'Strategy3',play:`Strategy3 is the conservative known-value profile. It values purple more heavily, is more cautious around traps, and is less likely to skip solid value while chasing gold+ spikes.`,result:`Observed behavior: strong when purple+ density is high or survival/pathing matters.`,dist:[['Normal','Rerun needed after 10–13 chest change'],['Special 1','Strong on upgrade-heavy patterns'],['Special 2','Close when safe value is available'],['Special 3','Competitive on rarity-ladder patterns']]},
-  Strategy4:{kicker:'UF Ticket Lean',title:'Strategy4',play:`Strategy4 leans into chest quantity. Green/blue remain low normal-loot EV, but each collected chest is still an Undetermined Fate ticket check when route cost is reasonable.`,result:`Observed behavior: strongest when board shape rewards volume or premium conversion is less reliable than capped chest count.`,dist:[['Normal','Rerun needed after 10–13 chest change'],['Special 1','Close when chest access is efficient'],['Special 2','Strong on chest-volume patterns'],['Special 3','Usually behind premium/known-value profiles']]}
-};
-function openStrategyLightbox(id){
-  const data=STRATEGY_LIGHTBOX_DATA[id]||STRATEGY_LIGHTBOX_DATA.Strategy1;
-  $('strategyLightboxKicker').textContent=data.kicker;
-  $('strategyLightboxTitle').textContent=data.title;
-  $('strategyProfileText').textContent=data.profile;
-  $('strategyBoardNotes').innerHTML='<table class="strategyTable"><tr><th>Board</th><th>Note</th></tr>'+data.notes.map(row=>'<tr><td>'+row[0]+'</td><td>'+row[1]+'</td></tr>').join('')+'</table>';
-  const box=$('strategyLightbox');
-  box.hidden=false;
-  box.style.display='block';
-  box.classList.add('isOpen');
-  box.setAttribute('aria-hidden','false');
-}
-function closeStrategyLightbox(){
-  const box=$('strategyLightbox');
-  box.classList.remove('isOpen');
-  box.setAttribute('aria-hidden','true');
-  box.style.display='none';
-  box.hidden=true;
-}
-
-
 const STRATEGY_LIGHTBOX_DATA={
   Strategy1:{kicker:'Default / Balanced',title:'Strategy1',profile:'Strategy1 is the baseline profile. It preserves known value without becoming too greedy, prioritizes gold/red/rainbow, and treats green/blue as lower-value Undetermined Fate tickets unless the route cost is low.',notes:[['Normal','Rerun needed after the 10–13 chest change.'],['Special 1','Close to conservative known-value routing.'],['Special 2','Usually behind ticket-leaning routing.'],['Special 3','Generally close to the top profiles.']]},
   Strategy2:{kicker:'Gold Focus',title:'Strategy2',profile:'Strategy2 weights gold+ value more heavily. It is more willing to pay pathing cost when the route can convert into premium chest value.',notes:[['Normal','Rerun needed after the 10–13 chest change.'],['Special 1','Close when premium upgrades or chests are reachable.'],['Special 2','Less favored than quantity routing.'],['Special 3','Strong on rarity-ladder patterns.']]},
@@ -608,16 +556,24 @@ const STRATEGY_LIGHTBOX_DATA={
 };
 function openStrategyLightbox(id){
   const data=STRATEGY_LIGHTBOX_DATA[id]||STRATEGY_LIGHTBOX_DATA.Strategy1;
+  const box=$('strategyLightbox');
+  if(!box)return;
   $('strategyLightboxKicker').textContent=data.kicker;
   $('strategyLightboxTitle').textContent=data.title;
   $('strategyProfileText').textContent=data.profile;
   $('strategyBoardNotes').innerHTML='<table class="strategyTable"><tr><th>Board</th><th>Note</th></tr>'+data.notes.map(row=>'<tr><td>'+row[0]+'</td><td>'+row[1]+'</td></tr>').join('')+'</table>';
-  $('strategyLightbox').classList.add('isOpen');
-  $('strategyLightbox').setAttribute('aria-hidden','false');
+  box.hidden=false;
+  box.style.display='block';
+  box.classList.add('isOpen');
+  box.setAttribute('aria-hidden','false');
 }
 function closeStrategyLightbox(){
-  $('strategyLightbox').classList.remove('isOpen');
-  $('strategyLightbox').setAttribute('aria-hidden','true');
+  const box=$('strategyLightbox');
+  if(!box)return;
+  box.classList.remove('isOpen');
+  box.setAttribute('aria-hidden','true');
+  box.style.display='none';
+  box.hidden=true;
 }
 function wireStrategyCards(){
   document.querySelectorAll('.strategyCard[data-strategy]').forEach(btn=>{
@@ -626,7 +582,13 @@ function wireStrategyCards(){
   const closeBtn=$('strategyLightboxClose');
   if(closeBtn)closeBtn.addEventListener('click',closeStrategyLightbox);
   const lightbox=$('strategyLightbox');
-  if(lightbox)lightbox.addEventListener('click',e=>{if(e.target===lightbox)closeStrategyLightbox()});
+  if(lightbox){
+    lightbox.hidden=true;
+    lightbox.style.display='none';
+    lightbox.classList.remove('isOpen');
+    lightbox.setAttribute('aria-hidden','true');
+    lightbox.addEventListener('click',e=>{if(e.target===lightbox)closeStrategyLightbox()});
+  }
 }
 
 window.addEventListener('load',()=>{newGame(false);wireStrategyCards();});
