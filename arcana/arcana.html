@@ -626,8 +626,8 @@ function render(){
       let visit=state.path.indexOf(i+1),land=visit>=0?`<span class="land">${visit+1}</span>`:'';
       let link='';
       if(rowEnd<state.tiles.length-1){
-        if(r%2===0 && i===rowEnd)link=`<span class="rowEndLink" title="Continues to tile ${rowEnd+2}">${i+1} ↴ ${rowEnd+2}</span>`;
-        if(r%2===1 && i===start)link=`<span class="rowEndLink left" title="Continues to tile ${rowEnd+2}">${i+1} ↵ ${rowEnd+2}</span>`;
+        if(r%2===0 && i===rowEnd)link=`<span class="rowEndLink" title="Continues to tile ${rowEnd+2}">${rowEnd+1} ↴ ${rowEnd+2}</span>`;
+        if(r%2===1 && i===rowEnd)link=`<span class="rowEndLink left" title="Continues to tile ${rowEnd+2}">${rowEnd+1} ↵ ${rowEnd+2}</span>`;
       }
       return `<button class="tile ${t.type} ${t.type==='chest'?'chest chest-'+t.rarity:''} ${t.rarity||''} ${i<state.pos?'done':''} ${visit>=0?'landed':''} ${i===state.pos?'pos':''} ${targets.includes(i)?'reach':''} ${suggested&&i===suggested.idx?'suggest':''}" onclick="clickTile(${i})"><span class="n">${i+1}</span><span class="c">${icon(t)}</span>${land}${link}</button>`;
     }).join('');
