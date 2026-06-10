@@ -1,0 +1,370 @@
+{
+  "schemaVersion": 1,
+  "updated": "2026-06-10",
+  "defaultStrategy": "Purple_Before_Q",
+  "source": {
+    "summary": "arcana_strategy_family_aggregate_v4_summary.csv",
+    "confidence": "arcana_strategy_family_aggregate_v4_confidence.csv",
+    "pairwise": "arcana_strategy_family_aggregate_v4_pairwise.csv",
+    "runsPerStrategy": 10000,
+    "totalRuns": 80000,
+    "batches": 10,
+    "sourceHtmlHash": "1150773dcdcd0844"
+  },
+  "conclusions": [
+    "? tiles are strong, but pure ? greed was not the best family.",
+    "Purple+ chest before ? was the best practical EV profile in this aggregate.",
+    "Chest-first had the best 7-chest completion rate, but lower average value.",
+    "Upgrade-lean was weak as a primary normal-board plan."
+  ],
+  "strategies": [
+    {
+      "id": "Purple_Before_Q",
+      "label": "Purple Before ?",
+      "kicker": "Best EV",
+      "title": "Purple Before ?",
+      "meta": "Best practical value profile",
+      "cardSummary": "Prioritizes purple+ chest value before chasing ? variance. Best practical EV in the aggregate.",
+      "profile": "Best practical value profile from the 80,000-run family aggregate. It treats ? tiles as strong, but not stronger than known purple+ chest value.",
+      "useWhen": "Use when you want the best tested average value without going full ?-greedy.",
+      "avoidWhen": "Avoid if your goal is raw 7-chest completion rate instead of value.",
+      "notes": [
+        [
+          "Normal",
+          "Best average value in the aggregate; won 7 of 10 batches."
+        ],
+        [
+          "Tradeoff",
+          "Lower 7-chest rate than chest-first, but much better average value."
+        ]
+      ],
+      "weights": {
+        "q": 7,
+        "chest": 1.05,
+        "low_chest_penalty": 5,
+        "purple_bonus": 8,
+        "gold_bonus": 14,
+        "upgrade": 4,
+        "card": 3,
+        "life": 2,
+        "low_life": 8,
+        "trap": 20,
+        "empty": -6,
+        "q_after4": 2,
+        "q_late": -3,
+        "upgrade_bias": 0.9,
+        "chest_count_bias": 1
+      },
+      "metrics": {
+        "runs": 10000,
+        "avgValue": 31.455,
+        "ci95": [
+          30.407,
+          32.503
+        ],
+        "medianValue": 17.3,
+        "completion7Rate": 0.0616,
+        "avgChests": 3.275,
+        "avgQuestions": 2.253,
+        "avgUpgradeCardsUsed": 2.062,
+        "avgTrapsHit": 0.512,
+        "avgLifeEnd": 7.042,
+        "avgRainbow": 0.0682,
+        "avgRed": 0.1772,
+        "avgGold": 0.6105,
+        "avgPurple": 1.0926,
+        "rank": 1
+      }
+    },
+    {
+      "id": "Balanced_Current",
+      "label": "Balanced",
+      "kicker": "Default",
+      "title": "Balanced Current",
+      "meta": "Stable baseline",
+      "cardSummary": "Close to the top profile and safer as a general default. Strong baseline for future tests.",
+      "profile": "The current balanced scoring model. It was close to the best EV result and remains a stable default for mixed boards.",
+      "useWhen": "Use when you want a conservative default that avoids overfitting to one test profile.",
+      "avoidWhen": "Avoid if you specifically want the best measured EV or max chest-count completion.",
+      "notes": [
+        [
+          "Normal",
+          "Second-best average value; close enough to remain a valid default."
+        ],
+        [
+          "Testing",
+          "Useful as the baseline for future A/B comparisons."
+        ]
+      ],
+      "weights": {
+        "q": 6,
+        "chest": 1.0,
+        "low_chest_penalty": 4,
+        "purple_bonus": 4,
+        "gold_bonus": 10,
+        "upgrade": 5,
+        "card": 3,
+        "life": 2,
+        "low_life": 8,
+        "trap": 18,
+        "empty": -6,
+        "q_after4": 1.0,
+        "q_late": -4,
+        "upgrade_bias": 1.0,
+        "chest_count_bias": 0
+      },
+      "metrics": {
+        "runs": 10000,
+        "avgValue": 30.794,
+        "ci95": [
+          29.742,
+          31.845
+        ],
+        "medianValue": 17.2,
+        "completion7Rate": 0.0567,
+        "avgChests": 3.235,
+        "avgQuestions": 2.146,
+        "avgUpgradeCardsUsed": 2.142,
+        "avgTrapsHit": 0.55,
+        "avgLifeEnd": 6.972,
+        "avgRainbow": 0.0676,
+        "avgRed": 0.1683,
+        "avgGold": 0.6073,
+        "avgPurple": 1.0577,
+        "rank": 2
+      }
+    },
+    {
+      "id": "Question_After_Chest",
+      "label": "? After Chest",
+      "kicker": "Hybrid",
+      "title": "Question After Chest",
+      "meta": "More count, still value-aware",
+      "cardSummary": "Takes more chest count before leaning into ?. Better completion rate than balanced, lower EV than Purple Before ?.",
+      "profile": "Hybrid profile that establishes chest count before weighting ? tiles harder. It sits between value routing and completion routing.",
+      "useWhen": "Use when you want more chest count without committing to full chest-first.",
+      "avoidWhen": "Avoid when pure average value is the only goal.",
+      "notes": [
+        [
+          "Normal",
+          "Higher 7-chest rate than Purple Before ? and Balanced."
+        ],
+        [
+          "Tradeoff",
+          "Lower average value than the top EV profile."
+        ]
+      ],
+      "weights": {
+        "q": 4,
+        "chest": 1.15,
+        "low_chest_penalty": 3,
+        "purple_bonus": 6,
+        "gold_bonus": 13,
+        "upgrade": 5,
+        "card": 3,
+        "life": 2,
+        "low_life": 8,
+        "trap": 20,
+        "empty": -6,
+        "q_after4": 5,
+        "q_late": -2,
+        "upgrade_bias": 1,
+        "chest_count_bias": 2
+      },
+      "metrics": {
+        "runs": 10000,
+        "avgValue": 29.775,
+        "ci95": [
+          28.806,
+          30.744
+        ],
+        "medianValue": 17.4,
+        "completion7Rate": 0.0694,
+        "avgChests": 3.424,
+        "avgQuestions": 1.997,
+        "avgUpgradeCardsUsed": 2.127,
+        "avgTrapsHit": 0.565,
+        "avgLifeEnd": 6.751,
+        "avgRainbow": 0.0573,
+        "avgRed": 0.1578,
+        "avgGold": 0.6094,
+        "avgPurple": 1.1019,
+        "rank": 3
+      }
+    },
+    {
+      "id": "Chest_First_Completion",
+      "label": "Chest First",
+      "kicker": "Completion",
+      "title": "Chest First Completion",
+      "meta": "Best 7-chest rate",
+      "cardSummary": "Best chest count and 7-chest completion rate, but loses average value.",
+      "profile": "Quantity-first profile. It collects more chests and completes 7 chests most often, but gives up average value.",
+      "useWhen": "Use when your goal is completion rate, chest quantity, or Undetermined Fate ticket volume.",
+      "avoidWhen": "Avoid when average chest value is more important than count.",
+      "notes": [
+        [
+          "Normal",
+          "Best 7-chest completion rate in the aggregate."
+        ],
+        [
+          "Tradeoff",
+          "Much lower average value than Purple Before ?."
+        ]
+      ],
+      "weights": {
+        "q": 2,
+        "chest": 1.35,
+        "low_chest_penalty": 1,
+        "purple_bonus": 6,
+        "gold_bonus": 14,
+        "upgrade": 4,
+        "card": 2,
+        "life": 2,
+        "low_life": 8,
+        "trap": 20,
+        "empty": -6,
+        "q_after4": 0.5,
+        "q_late": -5,
+        "upgrade_bias": 0.8,
+        "chest_count_bias": 3
+      },
+      "metrics": {
+        "runs": 10000,
+        "avgValue": 26.212,
+        "ci95": [
+          25.414,
+          27.01
+        ],
+        "medianValue": 16.2,
+        "completion7Rate": 0.1284,
+        "avgChests": 3.939,
+        "avgQuestions": 1.513,
+        "avgUpgradeCardsUsed": 2.035,
+        "avgTrapsHit": 0.566,
+        "avgLifeEnd": 6.534,
+        "avgRainbow": 0.0409,
+        "avgRed": 0.1127,
+        "avgGold": 0.5402,
+        "avgPurple": 1.1068,
+        "rank": 7
+      }
+    },
+    {
+      "id": "Question_Greedy",
+      "label": "? Greedy",
+      "kicker": "Control",
+      "title": "Question Greedy",
+      "meta": "High variance control",
+      "cardSummary": "Confirms ? tiles are strong, but pure ? greed underperforms the better hybrid profiles.",
+      "profile": "Aggressive ?-tile profile. Useful as a test control showing that ? is strong but should not override known value every time.",
+      "useWhen": "Use for testing high-variance ? behavior.",
+      "avoidWhen": "Avoid as a main recommendation; it underperformed the top hybrid profiles.",
+      "notes": [
+        [
+          "Normal",
+          "Takes the most ? tiles among the main profiles."
+        ],
+        [
+          "Finding",
+          "Pure ? greed was not the best strategy family."
+        ]
+      ],
+      "weights": {
+        "q": 12,
+        "chest": 0.9,
+        "low_chest_penalty": 6,
+        "purple_bonus": 3,
+        "gold_bonus": 9,
+        "upgrade": 3,
+        "card": 3,
+        "life": 2,
+        "low_life": 8,
+        "trap": 20,
+        "empty": -6,
+        "q_after4": 2.5,
+        "q_late": -2,
+        "upgrade_bias": 0.8,
+        "chest_count_bias": 0
+      },
+      "metrics": {
+        "runs": 10000,
+        "avgValue": 29.094,
+        "ci95": [
+          27.969,
+          30.218
+        ],
+        "medianValue": 13.0,
+        "completion7Rate": 0.0381,
+        "avgChests": 2.773,
+        "avgQuestions": 2.256,
+        "avgUpgradeCardsUsed": 2.036,
+        "avgTrapsHit": 0.144,
+        "avgLifeEnd": 7.204,
+        "avgRainbow": 0.0803,
+        "avgRed": 0.1657,
+        "avgGold": 0.447,
+        "avgPurple": 0.9397,
+        "rank": 5
+      }
+    },
+    {
+      "id": "Upgrade_Lean_Control",
+      "label": "Upgrade Lean",
+      "kicker": "Control",
+      "title": "Upgrade Lean Control",
+      "meta": "Weak primary plan",
+      "cardSummary": "Upgrade-heavy routing was the weakest family in this test. Keep as a control/niche option.",
+      "profile": "Upgrade-heavy control profile. It overvalues upgrade-card routing relative to known chest value and ?-hybrid play.",
+      "useWhen": "Use only as a control or for unusual boards with dense upgrade targets.",
+      "avoidWhen": "Avoid as a normal-board recommendation.",
+      "notes": [
+        [
+          "Normal",
+          "Lowest average value among tested families."
+        ],
+        [
+          "Finding",
+          "Upgrade cards are useful, but upgrade-lean routing is not a strong primary plan."
+        ]
+      ],
+      "weights": {
+        "q": 5,
+        "chest": 1.0,
+        "low_chest_penalty": 4,
+        "purple_bonus": 4,
+        "gold_bonus": 11,
+        "upgrade": 9,
+        "card": 2,
+        "life": 2,
+        "low_life": 8,
+        "trap": 20,
+        "empty": -6,
+        "q_after4": 1,
+        "q_late": -4,
+        "upgrade_bias": 1.8,
+        "chest_count_bias": 0
+      },
+      "metrics": {
+        "runs": 10000,
+        "avgValue": 25.079,
+        "ci95": [
+          24.142,
+          26.016
+        ],
+        "medianValue": 11.8,
+        "completion7Rate": 0.0353,
+        "avgChests": 2.725,
+        "avgQuestions": 1.699,
+        "avgUpgradeCardsUsed": 2.197,
+        "avgTrapsHit": 0.201,
+        "avgLifeEnd": 7.023,
+        "avgRainbow": 0.0559,
+        "avgRed": 0.1489,
+        "avgGold": 0.4121,
+        "avgPurple": 0.9172,
+        "rank": 8
+      }
+    }
+  ]
+}

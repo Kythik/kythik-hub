@@ -32,12 +32,7 @@
       <p>Each profile biases routing differently. Open a card for assumptions, expected-value logic, rarity modeling, and board notes.</p>
     </div>
   </div>
-  <div class="strategyCards">
-    <button class="strategyCard" data-strategy="Strategy1" onclick="openStrategyLightbox(\'Strategy1\')"><div class="strategyKicker">Default</div><h3>Strategy1</h3><p>Balanced routing. Respects purple+, prioritizes gold+, and avoids chasing low-value tiles unless the route is efficient.</p><div class="strategyMeta">General play / mixed boards</div></button>
-    <button class="strategyCard" data-strategy="Strategy2" onclick="openStrategyLightbox(\'Strategy2\')"><div class="strategyKicker">Gold Focus</div><h3>Strategy2</h3><p>Weights gold/red/rainbow outcomes more heavily and accepts more pathing cost for premium chest conversion.</p><div class="strategyMeta">Premium chest bias</div></button>
-    <button class="strategyCard" data-strategy="Strategy3" onclick="openStrategyLightbox(\'Strategy3\')"><div class="strategyKicker">Purple Safe</div><h3>Strategy3</h3><p>Conservative known-value profile. Values purple more heavily and avoids riskier skips.</p><div class="strategyMeta">Safer known value</div></button>
-    <button class="strategyCard" data-strategy="Strategy4" onclick="openStrategyLightbox(\'Strategy4\')"><div class="strategyKicker">Ticket Lean</div><h3>Strategy4</h3><p>Values chest quantity more when path cost is low or the board favors Undetermined Fate ticket volume.</p><div class="strategyMeta">Chest quantity bias</div></button>
-  </div>
+  <div class="strategyCards" id="strategyCards"></div>
 </section>
 
 
@@ -122,7 +117,7 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
         <p>Recommendation and autoplay behavior only.</p>
       </div>
       <div class="autoplayControls">
-        <label>Strategy <select id="strategyInput" onchange="suggested=null;render()"><option value="Strategy1" selected>Strategy1</option><option value="Strategy2">Strategy2</option><option value="Strategy3">Strategy3</option><option value="Strategy4">Strategy4</option></select></label>
+        <label>Strategy <select id="strategyInput" onchange="suggested=null;render()"><option value="Purple_Before_Q" selected>Purple Before ?</option></select></label>
         <label>Combo <select id="comboDepthInput"><option value="2" selected>2-card</option><option value="3">3-card safe</option><option value="4">4-card survival</option></select></label>
         <label>Backtrack <select id="backtrackModeInput"><option value="value" selected>value recovery</option><option value="tile80">final tile only</option></select></label>
       </div>
@@ -195,29 +190,42 @@ Rule:
 </div>
 
 <script>
-const R=['green','blue','purple','orange','red','rainbow'];
-const V={green:1,blue:1.2,purple:4,orange:10,red:16,rainbow:25};
-const STRATEGIES={
-  Strategy1:{goldBonus:10,purpleBonus:4,lowPenalty:-4,qEarly:8,qMid:5,qLate:2,empty:-6,move:3,upgradeTile:5,trap:-5},
-  Strategy2:{goldBonus:15,purpleBonus:3,lowPenalty:-5,qEarly:6,qMid:3,qLate:0,empty:-7,move:3,upgradeTile:6,trap:-5},
-  Strategy3:{goldBonus:10,purpleBonus:7,lowPenalty:-5,qEarly:7,qMid:4,qLate:1,empty:-7,move:3,upgradeTile:5,trap:-8},
-  Strategy4:{goldBonus:8,purpleBonus:4,lowPenalty:-1,qEarly:8,qMid:5,qLate:2,empty:-5,move:3,upgradeTile:4,trap:-5}
-};
-const maxChests=7;
-let totalTiles=80;
-const tileW={empty:.25,chest:.24,trap:.12,movement:.12,upgrade:.10,life:.07,question:.10};
-const NORMAL_CHEST_MIN=10;
-const NORMAL_CHEST_MAX=12;
-const chestW={green:.275544,blue:.413316,purple:.25295,orange:.05399,red:.0038,rainbow:.0002};
-const upgradeCardW={blue:.54,purple:.35,orange:.107,red:.008};
-const qW={life:.14,mapping_card:.17,upgrade_random_owned:.085,upgrade_random_map:.085,upgrade_all_owned:.03,upgrade_all_map:.03,add_chest:.13,add_high:.08,rainbow_all:.005,remove_traps:.08};
-
-let rngSeed=1,state=null,originalTiles=null,selected=null,suggested=null;
+const FALLBACK_MECHANICS_DATA={"schemaVersion":1,"updated":"2026-06-10","id":"normal_v1_opener_row3_qsplit","game":{"rarityOrder":["green","blue","purple","orange","red","rainbow"],"rarityValue":{"green":1,"blue":1.2,"purple":4,"orange":10,"red":16,"rainbow":25},"maxChests":7,"startingLife":3,"defaultStartingHand":4,"totalTiles":80},"weights":{"tile":{"empty":0.25,"chest":0.24,"trap":0.12,"movement":0.12,"upgrade":0.1,"life":0.07,"question":0.1},"chestRarity":{"green":0.275544,"blue":0.413316,"purple":0.25295,"orange":0.05399,"red":0.0038,"rainbow":0.0002},"upgradeCardRarity":{"blue":0.54,"purple":0.35,"orange":0.107,"red":0.008},"mappingCardType":{"move_fixed":0.24,"back_fixed":0.1,"move_any":0.13,"move_even":0.08,"move_odd":0.08,"back_any":0.09,"upgrade":0.28},"questionEffects":{"life":0.14,"mapping_card":0.17,"upgrade_random_owned":0.085,"upgrade_random_map":0.085,"upgrade_all_owned":0.03,"upgrade_all_map":0.03,"add_chest":0.13,"add_high":0.08,"rainbow_all":0.005,"remove_traps":0.08},"questionAddHighChestRarity":{"purple":0.45,"orange":0.38,"red":0.14,"rainbow":0.03}},"normalBoard":{"type":"count_based_with_curated_opener","rows":20,"columns":4,"opener":{"rangeTiles":[1,8],"tile1":"start","guaranteed":{"chest":1,"upgrade_at_or_above_chest_rarity":1,"life":1,"movement":[1,2]},"excludedTypes":["trap","question"],"fill":"empty"},"emptyBufferRows":[3],"randomSection":{"startTile":13,"counts":{"chest":[10,12],"empty":[15,25],"trap":[10,13],"movement":[8,11],"upgrade":[8,10],"life":[6,9],"question":[6,9]},"emptyIsRemainder":true,"maxAttempts":500}},"cards":{"rollMove":[1,6],"upgradeCardSearchWindow":12,"storedHandPool":["move","back","move_any","move_even","move_odd","back_any","upgrade"],"upgradeCardsHaveNoGreen":true,"mappingTileFixedMoveRange":[1,3],"lifeTileFixedRange":[1,3]},"questionEffects":{"lifeRange":[1,3],"mappingCardsRange":[1,3],"upgradeRandomOwnedRange":[1,3],"upgradeRandomMapRange":[1,3],"fizzleIfNoTarget":true},"specialBoards":{"special1":{"totalTiles":68,"note":"Legacy special board 1 remains code-defined."},"special2":{"totalTiles":68,"note":"Legacy special board 2 remains code-defined."},"special3":{"totalTiles":96,"note":"Legacy special board 3 remains code-defined."}}};
+let MECHANICS=null;
+let R=[],V={},maxChests=7,totalTiles=80,tileW={},NORMAL_CHEST_MIN=10,NORMAL_CHEST_MAX=12,chestW={},upgradeCardW={},qW={},mappingCardW={},qAddHighChestW={};
+function applyMechanicsData(data){
+  MECHANICS=data||clone(FALLBACK_MECHANICS_DATA);
+  const game=MECHANICS.game||{};
+  const weights=MECHANICS.weights||{};
+  const normal=MECHANICS.normalBoard?.randomSection?.counts||{};
+  R=game.rarityOrder||['green','blue','purple','orange','red','rainbow'];
+  V=game.rarityValue||{green:1,blue:1.2,purple:4,orange:10,red:16,rainbow:25};
+  maxChests=game.maxChests??7;
+  totalTiles=game.totalTiles??80;
+  tileW=weights.tile||{empty:.25,chest:.24,trap:.12,movement:.12,upgrade:.10,life:.07,question:.10};
+  NORMAL_CHEST_MIN=normal.chest?.[0]??10;
+  NORMAL_CHEST_MAX=normal.chest?.[1]??12;
+  chestW=weights.chestRarity||{green:.275544,blue:.413316,purple:.25295,orange:.05399,red:.0038,rainbow:.0002};
+  upgradeCardW=weights.upgradeCardRarity||{blue:.54,purple:.35,orange:.107,red:.008};
+  mappingCardW=weights.mappingCardType||{move_fixed:.24,back_fixed:.10,move_any:.13,move_even:.08,move_odd:.08,back_any:.09,upgrade:.28};
+  qW=weights.questionEffects||{life:.14,mapping_card:.17,upgrade_random_owned:.085,upgrade_random_map:.085,upgrade_all_owned:.03,upgrade_all_map:.03,add_chest:.13,add_high:.08,rainbow_all:.005,remove_traps:.08};
+  qAddHighChestW=weights.questionAddHighChestRarity||{purple:.45,orange:.38,red:.14,rainbow:.03};
+}
+applyMechanicsData(FALLBACK_MECHANICS_DATA);
+const FALLBACK_STRATEGY_DATA={"schemaVersion":1,"updated":"2026-06-10","defaultStrategy":"Purple_Before_Q","source":{"summary":"arcana_strategy_family_aggregate_v4_summary.csv","confidence":"arcana_strategy_family_aggregate_v4_confidence.csv","pairwise":"arcana_strategy_family_aggregate_v4_pairwise.csv","runsPerStrategy":10000,"totalRuns":80000,"batches":10,"sourceHtmlHash":"1150773dcdcd0844"},"conclusions":["? tiles are strong, but pure ? greed was not the best family.","Purple+ chest before ? was the best practical EV profile in this aggregate.","Chest-first had the best 7-chest completion rate, but lower average value.","Upgrade-lean was weak as a primary normal-board plan."],"strategies":[{"id":"Purple_Before_Q","label":"Purple Before ?","kicker":"Best EV","title":"Purple Before ?","meta":"Best practical value profile","cardSummary":"Prioritizes purple+ chest value before chasing ? variance. Best practical EV in the aggregate.","profile":"Best practical value profile from the 80,000-run family aggregate. It treats ? tiles as strong, but not stronger than known purple+ chest value.","useWhen":"Use when you want the best tested average value without going full ?-greedy.","avoidWhen":"Avoid if your goal is raw 7-chest completion rate instead of value.","notes":[["Normal","Best average value in the aggregate; won 7 of 10 batches."],["Tradeoff","Lower 7-chest rate than chest-first, but much better average value."]],"weights":{"q":7,"chest":1.05,"low_chest_penalty":5,"purple_bonus":8,"gold_bonus":14,"upgrade":4,"card":3,"life":2,"low_life":8,"trap":20,"empty":-6,"q_after4":2,"q_late":-3,"upgrade_bias":0.9,"chest_count_bias":1},"metrics":{"runs":10000,"avgValue":31.455,"ci95":[30.407,32.503],"medianValue":17.3,"completion7Rate":0.0616,"avgChests":3.275,"avgQuestions":2.253,"avgUpgradeCardsUsed":2.062,"avgTrapsHit":0.512,"avgLifeEnd":7.042,"avgRainbow":0.0682,"avgRed":0.1772,"avgGold":0.6105,"avgPurple":1.0926,"rank":1}},{"id":"Balanced_Current","label":"Balanced","kicker":"Default","title":"Balanced Current","meta":"Stable baseline","cardSummary":"Close to the top profile and safer as a general default. Strong baseline for future tests.","profile":"The current balanced scoring model. It was close to the best EV result and remains a stable default for mixed boards.","useWhen":"Use when you want a conservative default that avoids overfitting to one test profile.","avoidWhen":"Avoid if you specifically want the best measured EV or max chest-count completion.","notes":[["Normal","Second-best average value; close enough to remain a valid default."],["Testing","Useful as the baseline for future A/B comparisons."]],"weights":{"q":6,"chest":1.0,"low_chest_penalty":4,"purple_bonus":4,"gold_bonus":10,"upgrade":5,"card":3,"life":2,"low_life":8,"trap":18,"empty":-6,"q_after4":1.0,"q_late":-4,"upgrade_bias":1.0,"chest_count_bias":0},"metrics":{"runs":10000,"avgValue":30.794,"ci95":[29.742,31.845],"medianValue":17.2,"completion7Rate":0.0567,"avgChests":3.235,"avgQuestions":2.146,"avgUpgradeCardsUsed":2.142,"avgTrapsHit":0.55,"avgLifeEnd":6.972,"avgRainbow":0.0676,"avgRed":0.1683,"avgGold":0.6073,"avgPurple":1.0577,"rank":2}},{"id":"Question_After_Chest","label":"? After Chest","kicker":"Hybrid","title":"Question After Chest","meta":"More count, still value-aware","cardSummary":"Takes more chest count before leaning into ?. Better completion rate than balanced, lower EV than Purple Before ?.","profile":"Hybrid profile that establishes chest count before weighting ? tiles harder. It sits between value routing and completion routing.","useWhen":"Use when you want more chest count without committing to full chest-first.","avoidWhen":"Avoid when pure average value is the only goal.","notes":[["Normal","Higher 7-chest rate than Purple Before ? and Balanced."],["Tradeoff","Lower average value than the top EV profile."]],"weights":{"q":4,"chest":1.15,"low_chest_penalty":3,"purple_bonus":6,"gold_bonus":13,"upgrade":5,"card":3,"life":2,"low_life":8,"trap":20,"empty":-6,"q_after4":5,"q_late":-2,"upgrade_bias":1,"chest_count_bias":2},"metrics":{"runs":10000,"avgValue":29.775,"ci95":[28.806,30.744],"medianValue":17.4,"completion7Rate":0.0694,"avgChests":3.424,"avgQuestions":1.997,"avgUpgradeCardsUsed":2.127,"avgTrapsHit":0.565,"avgLifeEnd":6.751,"avgRainbow":0.0573,"avgRed":0.1578,"avgGold":0.6094,"avgPurple":1.1019,"rank":3}},{"id":"Chest_First_Completion","label":"Chest First","kicker":"Completion","title":"Chest First Completion","meta":"Best 7-chest rate","cardSummary":"Best chest count and 7-chest completion rate, but loses average value.","profile":"Quantity-first profile. It collects more chests and completes 7 chests most often, but gives up average value.","useWhen":"Use when your goal is completion rate, chest quantity, or Undetermined Fate ticket volume.","avoidWhen":"Avoid when average chest value is more important than count.","notes":[["Normal","Best 7-chest completion rate in the aggregate."],["Tradeoff","Much lower average value than Purple Before ?."]],"weights":{"q":2,"chest":1.35,"low_chest_penalty":1,"purple_bonus":6,"gold_bonus":14,"upgrade":4,"card":2,"life":2,"low_life":8,"trap":20,"empty":-6,"q_after4":0.5,"q_late":-5,"upgrade_bias":0.8,"chest_count_bias":3},"metrics":{"runs":10000,"avgValue":26.212,"ci95":[25.414,27.01],"medianValue":16.2,"completion7Rate":0.1284,"avgChests":3.939,"avgQuestions":1.513,"avgUpgradeCardsUsed":2.035,"avgTrapsHit":0.566,"avgLifeEnd":6.534,"avgRainbow":0.0409,"avgRed":0.1127,"avgGold":0.5402,"avgPurple":1.1068,"rank":7}},{"id":"Question_Greedy","label":"? Greedy","kicker":"Control","title":"Question Greedy","meta":"High variance control","cardSummary":"Confirms ? tiles are strong, but pure ? greed underperforms the better hybrid profiles.","profile":"Aggressive ?-tile profile. Useful as a test control showing that ? is strong but should not override known value every time.","useWhen":"Use for testing high-variance ? behavior.","avoidWhen":"Avoid as a main recommendation; it underperformed the top hybrid profiles.","notes":[["Normal","Takes the most ? tiles among the main profiles."],["Finding","Pure ? greed was not the best strategy family."]],"weights":{"q":12,"chest":0.9,"low_chest_penalty":6,"purple_bonus":3,"gold_bonus":9,"upgrade":3,"card":3,"life":2,"low_life":8,"trap":20,"empty":-6,"q_after4":2.5,"q_late":-2,"upgrade_bias":0.8,"chest_count_bias":0},"metrics":{"runs":10000,"avgValue":29.094,"ci95":[27.969,30.218],"medianValue":13.0,"completion7Rate":0.0381,"avgChests":2.773,"avgQuestions":2.256,"avgUpgradeCardsUsed":2.036,"avgTrapsHit":0.144,"avgLifeEnd":7.204,"avgRainbow":0.0803,"avgRed":0.1657,"avgGold":0.447,"avgPurple":0.9397,"rank":5}},{"id":"Upgrade_Lean_Control","label":"Upgrade Lean","kicker":"Control","title":"Upgrade Lean Control","meta":"Weak primary plan","cardSummary":"Upgrade-heavy routing was the weakest family in this test. Keep as a control/niche option.","profile":"Upgrade-heavy control profile. It overvalues upgrade-card routing relative to known chest value and ?-hybrid play.","useWhen":"Use only as a control or for unusual boards with dense upgrade targets.","avoidWhen":"Avoid as a normal-board recommendation.","notes":[["Normal","Lowest average value among tested families."],["Finding","Upgrade cards are useful, but upgrade-lean routing is not a strong primary plan."]],"weights":{"q":5,"chest":1.0,"low_chest_penalty":4,"purple_bonus":4,"gold_bonus":11,"upgrade":9,"card":2,"life":2,"low_life":8,"trap":20,"empty":-6,"q_after4":1,"q_late":-4,"upgrade_bias":1.8,"chest_count_bias":0},"metrics":{"runs":10000,"avgValue":25.079,"ci95":[24.142,26.016],"medianValue":11.8,"completion7Rate":0.0353,"avgChests":2.725,"avgQuestions":1.699,"avgUpgradeCardsUsed":2.197,"avgTrapsHit":0.201,"avgLifeEnd":7.023,"avgRainbow":0.0559,"avgRed":0.1489,"avgGold":0.4121,"avgPurple":0.9172,"rank":8}}]};
+let STRATEGY_DATA=null;
+let STRATEGIES={};
+function applyStrategyData(data){
+  STRATEGY_DATA=data||clone(FALLBACK_STRATEGY_DATA);
+  STRATEGIES={};
+  (STRATEGY_DATA.strategies||[]).forEach(s=>{STRATEGIES[s.id]=s;});
+}
+applyStrategyData(FALLBACK_STRATEGY_DATA);let rngSeed=1,state=null,originalTiles=null,selected=null,suggested=null;
 
 function $(id){return document.getElementById(id)}
 function getSeedValue(){return 'kythik'}
-function getLifeValue(){return 3}
-function getStartingHandValue(){return +($('handInput')?.value||4)}
+function getLifeValue(){return +(MECHANICS?.game?.startingLife??3)}
+function getStartingHandValue(){return +($('handInput')?.value||(MECHANICS?.game?.defaultStartingHand??4))}
 function rarityLabel(r){return r==='orange'?'Gold':(r?String(r).charAt(0).toUpperCase()+String(r).slice(1):'')}
 function hashStr(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 function initRng(s){rngSeed=hashStr(String(s||'kythik'))||1}
@@ -230,14 +238,14 @@ function upgrade(r,n=1){let i=R.indexOf(r);return R[Math.min(R.length-1,Math.max
 function phase(){let t=state?.pos+1||1;if(t<=20)return'setup';if(t<=40)return'conversion';if(t<=60)return'collect';return'cashout'}
 function boardType(){return $('boardTypeInput')?.value||'normal'}
 function strategyId(){return $('strategyInput')?.value||'Strategy1'}
-function strategyProfile(){return STRATEGIES[strategyId()]||STRATEGIES.Strategy1}
+function strategyProfile(){return STRATEGIES[strategyId()]||STRATEGIES[STRATEGY_DATA.defaultStrategy]||strategyList()[0]||{weights:{}}}
 function randomSpotsInRow(row,n){
   let start=(row-1)*4, arr=[start,start+1,start+2,start+3].filter(x=>x>=0&&x<totalTiles);
   for(let i=arr.length-1;i>0;i--){let j=randint(0,i+1);[arr[i],arr[j]]=[arr[j],arr[i]]}
   return arr.slice(0,n);
 }
 function putFixedSpecialPickups(tiles){
-  for(const idx of [3,11,19]) if(idx<totalTiles) tiles[idx]={type:'movement',fixedN:randint(1,4)};
+  for(const idx of [3,11,19]) if(idx<totalTiles) tiles[idx]={type:'movement',fixedN:randint((MECHANICS?.cards?.lifeTileFixedRange?.[0]??1),(MECHANICS?.cards?.lifeTileFixedRange?.[1]??3)+1)};
   for(const idx of [7,15,23]) if(idx<totalTiles) tiles[idx]={type:'life',fixedN:randint(1,4)};
 }
 function fillTrapRows(tiles,a,b){for(let row=a;row<=b;row++)for(let idx=(row-1)*4;idx<row*4&&idx<totalTiles;idx++)tiles[idx]={type:'trap'}}
@@ -269,7 +277,7 @@ function makeBoard(){
   if(bt==='special2')return makeSpecialBoard2();
   if(bt==='special3')return makeSpecialBoard3();
 
-  totalTiles=80;
+  totalTiles=MECHANICS?.game?.totalTiles??80;
   let a=Array.from({length:totalTiles},()=>({type:'empty'}));
   a[0]={type:'start'};
 
@@ -290,7 +298,7 @@ function makeBoard(){
   // 1 life tile, and 1–2 movement/card tiles. No traps and no ? tiles.
   let opener=[1,2,3,4,5,6,7];
   shuffle(opener);
-  let openerCardCount=randint(1,3); // 1–2
+  let openerCardCount=randint((MECHANICS?.normalBoard?.opener?.guaranteed?.movement?.[0]??1),(MECHANICS?.normalBoard?.opener?.guaranteed?.movement?.[1]??2)+1); // JSON range
   let openerChestRarity=wc(chestW);
   a[chooseOne(opener)]={type:'chest',rarity:openerChestRarity};
   a[chooseOne(opener)]={type:'upgrade',fixedFrom:upgradeAtOrAbove(openerChestRarity)};
@@ -305,15 +313,15 @@ function makeBoard(){
   // Start 1, Chest 10–12, Empty 15–25, Trap 10–13, Card 8–11,
   // Upgrade 8–10, Life 6–9, ? 6–9.
   let targets=null;
-  for(let attempt=0;attempt<500;attempt++){
-    let chest=randint(10,13);
-    let trap=randint(10,14);
-    let movement=randint(8,12);
-    let upgradeCt=randint(8,11);
-    let lifeCt=randint(6,10);
-    let question=randint(6,10);
+  for(let attempt=0;attempt<(MECHANICS?.normalBoard?.randomSection?.maxAttempts??500);attempt++){
+    let chest=randint((MECHANICS?.normalBoard?.randomSection?.counts?.chest?.[0]??10),(MECHANICS?.normalBoard?.randomSection?.counts?.chest?.[1]??12)+1);
+    let trap=randint((MECHANICS?.normalBoard?.randomSection?.counts?.trap?.[0]??10),(MECHANICS?.normalBoard?.randomSection?.counts?.trap?.[1]??13)+1);
+    let movement=randint((MECHANICS?.normalBoard?.randomSection?.counts?.movement?.[0]??8),(MECHANICS?.normalBoard?.randomSection?.counts?.movement?.[1]??11)+1);
+    let upgradeCt=randint((MECHANICS?.normalBoard?.randomSection?.counts?.upgrade?.[0]??8),(MECHANICS?.normalBoard?.randomSection?.counts?.upgrade?.[1]??10)+1);
+    let lifeCt=randint((MECHANICS?.normalBoard?.randomSection?.counts?.life?.[0]??6),(MECHANICS?.normalBoard?.randomSection?.counts?.life?.[1]??9)+1);
+    let question=randint((MECHANICS?.normalBoard?.randomSection?.counts?.question?.[0]??6),(MECHANICS?.normalBoard?.randomSection?.counts?.question?.[1]??9)+1);
     let empty=80-(1+chest+trap+movement+upgradeCt+lifeCt+question);
-    if(empty>=15&&empty<=25){
+    if(empty>=(MECHANICS?.normalBoard?.randomSection?.counts?.empty?.[0]??15)&&empty<=(MECHANICS?.normalBoard?.randomSection?.counts?.empty?.[1]??25)){
       targets={chest,trap,movement,upgrade:upgradeCt,life:lifeCt,question,empty};
       break;
     }
@@ -355,7 +363,7 @@ function makeBoard(){
 function drawMappingCard(){
   // Stored hand cards:
   // Move X, Back X, Choose 1–6, Choose Even, Choose Odd, Choose 1–3 Back, Upgrade.
-  let t=wc({move_fixed:.24,back_fixed:.10,move_any:.13,move_even:.08,move_odd:.08,back_any:.09,upgrade:.28});
+  let t=wc(mappingCardW);
   if(t==='move_fixed'){let n=rollMove();return{type:'move',n,name:'Move '+n}}
   if(t==='back_fixed'){let n=rollMove();return{type:'back',n,name:'Back '+n}}
   if(t==='move_any')return{type:'move_any',name:'Choose 1–6'};
@@ -438,7 +446,7 @@ function selectHand(idx){
 }
 function bestUpgradeTargetForCard(c){
   let best=-1,bv=-1,cap=R.indexOf(c.from);
-  for(let i=state.pos+1;i<Math.min(totalTiles,state.pos+13);i++){
+  for(let i=state.pos+1;i<Math.min(totalTiles,state.pos+(MECHANICS?.cards?.upgradeCardSearchWindow??12)+1);i++){
     let t=state.tiles[i],v=R.indexOf(t.rarity);
     if(t.type==='chest'&&!t.used&&v<=cap&&v<R.length-1){
       let val=V[upgrade(t.rarity)]-V[t.rarity]+v*.05;
@@ -514,6 +522,9 @@ function movableActions(){
 }
 function tileScore(i,ctx=null,mode='normal'){
   const sim=ctx||{pos:state.pos,life:state.life,collected:state.collected.length};
+  const profile=strategyProfile();
+  const w=profile.weights||profile||{};
+  const wf=(k,d)=>Number.isFinite(+w[k])?+w[k]:d;
   let t=state.tiles[i],dist=Math.abs(i-sim.pos),score=-dist*.25,why=[];
   if(!t)return{score:-9999,why:['invalid tile']};
   if(t.used)return{score:-8-dist*.25,why:['already-used tile; pathing only']};
@@ -524,34 +535,45 @@ function tileScore(i,ctx=null,mode='normal'){
       why.push('chest cap reached; no extra chest value');
     }else{
       let r=t.rarity;
-      score+=V[r]+0.8;
+      score+=V[r]*wf('chest',1)+0.8+(sim.collected<4?wf('chest_count_bias',0):0);
       why.push(r+' chest known value');
-      if(['orange','red','rainbow'].includes(r)){score+=10;why.push('gold+ is premium/paycheck')}
-      else if(r==='purple'){score+=4;why.push('purple+ is known value')}
-      else{score-=4;why.push('green/blue is mostly filler but still a UF ticket')}
+      if(['orange','red','rainbow'].includes(r)){score+=wf('gold_bonus',10);why.push('gold+ is premium/paycheck')}
+      else if(r==='purple'){score+=wf('purple_bonus',4);why.push('purple+ is known value')}
+      else{score-=wf('low_chest_penalty',4);why.push('green/blue is mostly filler but still a UF ticket')}
     }
   }
   else if(t.type==='question'){
-    const latePenalty=mode==='survival'?2:0;
-    score+=(sim.pos<25?7:sim.pos<45?4:sim.pos<60?1:-3)-latePenalty;
-    why.push('? is variance; safer early, worse late');
+    score+=wf('q',7);
+    if(sim.collected>=4)score+=wf('q_after4',0);
+    if(sim.pos>=60)score+=wf('q_late',-3);
+    if(mode==='survival')score-=2;
+    why.push('? weighted by selected strategy');
   }
-  else if(t.type==='upgrade'){score+=5;why.push('upgrade card can improve future chests')}
-  else if(t.type==='movement'){score+=3;why.push('mapping card pickup improves hand')}
-  else if(t.type==='life'){score+=sim.life<=2?8:2;why.push('life/safety')}
+  else if(t.type==='upgrade'){
+    score+=wf('upgrade',5);
+    let cap=R.indexOf(t.fixedFrom||'red'),future=0;
+    for(let j=i+1;j<Math.min(totalTiles,i+18);j++){
+      let tt=state.tiles[j];
+      if(tt?.type==='chest'&&R.indexOf(tt.rarity)<=cap&&tt.rarity!=='rainbow')future+=V[upgrade(tt.rarity)]-V[tt.rarity];
+    }
+    score+=Math.min(12,future*.15*wf('upgrade_bias',1));
+    why.push('upgrade card can improve future chests');
+  }
+  else if(t.type==='movement'){score+=wf('card',3);why.push('mapping card pickup improves hand')}
+  else if(t.type==='life'){score+=sim.life<=2?wf('low_life',8):wf('life',2);why.push('life/safety')}
   else if(t.type==='trap'){
     const projected=sim.life-1;
     if(projected<=0){
       score-=9999;
       why.push('LETHAL trap; rejected');
     }else{
-      const base=mode==='normal'?8:mode==='safe'?24:38;
+      const base=mode==='normal'?wf('trap',18):mode==='safe'?Math.max(24,wf('trap',18)):Math.max(38,wf('trap',18));
       const low=sim.life<=2?(mode==='normal'?16:55):0;
       score-=base+low;
       why.push('trap costs life; survival penalty');
     }
   }
-  else{score-=6;why.push('empty is pathing cost only')}
+  else{score+=wf('empty',-6);why.push('empty is pathing cost only')}
 
   return{score,why};
 }
@@ -788,7 +810,7 @@ function pickSome(arr,minN=1,maxN=3){
   return pool.slice(0,Math.min(pool.length,randint(minN,maxN+1)));
 }
 function gainQuestionCards(){
-  let n=randint(1,4);
+  let n=randint((MECHANICS?.questionEffects?.mappingCardsRange?.[0]??1),(MECHANICS?.questionEffects?.mappingCardsRange?.[1]??3)+1);
   for(let i=0;i<n;i++)state.hand.push(normalizeCard(drawMappingCard()));
   log('? gained '+n+' stored card'+(n>1?'s':'')+'.');
 }
@@ -820,7 +842,7 @@ function upgradeAllMap(){
 function applyQuestion(){
   let e=wc(qW);
   if(e==='life'){
-    let n=randint(1,4);
+    let n=randint((MECHANICS?.questionEffects?.lifeRange?.[0]??1),(MECHANICS?.questionEffects?.lifeRange?.[1]??3)+1);
     state.life+=n;
     log('? gained '+n+' life.');
   }
@@ -833,7 +855,7 @@ function applyQuestion(){
     let spots=[];
     for(let i=state.pos+1;i<totalTiles;i++)if(state.tiles[i].type!=='chest'&&state.tiles[i].type!=='start')spots.push(i);
     if(spots.length){
-      let i=spots[randint(0,spots.length)],r=e==='add_high'?wc({purple:.45,orange:.38,red:.14,rainbow:.03}):wc(chestW);
+      let i=spots[randint(0,spots.length)],r=e==='add_high'?wc(qAddHighChestW):wc(chestW);
       state.tiles[i]={type:'chest',rarity:upgrade(r,state.futureUpgrade)};
       log('? added '+rarityLabel(state.tiles[i].rarity)+' chest at tile '+(i+1)+'.');
     }else log('? rolled add-chest but no open map tile was available.');
@@ -977,20 +999,89 @@ function openInfoModal(){$('infoModal').classList.add('open')}
 function closeInfoModal(){$('infoModal').classList.remove('open')}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeInfoModal()});
 
-const STRATEGY_LIGHTBOX_DATA={
-  Strategy1:{kicker:'Default / Balanced',title:'Strategy1',profile:'Strategy1 is the baseline profile. It preserves known value without becoming too greedy, prioritizes gold/red/rainbow, and treats green/blue as lower-value Undetermined Fate tickets unless the route cost is low.',notes:[['Normal','Rerun needed after the 10–13 chest change.'],['Special 1','Close to conservative known-value routing.'],['Special 2','Usually behind ticket-leaning routing.'],['Special 3','Generally close to the top profiles.']]},
-  Strategy2:{kicker:'Gold Focus',title:'Strategy2',profile:'Strategy2 weights gold+ value more heavily. It is more willing to pay pathing cost when the route can convert into premium chest value.',notes:[['Normal','Rerun needed after the 10–13 chest change.'],['Special 1','Close when premium upgrades or chests are reachable.'],['Special 2','Less favored than quantity routing.'],['Special 3','Strong on rarity-ladder patterns.']]},
-  Strategy3:{kicker:'Purple Safe',title:'Strategy3',profile:'Strategy3 is the conservative known-value profile. It values purple more heavily, is more cautious around traps, and is less likely to skip solid value while chasing gold+ spikes.',notes:[['Normal','Rerun needed after the 10–13 chest change.'],['Special 1','Strong on upgrade-heavy patterns.'],['Special 2','Close when safe value is available.'],['Special 3','Competitive on rarity-ladder patterns.']]},
-  Strategy4:{kicker:'UF Ticket Lean',title:'Strategy4',profile:'Strategy4 leans into chest quantity. Green/blue remain low normal-loot EV, but each collected chest is still an Undetermined Fate ticket check when route cost is reasonable.',notes:[['Normal','Rerun needed after the 10–13 chest change.'],['Special 1','Close when chest access is efficient.'],['Special 2','Strong on chest-volume patterns.'],['Special 3','Usually behind premium/known-value profiles.']]}
-};
+function escapeHtml(s){
+  return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function strategyList(){return (STRATEGY_DATA?.strategies||[])}
+function strategyMetricTable(s){
+  const m=s.metrics||{};
+  const pct=v=>Number.isFinite(+v)?((+v)*100).toFixed(2)+'%':'—';
+  const num=v=>Number.isFinite(+v)?(+v).toFixed(3):'—';
+  return '<table class="strategyTable"><tr><th>Metric</th><th>Result</th></tr>'+
+    '<tr><td>Rank</td><td>#'+escapeHtml(m.rank??'—')+'</td></tr>'+
+    '<tr><td>Runs</td><td>'+escapeHtml(m.runs??'—')+'</td></tr>'+
+    '<tr><td>Avg value</td><td>'+num(m.avgValue)+'</td></tr>'+
+    '<tr><td>95% CI</td><td>'+(m.ci95?num(m.ci95[0])+' – '+num(m.ci95[1]):'—')+'</td></tr>'+
+    '<tr><td>7-chest rate</td><td>'+pct(m.completion7Rate)+'</td></tr>'+
+    '<tr><td>Avg chests</td><td>'+num(m.avgChests)+'</td></tr>'+
+    '<tr><td>Avg ? tiles</td><td>'+num(m.avgQuestions)+'</td></tr>'+
+    '<tr><td>Avg upgrade cards used</td><td>'+num(m.avgUpgradeCardsUsed)+'</td></tr>'+
+  '</table>';
+}
+function renderStrategyDropdown(){
+  const sel=$('strategyInput');
+  if(!sel)return;
+  const current=sel.value||STRATEGY_DATA.defaultStrategy;
+  sel.innerHTML=strategyList().map(s=>'<option value="'+escapeHtml(s.id)+'">'+escapeHtml(s.label||s.title||s.id)+'</option>').join('');
+  sel.value=STRATEGIES[current]?current:(STRATEGY_DATA.defaultStrategy||strategyList()[0]?.id||'');
+}
+function renderStrategyCards(){
+  const wrap=$('strategyCards');
+  if(!wrap)return;
+  wrap.innerHTML=strategyList().map(s=>{
+    const m=s.metrics||{};
+    const ev=Number.isFinite(+m.avgValue)?(+m.avgValue).toFixed(2):'—';
+    const rate=Number.isFinite(+m.completion7Rate)?((+m.completion7Rate)*100).toFixed(1)+'%':'—';
+    return '<button type="button" class="strategyCard" data-strategy="'+escapeHtml(s.id)+'">'+
+      '<div class="strategyKicker">'+escapeHtml(s.kicker||'Strategy')+'</div>'+
+      '<h3>'+escapeHtml(s.title||s.label||s.id)+'</h3>'+
+      '<p>'+escapeHtml(s.cardSummary||s.profile||'')+'</p>'+
+      '<div class="strategyMiniStats"><span>EV '+escapeHtml(ev)+'</span><span>7-chest '+escapeHtml(rate)+'</span></div>'+
+      '<div class="strategyMeta">'+escapeHtml(s.meta||'')+'</div>'+
+    '</button>';
+  }).join('');
+}
+function renderStrategyUI(){renderStrategyDropdown();renderStrategyCards();}
+async function loadMechanicsData(){
+  try{
+    const res=await fetch('arcana_mechanics.json',{cache:'no-store'});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    if(!data||!data.game||!data.weights)throw new Error('Invalid mechanics JSON');
+    applyMechanicsData(data);
+    console.info('Loaded arcana_mechanics.json');
+  }catch(err){
+    applyMechanicsData(clone(FALLBACK_MECHANICS_DATA));
+    console.warn('Using embedded mechanics fallback:',err);
+  }
+}
+async function loadStrategyData(){
+  try{
+    const res=await fetch('arcana_strategies.json',{cache:'no-store'});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    if(!data||!Array.isArray(data.strategies)||!data.strategies.length)throw new Error('Invalid strategy JSON');
+    applyStrategyData(data);
+    console.info('Loaded arcana_strategies.json');
+  }catch(err){
+    applyStrategyData(clone(FALLBACK_STRATEGY_DATA));
+    console.warn('Using embedded strategy fallback:',err);
+  }
+  renderStrategyUI();
+}
 function openStrategyLightbox(id){
-  const data=STRATEGY_LIGHTBOX_DATA[id]||STRATEGY_LIGHTBOX_DATA.Strategy1;
+  const data=STRATEGIES[id]||STRATEGIES[STRATEGY_DATA.defaultStrategy]||strategyList()[0];
   const box=$('strategyLightbox');
-  if(!box)return;
-  $('strategyLightboxKicker').textContent=data.kicker;
-  $('strategyLightboxTitle').textContent=data.title;
-  $('strategyProfileText').textContent=data.profile;
-  $('strategyBoardNotes').innerHTML='<table class="strategyTable"><tr><th>Board</th><th>Note</th></tr>'+data.notes.map(row=>'<tr><td>'+row[0]+'</td><td>'+row[1]+'</td></tr>').join('')+'</table>';
+  if(!box||!data)return;
+  $('strategyLightboxKicker').textContent=data.kicker||'Strategy';
+  $('strategyLightboxTitle').textContent=data.title||data.label||data.id;
+  $('strategyProfileText').textContent=data.profile||'';
+  const notes=(data.notes||[]).map(row=>'<tr><td>'+escapeHtml(row[0])+'</td><td>'+escapeHtml(row[1])+'</td></tr>').join('');
+  $('strategyBoardNotes').innerHTML=
+    '<table class="strategyTable"><tr><th>Context</th><th>Note</th></tr>'+notes+'</table>'+
+    '<h3>Aggregate results</h3>'+strategyMetricTable(data)+
+    '<h3>Use when</h3><p>'+escapeHtml(data.useWhen||'—')+'</p>'+
+    '<h3>Avoid when</h3><p>'+escapeHtml(data.avoidWhen||'—')+'</p>';
   box.hidden=false;
   box.style.display='block';
   box.classList.add('isOpen');
@@ -1005,8 +1096,10 @@ function closeStrategyLightbox(){
   box.hidden=true;
 }
 function wireStrategyCards(){
-  document.querySelectorAll('.strategyCard[data-strategy]').forEach(btn=>{
-    btn.addEventListener('click',()=>openStrategyLightbox(btn.dataset.strategy));
+  const wrap=$('strategyCards');
+  if(wrap)wrap.addEventListener('click',e=>{
+    const btn=e.target.closest('.strategyCard[data-strategy]');
+    if(btn)openStrategyLightbox(btn.dataset.strategy);
   });
   const closeBtn=$('strategyLightboxClose');
   if(closeBtn)closeBtn.addEventListener('click',closeStrategyLightbox);
@@ -1019,8 +1112,7 @@ function wireStrategyCards(){
     lightbox.addEventListener('click',e=>{if(e.target===lightbox)closeStrategyLightbox()});
   }
 }
-
-window.addEventListener('load',()=>{newGame(false);wireStrategyCards();});
+window.addEventListener('load',async()=>{await loadMechanicsData();await loadStrategyData();newGame(false);wireStrategyCards();});
 </script>
 </body>
 </html>
