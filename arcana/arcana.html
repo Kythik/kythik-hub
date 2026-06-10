@@ -436,16 +436,47 @@ function selectHand(idx){
   if(isMovementCard(c)){selected={type:'hand',idx};suggested=null;render();return}
   useUtility(idx)
 }
+function bestUpgradeTargetForCard(c){
+  let best=-1,bv=-1,cap=R.indexOf(c.from);
+  for(let i=state.pos+1;i<Math.min(totalTiles,state.pos+13);i++){
+    let t=state.tiles[i],v=R.indexOf(t.rarity);
+    if(t.type==='chest'&&!t.used&&v<=cap&&v<R.length-1){
+      let val=V[upgrade(t.rarity)]-V[t.rarity]+v*.05;
+      if(val>bv){bv=val;best=i}
+    }
+  }
+  return best;
+}
+function playUpgradeCard(idx,reason=''){
+  let c=state.hand[idx];
+  if(!c||c.type!=='upgrade'||state.done||state.dead)return false;
+  let best=bestUpgradeTargetForCard(c);
+  if(best<0)return false;
+  let old=state.tiles[best].rarity;
+  state.tiles[best].rarity=upgrade(old);
+  log('Used '+c.name+' on tile '+(best+1)+': '+old+' → '+state.tiles[best].rarity+(reason?' ('+reason+')':'')+'.');
+  state.hand.splice(idx,1);
+  selected=null;
+  suggested=null;
+  return true;
+}
+function playBestUpgradeCard(reason='autoplay fallback'){
+  let bestIdx=-1,bestTile=-1,bestValue=-1;
+  state.hand.forEach((c,idx)=>{
+    if(c.type!=='upgrade')return;
+    let tile=bestUpgradeTargetForCard(c);
+    if(tile<0)return;
+    let old=state.tiles[tile].rarity;
+    let val=V[upgrade(old)]-V[old]+R.indexOf(old)*.05;
+    if(val>bestValue){bestValue=val;bestIdx=idx;bestTile=tile}
+  });
+  if(bestIdx<0)return false;
+  return playUpgradeCard(bestIdx,reason);
+}
 function useUtility(idx){
   let c=state.hand[idx];if(!c||state.done)return;
   if(c.type==='upgrade'){
-    let best=-1,bv=-1,cap=R.indexOf(c.from);
-    for(let i=state.pos+1;i<Math.min(totalTiles,state.pos+13);i++){
-      let t=state.tiles[i],v=R.indexOf(t.rarity);
-      if(t.type==='chest'&&!t.used&&v<=cap&&v<R.length-1){let val=V[upgrade(t.rarity)]-V[t.rarity]+v*.05;if(val>bv){bv=val;best=i}}
-    }
-    if(best>=0){let old=state.tiles[best].rarity;state.tiles[best].rarity=upgrade(old);log('Used '+c.name+' on tile '+(best+1)+': '+old+' → '+state.tiles[best].rarity+'.');state.hand.splice(idx,1)}
-    else log('No valid chest at or below '+c.from+' for '+c.name+'.')
+    if(!playUpgradeCard(idx,''))log('No valid chest at or below '+c.from+' for '+c.name+'.');
   }
   render();
 }
@@ -819,16 +850,66 @@ function applyQuestion(){
     else log('? rolled remove traps but no future traps were available.');
   }
 }
+function suggestionTarget(){
+  if(!suggested||!suggested.first)return -1;
+  return targetFor(suggested.first);
+}
+function suggestionIsEndgameMove(){
+  let idx=suggestionTarget();
+  return idx>=totalTiles-1 || (suggested&&suggested.tiles&&suggested.tiles.some(t=>t>=totalTiles));
+}
+function suggestionIsUnsafeMove(){
+  let idx=suggestionTarget();
+  let t=idx>=0?state.tiles[idx]:null;
+  return !!(suggested&&(suggested.death||suggested.score<-12||(suggested.trapCount&&state.life<=2)||(t&&t.type==='trap'&&state.life<=1)));
+}
+function suggestionTarget(){
+  if(!suggested||!suggested.first)return -1;
+  return targetFor(suggested.first);
+}
+function suggestionIsEndgameMove(){
+  let idx=suggestionTarget();
+  return idx>=totalTiles-1 || (suggested&&suggested.tiles&&suggested.tiles.some(t=>t>=totalTiles));
+}
+function suggestionIsUnsafeMove(){
+  let idx=suggestionTarget();
+  let t=idx>=0?state.tiles[idx]:null;
+  return !!(suggested&&(suggested.death||suggested.score<-12||(suggested.trapCount&&state.life<=2)||(t&&t.type==='trap'&&state.life<=1)));
+}
 function autoPlay(limit=300){
   for(let step=0;step<limit;step++){
     if(state.done||state.dead)break;
+
     if(state.pos===totalTiles-1){
       let plan=finalTileRecoveryPlan();
-      if(!plan){state.autoStatus='Auto stopped at final tile: no Back-card recovery target.';log(state.autoStatus);break}
+      if(!plan){
+        if(playBestUpgradeCard('autoplay before final-tile stop')){render();continue}
+        state.autoStatus='Auto stopped at final tile: no Back-card recovery target.';
+        log(state.autoStatus);
+        break;
+      }
     }
+
     suggestMove();
-    if(!suggested){state.autoStatus='Auto stopped: no suggestion.';log(state.autoStatus);break}
-    if(suggested.death||suggested.score<-12||(suggested.trapCount&&state.life<=2)){state.autoStatus='Auto stopped: best move score too low / unsafe.';log(state.autoStatus);break}
+
+    if(!suggested){
+      if(playBestUpgradeCard('autoplay before no-move stop')){render();continue}
+      state.autoStatus='Auto stopped: no suggestion.';
+      log(state.autoStatus);
+      break;
+    }
+
+    if(suggestionIsUnsafeMove()){
+      if(playBestUpgradeCard('autoplay before unsafe/death move')){render();continue}
+      state.autoStatus='Auto stopped: best move score too low / unsafe.';
+      log(state.autoStatus);
+      break;
+    }
+
+    if(suggestionIsEndgameMove()){
+      if(playBestUpgradeCard('autoplay before final/endgame move')){render();continue}
+    }
+
     takeSuggestion();
   }
   render();
