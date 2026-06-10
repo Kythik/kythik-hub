@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link rel="stylesheet" href="/styles.css" />
-<link rel="stylesheet" href="arcana.css" />
+<link rel="stylesheet" href="arcana.css?v=20" />
 <title>Arcana Tarot Minigame</title>
 </head>
 <body class="arcana-page">
@@ -51,7 +51,7 @@ Total route EV = UF value + rarity value + ? value - movement/trap/opportunity c
 </div>
 
 
-<div class="strategyLightbox" id="strategyLightbox" aria-hidden="true" style="display:none">
+<div class="strategyLightbox" id="strategyLightbox" aria-hidden="true" hidden style="display:none">
   <div class="strategyLightboxPanel" role="dialog" aria-modal="true" aria-labelledby="strategyLightboxTitle">
     <div class="strategyLightboxHeader">
       <div>
@@ -529,7 +529,7 @@ function icon(t){
   if(t.type==='start')return 'START';
   if(t.type==='chest'){
     const label=rarityLabel(t.rarity);
-    return '<span class="chestIcon" aria-hidden="true">▰</span><span class="chestText">'+label+'</span>';
+    return '<span class="chestIcon" aria-hidden="true">▣</span><span class="chestText">'+label+'</span>';
   }
   if(t.type==='trap')return '⚠';
   if(t.type==='movement')return t.fixedN?'Move '+t.fixedN:'Card';
@@ -580,6 +580,7 @@ function openStrategyLightbox(id){
   $('strategyProfileText').textContent=data.profile;
   $('strategyBoardNotes').innerHTML='<table class="strategyTable"><tr><th>Board</th><th>Note</th></tr>'+data.notes.map(row=>'<tr><td>'+row[0]+'</td><td>'+row[1]+'</td></tr>').join('')+'</table>';
   const box=$('strategyLightbox');
+  box.hidden=false;
   box.style.display='block';
   box.classList.add('isOpen');
   box.setAttribute('aria-hidden','false');
@@ -589,6 +590,7 @@ function closeStrategyLightbox(){
   box.classList.remove('isOpen');
   box.setAttribute('aria-hidden','true');
   box.style.display='none';
+  box.hidden=true;
 }
 
 
