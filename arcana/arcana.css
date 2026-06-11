@@ -400,9 +400,9 @@ body.arcana-page .board {
   display:flex;
   flex-direction:column;
   gap:8px;
-  align-items:center;
+  align-items:flex-start;
   justify-content:flex-start;
-  text-align:center;
+  text-align:left;
   background:linear-gradient(180deg,rgba(13,24,40,.94),rgba(11,21,36,.98));
   border:1px solid var(--border-soft);
   border-radius:var(--radius-lg);
@@ -757,5 +757,45 @@ body.arcana-page .board {
 @media(max-width:700px){
   .arcana-page .resource-backline{
     padding: 18px 18px 0;
+  }
+}
+
+
+/* ── Strategy card layout correction ──────────────────────────────────────
+   Center the row/group on the page, but keep text inside cards left aligned. */
+.arcana-page .strategyCards{
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 352px)) !important;
+  justify-content: center !important;
+  justify-items: stretch !important;
+  gap: 14px !important;
+  max-width: 1120px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.arcana-page .strategyCard{
+  align-items: flex-start !important;
+  text-align: left !important;
+  width: 100%;
+  max-width: 352px;
+}
+
+.arcana-page .strategyCard p,
+.arcana-page .strategyMeta{
+  text-align: left !important;
+}
+
+.arcana-page .strategyMiniStats{
+  justify-content: flex-start !important;
+}
+
+@media(max-width:700px){
+  .arcana-page .strategyCards{
+    grid-template-columns: minmax(0, 1fr) !important;
+    max-width: 420px;
+  }
+  .arcana-page .strategyCard{
+    max-width: none;
   }
 }
