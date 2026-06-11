@@ -2022,3 +2022,351 @@ body.arcana-page .board {
   .arcana-page.visual-fork .lootCol.right{ padding-top:0; }
   .arcana-page.visual-fork .lootChestSlot{ max-width:none; }
 }
+
+
+
+/* ═══════════════════════════════════════════
+   ARCANA VISUAL SITE V1.1 — Floating in-play hand dock
+   Keeps current move + stored cards available while scrolling.
+   ═══════════════════════════════════════════ */
+.arcana-page.visual-fork{
+  padding-bottom:118px;
+}
+
+.arcana-page.visual-fork .floatingHandDock{
+  position:fixed;
+  left:50%;
+  bottom:18px;
+  transform:translate(-50%, 120%);
+  width:min(980px, calc(100vw - 28px));
+  z-index:500;
+  opacity:0;
+  pointer-events:none;
+  transition:transform .22s ease, opacity .22s ease;
+}
+
+.arcana-page.visual-fork .floatingHandDock.open{
+  transform:translate(-50%, 0);
+  opacity:1;
+  pointer-events:auto;
+}
+
+.arcana-page.visual-fork .floatingHandInner{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  gap:14px;
+  align-items:center;
+  padding:12px 14px;
+  border-radius:20px;
+  border:1px solid rgba(200,164,93,.30);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(200,164,93,.12), transparent 42%),
+    linear-gradient(180deg, rgba(11,21,36,.94), rgba(4,8,15,.98));
+  box-shadow:
+    0 22px 70px rgba(0,0,0,.56),
+    inset 0 0 0 1px rgba(255,255,255,.04),
+    inset 0 0 55px rgba(38,58,87,.16);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+
+.arcana-page.visual-fork .floatingHandHead{
+  min-width:140px;
+  padding-right:12px;
+  border-right:1px solid rgba(200,164,93,.18);
+}
+
+.arcana-page.visual-fork .floatingHandTitle{
+  display:block;
+  color:var(--vf-gold-bright,#E6C77A);
+  font-family:var(--font-display,Cinzel,serif);
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+}
+
+.arcana-page.visual-fork .floatingHandHint{
+  display:block;
+  margin-top:4px;
+  color:rgba(199,208,222,.72);
+  font-size:11px;
+}
+
+.arcana-page.visual-fork .floatingHandRows{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  gap:10px;
+  align-items:center;
+  min-width:0;
+}
+
+.arcana-page.visual-fork .floatingMoveCard,
+.arcana-page.visual-fork .floatingHandCard{
+  min-height:52px;
+  border-radius:12px;
+  border:1px solid rgba(200,164,93,.26);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(200,164,93,.10), transparent 42%),
+    linear-gradient(180deg, rgba(15,28,50,.96), rgba(5,10,22,.99));
+  color:var(--text-primary,#E8EDF6);
+  font-weight:850;
+  cursor:pointer;
+  box-shadow:0 10px 24px rgba(0,0,0,.28), inset 0 0 18px rgba(38,58,87,.10);
+  transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+.arcana-page.visual-fork .floatingMoveCard{
+  min-width:132px;
+  color:var(--vf-gold-bright,#E6C77A);
+  border-color:rgba(230,199,122,.40);
+}
+
+.arcana-page.visual-fork .floatingHandCards{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:2px 2px 6px;
+  scrollbar-width:thin;
+  min-width:0;
+}
+
+.arcana-page.visual-fork .floatingHandCard{
+  flex:0 0 auto;
+  min-width:118px;
+  max-width:170px;
+  padding:8px 10px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  text-align:center;
+}
+
+.arcana-page.visual-fork .floatingMoveCard:hover,
+.arcana-page.visual-fork .floatingHandCard:hover{
+  transform:translateY(-2px);
+  border-color:rgba(230,199,122,.62);
+  box-shadow:0 0 22px rgba(200,164,93,.18), 0 12px 28px rgba(0,0,0,.32);
+}
+
+.arcana-page.visual-fork .floatingMoveCard.selected,
+.arcana-page.visual-fork .floatingHandCard.selected{
+  border-color:var(--vf-gold-bright,#E6C77A);
+  box-shadow:0 0 0 1px rgba(230,199,122,.65),0 0 24px rgba(200,164,93,.28);
+}
+
+.arcana-page.visual-fork .floatingEmpty{
+  align-self:center;
+  color:rgba(199,208,222,.68);
+  font-size:12px;
+  padding:0 8px;
+}
+
+@media(max-width:820px){
+  .arcana-page.visual-fork{
+    padding-bottom:154px;
+  }
+  .arcana-page.visual-fork .floatingHandInner{
+    grid-template-columns:1fr;
+    gap:9px;
+  }
+  .arcana-page.visual-fork .floatingHandHead{
+    min-width:0;
+    padding-right:0;
+    border-right:0;
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .arcana-page.visual-fork .floatingHandRows{
+    grid-template-columns:1fr;
+  }
+  .arcana-page.visual-fork .floatingMoveCard{
+    min-width:0;
+  }
+}
+
+
+/* ═══════════════════════════════════════════
+   ARCANA VISUAL SITE V1.2 — Card select → highlight → confirm
+   Player selects a card, destination tile highlights automatically, then confirms.
+   ═══════════════════════════════════════════ */
+.arcana-page.visual-fork .floatingHandRows{
+  grid-template-columns:auto minmax(0,1fr) minmax(230px,330px);
+}
+
+.arcana-page.visual-fork .floatingConfirmPanel{
+  min-width:0;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:8px;
+  align-items:center;
+  padding-left:10px;
+  border-left:1px solid rgba(200,164,93,.18);
+}
+
+.arcana-page.visual-fork .floatingConfirmText{
+  color:rgba(232,237,246,.78);
+  font-size:11px;
+  line-height:1.25;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+}
+
+.arcana-page.visual-fork .floatingConfirmBtn{
+  min-height:44px;
+  border-radius:12px;
+  border:1px solid rgba(230,199,122,.46);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(230,199,122,.18), transparent 52%),
+    linear-gradient(180deg, rgba(92,70,33,.96), rgba(36,26,14,.98));
+  color:var(--vf-gold-bright,#E6C77A);
+  font-weight:900;
+  padding:8px 13px;
+  white-space:nowrap;
+}
+
+.arcana-page.visual-fork .floatingConfirmBtn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+  border-color:rgba(140,165,210,.20);
+  background:linear-gradient(180deg, rgba(14,26,44,.88), rgba(5,10,22,.94));
+  color:rgba(199,208,222,.72);
+}
+
+.arcana-page.visual-fork .floatingHandDock.hasPendingMove .floatingConfirmPanel{
+  border-left-color:rgba(230,199,122,.34);
+}
+
+.arcana-page.visual-fork .floatingHandDock.hasPendingMove .floatingConfirmText{
+  color:rgba(232,237,246,.92);
+}
+
+.arcana-page.visual-fork .tile.reach{
+  cursor:default;
+}
+
+.arcana-page.visual-fork .tile.reach::before{
+  animation:arcanaReachPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes arcanaReachPulse{
+  0%,100%{filter:brightness(1);}
+  50%{filter:brightness(1.22);}
+}
+
+.arcana-page.visual-fork .moveConfirmOverlay{
+  position:fixed;
+  inset:0;
+  z-index:800;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(4,8,15,.72);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+
+.arcana-page.visual-fork .moveConfirmOverlay[hidden]{
+  display:none!important;
+}
+
+.arcana-page.visual-fork .moveConfirmBox{
+  width:min(560px, calc(100vw - 32px));
+  position:relative;
+  padding:22px;
+  border-radius:22px;
+  border:1px solid rgba(230,199,122,.35);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(230,199,122,.12), transparent 42%),
+    linear-gradient(180deg, rgba(11,21,36,.97), rgba(4,8,15,.99));
+  box-shadow:
+    0 28px 90px rgba(0,0,0,.64),
+    inset 0 0 0 1px rgba(255,255,255,.04),
+    inset 0 0 60px rgba(38,58,87,.16);
+}
+
+.arcana-page.visual-fork .moveConfirmClose{
+  position:absolute;
+  right:14px;
+  top:12px;
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  padding:0;
+  border:1px solid rgba(140,165,210,.24);
+  background:rgba(7,17,31,.78);
+  color:rgba(232,237,246,.85);
+  font-size:22px;
+  line-height:1;
+}
+
+.arcana-page.visual-fork .moveConfirmKicker{
+  color:rgba(200,164,93,.86);
+  font-size:11px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  font-weight:900;
+  margin-bottom:8px;
+}
+
+.arcana-page.visual-fork .moveConfirmBody{
+  color:rgba(232,237,246,.88);
+  line-height:1.55;
+  padding:13px 14px;
+  border-radius:16px;
+  border:1px solid rgba(38,58,87,.36);
+  background:rgba(4,8,15,.38);
+}
+
+.arcana-page.visual-fork .moveOptionList{
+  display:grid;
+  gap:8px;
+  margin-top:12px;
+  max-height:260px;
+  overflow:auto;
+}
+
+.arcana-page.visual-fork .moveOption{
+  text-align:left;
+  color:rgba(232,237,246,.86);
+  background:linear-gradient(180deg, rgba(15,28,50,.94), rgba(5,10,22,.98));
+  border:1px solid rgba(38,58,87,.44);
+  border-radius:12px;
+  padding:10px 12px;
+}
+
+.arcana-page.visual-fork .moveOption.selected{
+  border-color:rgba(230,199,122,.70);
+  box-shadow:0 0 0 1px rgba(230,199,122,.35),0 0 18px rgba(200,164,93,.18);
+}
+
+.arcana-page.visual-fork .moveConfirmActions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top:16px;
+}
+
+.arcana-page.visual-fork .floatingHandHint::after{
+  content:" · select card, confirm use";
+}
+
+@media(max-width:980px){
+  .arcana-page.visual-fork .floatingHandRows{
+    grid-template-columns:1fr;
+  }
+  .arcana-page.visual-fork .floatingConfirmPanel{
+    grid-template-columns:1fr;
+    padding-left:0;
+    border-left:0;
+    border-top:1px solid rgba(200,164,93,.18);
+    padding-top:8px;
+  }
+}

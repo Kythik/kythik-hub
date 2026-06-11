@@ -30,6 +30,39 @@
   <a href="/" class="resource-backlink">Kythik.com — Resource</a>
 </div>
 
+
+
+<div class="moveConfirmOverlay" id="moveConfirmOverlay" hidden>
+  <div class="moveConfirmBox" role="dialog" aria-modal="true" aria-labelledby="moveConfirmTitle">
+    <button class="moveConfirmClose" onclick="cancelPendingMove()" aria-label="Cancel move">×</button>
+    <div class="moveConfirmKicker">Choose target</div>
+    <h3 id="moveConfirmTitle">Choose target and confirm</h3>
+    <div class="moveConfirmBody" id="moveConfirmBody"></div>
+    <div class="moveOptionList" id="moveOptionList"></div>
+    <div class="moveConfirmActions">
+      <button class="alt" onclick="cancelPendingMove()">Cancel</button>
+      <button onclick="confirmPendingMove()">Confirm Use</button>
+    </div>
+  </div>
+</div>
+
+<div class="floatingHandDock" id="floatingHandDock" aria-live="polite">
+  <div class="floatingHandInner">
+    <div class="floatingHandHead">
+      <span class="floatingHandTitle">Cards in Play</span>
+      <span class="floatingHandHint">Current move + stored hand</span>
+    </div>
+    <div class="floatingHandRows">
+      <button class="floatingMoveCard" id="floatingCurrentMoveBtn" onclick="selectCurrentMove()">Move —</button>
+      <div class="floatingHandCards" id="floatingHand"></div>
+      <div class="floatingConfirmPanel">
+        <div class="floatingConfirmText" id="floatingConfirmText">Select a card to preview its landing tile.</div>
+        <button class="floatingConfirmBtn" id="floatingConfirmMoveBtn" onclick="confirmPendingMove()" disabled>Confirm Use</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <section class="strategyDeck" aria-labelledby="strategyDeckTitle">
   <div class="strategyDeckHead">
     <div>
@@ -310,7 +343,7 @@ applyStrategyCards(FALLBACK_STRATEGY_CARD_DATA);
 applySpecialStrategyData(FALLBACK_SPECIAL_STRATEGY_DATA);
 applySpecialStrategyCards(FALLBACK_SPECIAL_STRATEGY_CARD_DATA);
 
-let rngSeed=1,state=null,originalTiles=null,selected=null,suggested=null;
+let rngSeed=1,state=null,originalTiles=null,selected=null,suggested=null,pendingMove=null;
 
 function $(id){return document.getElementById(id)}
 function getSeedValue(){return 'kythik'}
@@ -510,6 +543,7 @@ function actionWithChoice(sel,idx,pos=state.pos){
 }
 function log(s){state.log.unshift(s)}
 function changeBoardType(){
+  pendingMove=null;cancelPendingMove();
   selected=null;
   suggested=null;
   renderStrategyUI();
@@ -520,24 +554,24 @@ function newGame(same=false){
   let hand=[];for(let i=0;i<(getStartingHandValue());i++)hand.push(normalizeCard(drawMappingCard()));
   let initialMove=rollMove();
   state={tiles:clone(originalTiles),pos:0,currentMove:initialMove,hand,life:getLifeValue(),collected:[],dead:false,done:false,futureUpgrade:0,path:[1],log:[],autoStatus:'Ready on tile 1'};
-  selected=null;suggested=null;log('Current refilling move rolled: '+initialMove+'.');log('New '+boardType()+' board. Starting on tile 1.');render();
+  pendingMove=null;selected=null;suggested=null;log('Current refilling move rolled: '+initialMove+'.');log('New '+boardType()+' board. Starting on tile 1.');render();
 }
 function resetSame(){
   if(!originalTiles){newGame(false);return}
   let hand=[];for(let i=0;i<(getStartingHandValue());i++)hand.push(normalizeCard(drawMappingCard()));
   let initialMove=rollMove();
   state={tiles:clone(originalTiles),pos:0,currentMove:initialMove,hand,life:getLifeValue(),collected:[],dead:false,done:false,futureUpgrade:0,path:[1],log:['Current refilling move rolled: '+initialMove+'.','Reset same board. Starting on tile 1.'],autoStatus:'Ready on tile 1'};
-  selected=null;suggested=null;render();
+  pendingMove=null;selected=null;suggested=null;render();
 }
 function clampTarget(raw){return Math.min(Math.max(0,raw),totalTiles-1)}
 function targetFor(sel,pos=state.pos){
   let opts=targetOptionsFor(sel,pos);
   return opts.length===1?opts[0]:-1;
 }
-function selectCurrentMove(){selected={type:'current'};suggested=null;render()}
+function selectCurrentMove(){cancelPendingMove();selected={type:'current'};suggested=null;preparePendingMoveFromSelection(false);render()}
 function selectHand(idx){
   let c=state.hand[idx];if(!c)return;
-  if(isMovementCard(c)){selected={type:'hand',idx};suggested=null;render();return}
+  if(isMovementCard(c)){cancelPendingMove();selected={type:'hand',idx};suggested=null;preparePendingMoveFromSelection(true);render();return}
   useUtility(idx)
 }
 function isSpecialBoard1(){
@@ -1437,12 +1471,99 @@ function suggestMove(){
   render();
 }
 function takeSuggestion(){if(!suggested){suggestMove();if(!suggested)return}selected=suggested.first;let tgt=targetFor(selected);if(tgt<0)return;clickTile(tgt)}
+
+function selectedActionLabel(sel=selected){
+  if(!sel)return 'No card selected';
+  if(sel.type==='current')return 'Current Move '+state.currentMove;
+  const c=state.hand?.[sel.idx];
+  return c?handActionLabel(sel):'Stored card';
+}
+function targetTileSummary(i){
+  const t=state.tiles[i]||{};
+  const type=t.type||'empty';
+  let reward='';
+  if(type==='chest')reward='Chest: '+lootLevelLabel(t.rarity)+' '+lootPrettyName(t.rarity);
+  else if(type==='trap')reward='Trap: lose 1 life';
+  else if(type==='movement')reward=t.fixedN?'Gain Move '+t.fixedN:'Gain mapping card';
+  else if(type==='upgrade')reward='Gain upgrade card';
+  else if(type==='life')reward=t.fixedN?('Gain +'+t.fixedN+' life'):'Gain life';
+  else if(type==='question')reward='Mystery ? effect';
+  else if(type==='start')reward='Start tile';
+  else reward='Empty tile';
+  return 'Tile '+(i+1)+' — '+reward;
+}
+function moveChoiceText(sel,i){
+  if(!sel||!state)return '';
+  const from=state.pos;
+  const resolved=actionWithChoice(sel,i);
+  const rawTarget=resolved?.type==='current'?from+state.currentMove:(resolved?.choice?from+(resolved.choice.dir*resolved.choice.n):i);
+  const clampNote=rawTarget>=totalTiles?' Final move clamps to the last tile.':'';
+  return selectedActionLabel(resolved)+' → '+targetTileSummary(i)+'.'+clampNote;
+}
+function preparePendingMoveFromSelection(openMulti=true){
+  pendingMove=null;
+  if(!selected||state.done||state.dead)return;
+  const targets=targetOptionsFor(selected);
+  if(!targets.length)return;
+  pendingMove={sel:clone(selected),idx:targets[0]};
+  if(targets.length>1&&openMulti)openMoveSelector(targets[0]);
+}
+function pendingMoveSummary(){
+  if(!pendingMove||!state)return 'Select a card to preview its landing tile.';
+  return moveChoiceText(pendingMove.sel,pendingMove.idx);
+}
+function openMoveSelector(i){
+  if(!selected||state.done||state.dead)return;
+  const targets=targetOptionsFor(selected);
+  if(!targets.includes(i))return;
+  pendingMove={sel:clone(selected),idx:i};
+  const overlay=$('moveConfirmOverlay'),body=$('moveConfirmBody'),list=$('moveOptionList'),title=$('moveConfirmTitle');
+  if(!overlay||!body||!list||!title)return;
+  title.textContent='Choose target and confirm';
+  body.innerHTML='<b>'+selectedActionLabel(selected)+'</b><br><span class="small">This card has multiple landing options. Pick the tile, then confirm use.</span>';
+  list.innerHTML=targets.map(t=>`<button class="moveOption ${t===i?'selected':''}" data-target="${t}" onclick="choosePendingMoveTarget(${t})">${moveChoiceText(selected,t)}</button>`).join('');
+  overlay.hidden=false;
+  overlay.classList.add('open');
+  renderFloatingHandDock();
+}
+function choosePendingMoveTarget(i){
+  if(!pendingMove)return;
+  pendingMove.idx=i;
+  const body=$('moveConfirmBody'),list=$('moveOptionList');
+  if(body)body.innerHTML='<b>'+selectedActionLabel(pendingMove.sel)+'</b><br>'+moveChoiceText(pendingMove.sel,i)+'<br><span class="small">Press Confirm Use to spend the card.</span>';
+  if(list){
+    [...list.querySelectorAll('.moveOption')].forEach(btn=>btn.classList.toggle('selected',+btn.dataset.target===i));
+  }
+  renderFloatingHandDock();
+}
+function cancelPendingMove(){
+  pendingMove=null;
+  const overlay=$('moveConfirmOverlay');
+  if(overlay){overlay.classList.remove('open');overlay.hidden=true;}
+  if($('floatingHandDock'))renderFloatingHandDock();
+}
+function confirmPendingMove(){
+  if(!pendingMove)return;
+  const p=pendingMove;
+  pendingMove=null;
+  const overlay=$('moveConfirmOverlay');
+  if(overlay){overlay.classList.remove('open');overlay.hidden=true;}
+  resolveConfirmedMove(p.sel,p.idx);
+}
+
 function clickTile(i){
   if(state.done||state.dead)return;
   let targets=targetOptionsFor(selected);
   if(!targets.includes(i))return;
-  selected=actionWithChoice(selected,i);
-  let used=selected,t=state.tiles[i],from=state.pos,card=used.type==='hand'?state.hand[used.idx]:null;
+  pendingMove={sel:clone(selected),idx:i};
+  if(targets.length>1)openMoveSelector(i);
+  else renderFloatingHandDock();
+}
+function resolveConfirmedMove(sel,i){
+  if(state.done||state.dead)return;
+  let targets=targetOptionsFor(sel);
+  if(!targets.includes(i))return;
+  let used=actionWithChoice(sel,i),t=state.tiles[i],from=state.pos,card=used.type==='hand'?state.hand[used.idx]:null;
   if(used.type==='current'&&from===totalTiles-1&&i===totalTiles-1){
     let old=state.currentMove;state.currentMove=rollMove();log('Cycled current move at final tile: '+old+' → '+state.currentMove+'.');state.autoStatus='Cycled at final tile.';selected=null;suggested=null;render();return;
   }
@@ -1474,15 +1595,19 @@ function clickTile(i){
         if(playUpgradeCard(idx,'Special 1 upgrade tile'))log('Applied Special 1 upgrade tile immediately.');
       }
     }
-    else if(t.type==='life'){let n=t.fixedN||1;state.life+=n;t.used=true;log('Gained '+n+' life.')}
-    else if(t.type==='question'){t.used=true;log('Hit ? at tile '+(i+1)+'.');applyQuestion()}
-    else if(t.type==='start'){}
-    else {t.used=true;log('Empty tile '+(i+1)+'.')}
+    else if(t.type==='life'){let n=t.fixedN||randint(1,4);state.life+=n;t.used=true;log('Life tile: +'+n+' life.')}
+    else if(t.type==='question'){t.used=true;applyQuestion(i)}
+    else t.used=true;
   }
-  if(used.type==='hand')state.hand.splice(used.idx,1); else {let old=state.currentMove;state.currentMove=rollMove();log('Refilled current move: '+old+' → '+state.currentMove+'.')}
-  selected=null;suggested=null;
+  if(card){
+    if(card.type==='upgrade')state.hand.splice(used.idx,1);
+    else if(card.type!=='move_any'&&card.type!=='back_any')state.hand.splice(used.idx,1);
+    else if(card.type==='move_any'||card.type==='back_any')state.hand.splice(used.idx,1);
+  }else{
+    if(used.type==='current')state.currentMove=rollMove();
+  }
   if(state.collected.length>=maxChests){state.autoStatus='Chest cap reached at tile '+(state.pos+1)+'. Run remains active until manual end or 0 life.';log(state.autoStatus)}
-  render();
+  selected=null;suggested=null;pendingMove=null;render();
 }
 function collectedUpgradeableIndexes(){
   let a=[];
@@ -1677,6 +1802,30 @@ function renderLootColumns(){
   legend.textContent = state.collected.length ? ('Collected: ' + state.collected.map(lootPrettyName).join(' • ')) : 'No chests collected yet.';
 }
 
+
+function renderFloatingHandDock(){
+  const dock=$('floatingHandDock');
+  const moveBtn=$('floatingCurrentMoveBtn');
+  const handRoot=$('floatingHand');
+  const confirmBtn=$('floatingConfirmMoveBtn');
+  const confirmText=$('floatingConfirmText');
+  if(!dock||!moveBtn||!handRoot||!state)return;
+  const active=!!state && !state.dead && !state.done;
+  dock.classList.toggle('open',active);
+  dock.classList.toggle('hasCards',state.hand&&state.hand.length>0);
+  dock.classList.toggle('hasPendingMove',!!pendingMove);
+  moveBtn.textContent='Current Move '+state.currentMove;
+  moveBtn.className='floatingMoveCard '+(selected&&selected.type==='current'?'selected':'');
+  handRoot.innerHTML=state.hand.map((c,i)=>`<button class="floatingHandCard ${selected&&selected.type==='hand'&&selected.idx===i?'selected':''}" onclick="selectHand(${i})">${c.name}</button>`).join('')||'<span class="floatingEmpty">No stored cards.</span>';
+  if(confirmBtn){
+    confirmBtn.disabled=!pendingMove;
+    confirmBtn.textContent='Confirm Use';
+  }
+  if(confirmText){
+    confirmText.textContent=pendingMove?pendingMoveSummary():'Select a card to preview its landing tile.';
+  }
+}
+
 function render(){
   if(!state)return;
   $('debugline').innerHTML='<b>Current landed tile:</b> '+(state.pos+1)+' / '+totalTiles+' &nbsp; <b>Current refill Move:</b> '+state.currentMove+' &nbsp; <b>Status:</b> '+(state.autoStatus||'—');
@@ -1689,6 +1838,7 @@ function render(){
   $('currentMoveBtn').textContent='Preview current refill Move '+state.currentMove;
   $('currentMoveBtn').className='arc-card '+(selected&&selected.type==='current'?'selected':'');
   $('hand').innerHTML=state.hand.map((c,i)=>`<button class="arc-card ${selected&&selected.type==='hand'&&selected.idx===i?'selected':''}" onclick="selectHand(${i})">${c.name}</button>`).join('')||'<span class="small">No stored cards.</span>';
+  renderFloatingHandDock();
     let targets=targetOptionsFor(selected);
   let rows=[];
   for(let r=0;r<Math.ceil(state.tiles.length/4);r++){
@@ -1725,7 +1875,7 @@ function render(){
   }}
 function openInfoModal(){$('infoModal').classList.add('open')}
 function closeInfoModal(){$('infoModal').classList.remove('open')}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeInfoModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeInfoModal();cancelPendingMove();}});
 
 function escapeHtml(s){
   return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
