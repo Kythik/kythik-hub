@@ -197,6 +197,34 @@ select:focus{border-color:var(--gold-muted)}
 .reroll-pick-label{font-size:11px;color:var(--text-faint);margin-bottom:8px}
 .no-rerolls-note{font-size:12px;color:var(--text-faint);padding:4px 0}
 
+
+/* ── CONTROLS CARD ── */
+.ctrl-card{background:var(--bg-panel);border:1px solid var(--border-blue);border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:14px}
+.ctrl-card-title{font-size:10px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ctrl-card-title::before{content:'';display:block;width:12px;height:1px;background:var(--gold-muted)}
+.ctrl-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+.ctrl-row:last-child{margin-bottom:0}
+.ctrl-divider{height:1px;background:var(--border-blue);margin:12px 0}
+
+/* ── TIER GROUP SEPARATORS ── */
+.tier-sep{height:1px;background:rgba(140,165,210,0.06);margin:0 14px}
+.tier-sep-label{font-size:9px;color:var(--blue-steel);text-transform:uppercase;letter-spacing:.12em;padding:5px 14px;background:rgba(7,17,31,0.5);font-weight:600}
+
+/* ── SERVICE ROW VARIANTS ── */
+.svc-row-roulette td{background:rgba(216,90,78,0.04)!important}
+.svc-row-roulette td:first-child{box-shadow:inset 2px 0 0 rgba(216,90,78,0.4)}
+.svc-row-id23 td:first-child{box-shadow:inset 2px 0 0 rgba(47,211,107,0.3)}
+.svc-inline-warn{font-size:10px;color:var(--red-loss);margin-top:3px;line-height:1.4}
+.svc-inline-ok{font-size:10px;color:var(--green-recording);margin-top:3px;line-height:1.4}
+
+/* ── TABLE WRAPPER ── */
+.tbl-wrap{background:var(--bg-panel);border:1px solid var(--border-blue);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px}
+.tbl-sticky th{position:sticky;top:0;background:rgba(7,17,31,0.95);backdrop-filter:blur(4px);z-index:2}
+
+/* ── VERDICT CARD UPGRADE ── */
+.verdict-card-new{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.verdict-label-new{font-family:var(--font-display);font-size:17px;font-weight:700;letter-spacing:.04em}
+
 /* ── RESPONSIVE ── */
 @media(max-width:860px){
   .page-title{font-size:22px}

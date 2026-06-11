@@ -369,8 +369,7 @@ select:focus{border-color:var(--gold-muted)}
     </div>
     <div class="node-exclusive-note" id="exclusive-note" style="display:none">⚠ Sub-60s and Over-60s Podium are mutually exclusive — only one can be active.</div>
   </div>
-
-  
+  </div><!-- /ctrl-card -->
 
 <div id="reroll-decision-panel" class="reroll-panel">
   <div class="reroll-panel-title">
@@ -392,7 +391,7 @@ select:focus{border-color:var(--gold-muted)}
 </div>
 
 <div class="slabel">Service Rankings</div>
-  <table class="svc-table">
+  <div class="tbl-wrap"><table class="svc-table tbl-sticky">
     <thead>
       <tr>
         <th style="width:24px">#</th>
@@ -403,7 +402,7 @@ select:focus{border-color:var(--gold-muted)}
       </tr>
     </thead>
     <tbody id="tbody"></tbody>
-  </table>
+  </table></div><!-- /tbl-wrap -->
 
 </div>
 
@@ -946,6 +945,8 @@ function render(){
     const nameHtml=(s.name?`<span class="svc-name">${s.name}</span>`:s.id?`<span class="svc-name" style="color:var(--text-faint)">ID ${s.id}</span>`:'')+seasonBadge;
     const eff=`<div class="svc-effect">${(s.effect||s.desc||'').substring(0,100)}${(s.effect||s.desc||'').length>100?'…':''}${th}</div>`;
     const noteHtml=s.note?`<div class="svc-note">${s.note}</div>`:'';
+    const inlineWarn=s.isRoulette?`<div class="svc-inline-warn">~1 per 100 maps · 43% wipe rate · ~500 maps to be reliably profitable</div>`:
+                     s.isID23?`<div class="svc-inline-ok">~12.5% encounter rate · safe cashout · reliable every session</div>`:'';
     let extra='';
     const lbBtn=(id,label)=>`<button onclick="document.getElementById('${id}-lightbox').style.display='flex';document.body.style.overflow='hidden'" style="background:transparent;border:none;color:var(--blue-light);font-size:10px;cursor:pointer;padding:0;margin-top:3px;display:block">${label} ↗</button>`;
     if(s.id===10)extra=lbBtn('id10','how this is calculated');
@@ -956,14 +957,25 @@ function render(){
     if(s.isID23)extra=id23Block(gearsVal,base,nodeWasteful,nodeOstentatious,nodeCb59);
     if(s.id===35){const nt=NUT[parseInt(gearsVal)]||NUT[6];extra=`<div class="svc-info">P(0 proc): ${(nt.p0*100).toFixed(1)}% · P(1 proc): ${(nt.p1*100).toFixed(1)}% · P(2 procs): ${(nt.p2*100).toFixed(1)}%</div>`+lbBtn('id35','how this is calculated');}
     const tr=document.createElement('tr');
+    if(s.isRoulette)tr.className='svc-row-roulette';
+    if(s.isID23)tr.className='svc-row-id23';
     tr.innerHTML=`
       <td style="color:var(--text-faint);font-size:11px">${i+1}</td>
-      <td>${nameHtml}${eff}${noteHtml}${extra}</td>
+      <td>${nameHtml}${eff}${inlineWarn}${noteHtml}${extra}</td>
       <td><span class="badge ${RCLS[s.rarity]||'badge-blue'}">${RLABEL[s.rarity]||s.rarity}</span></td>
       <td><span class="${t2.c} tier">${t2.l}</span></td>
       <td><div class="ev-bar-wrap"><div class="ev-bar" style="width:${Math.min(bw,100)}px;max-width:100px"></div><span style="font-size:10px;color:var(--text-faint);margin-left:4px">${bw}% of top</span></div></td>
     `;
     tbody.appendChild(tr);
+    if(i>0&&svcs[i-1].tier!==s.tier){
+      const sepRow=document.createElement('tr');
+      sepRow.innerHTML=`<td colspan="5" style="padding:0"><div class="tier-sep-label">${s.tier} Tier</div></td>`;
+      tbody.insertBefore(sepRow,tr);
+    } else if(i===0){
+      const firstSep=document.createElement('tr');
+      firstSep.innerHTML=`<td colspan="5" style="padding:0"><div class="tier-sep-label">${s.tier} Tier</div></td>`;
+      tbody.insertBefore(firstSep,tr);
+    }
   });
 
   // ── Reroll recommendation ──────────────────────────────────────────────
