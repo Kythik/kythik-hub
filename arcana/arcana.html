@@ -131,23 +131,15 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
     <div class="autoplaySetup">
       <div class="autoplaySetupHead">
         <h3>Autoplay Setup</h3>
-        <p>Recommendation and autoplay behavior only.</p>
+        <p>Autoplay assumes value recovery backtracking by default.</p>
       </div>
       <div class="autoplayControls">
         <label>Strategy <select id="strategyInput" onchange="suggested=null;render()"><option value="Purple_Before_Q" selected>Purple Before ?</option></select></label>
         <label>Combo <select id="comboDepthInput"><option value="2" selected>2-card</option><option value="3">3-card safe</option><option value="4">4-card survival</option></select></label>
-        <label>Backtrack <select id="backtrackModeInput"><option value="value" selected>value recovery</option><option value="tile80">final tile only</option></select></label>
+        <label class="backtrackModeControl">Backtrack <select id="backtrackModeInput"><option value="value" selected>value recovery</option><option value="tile80">final tile only</option></select></label>
       </div>
     </div>
-
-    <div class="controls actionControls">
-      <button onclick="suggestMove()">Recommend Next Move</button>
-      <button onclick="takeSuggestion()">Take Recommended Move</button>
-      <button class="alt" onclick="autoPlay(300)">Auto Play</button>
-      <button class="bad" onclick="endRun()">Stop Run</button>
-    </div>
-
-    <h3>Route Notes</h3>
+<h3>Route Notes</h3>
     <div class="routeNotes" id="routeNotes"></div>
     <h3>Run log</h3>
     <div class="log" id="log"></div>
@@ -182,7 +174,11 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
       <button class="floatingMoveCard randomCard" id="floatingCurrentMoveBtn" onclick="selectCurrentMove()">Random Move —</button>
       <div class="floatingConfirmPanel">
         <div class="floatingConfirmText" id="floatingConfirmText">Select a card to preview its landing tile.</div>
-        <button class="floatingConfirmBtn" id="floatingConfirmMoveBtn" onclick="confirmPendingMove()" disabled>Confirm Use</button>
+        <div class="floatingDockActions">
+          <button class="floatingRecommendBtn" onclick="suggestMove()">Recommend</button>
+          <button class="floatingAutoBtn" onclick="autoPlay(300)">Auto Play</button>
+          <button class="floatingConfirmBtn" id="floatingConfirmMoveBtn" onclick="confirmPendingMove()" disabled>Confirm Use</button>
+        </div>
       </div>
     </div>
   </div>
@@ -354,6 +350,12 @@ function clone(x){return JSON.parse(JSON.stringify(x))}
 function rollMove(){return randint(1,7)}
 function upgrade(r,n=1){let i=R.indexOf(r);return R[Math.min(R.length-1,Math.max(0,i+n))]}
 function phase(){let t=state?.pos+1||1;if(t<=20)return'setup';if(t<=40)return'conversion';if(t<=60)return'collect';return'cashout'}
+
+function forceValueBacktracking(){
+  const el=$('backtrackModeInput');
+  if(el)el.value='value';
+}
+
 function boardType(){return $('boardTypeInput')?.value||'normal'}
 function strategyId(){return $('strategyInput')?.value||(STRATEGY_DATA?.defaultStrategy||'Kythiks')}
 function strategyProfile(){return STRATEGIES[strategyId()]||STRATEGIES[STRATEGY_DATA.defaultStrategy]||strategyList()[0]||{weights:{}}}
@@ -545,6 +547,7 @@ function changeBoardType(){
   newGame(false);
 }
 function newGame(same=false){
+  forceValueBacktracking();
   if(!same){initRng((getSeedValue())+'-'+Date.now());originalTiles=makeBoard()}
   let hand=[];for(let i=0;i<(getStartingHandValue());i++)hand.push(normalizeCard(drawMappingCard()));
   let initialMove=rollMove();
@@ -552,6 +555,7 @@ function newGame(same=false){
   pendingMove=null;selected=null;suggested=null;log('Current refilling move rolled: '+initialMove+'.');log('New '+boardType()+' board. Starting on tile 1.');render();
 }
 function resetSame(){
+  forceValueBacktracking();
   if(!originalTiles){newGame(false);return}
   let hand=[];for(let i=0;i<(getStartingHandValue());i++)hand.push(normalizeCard(drawMappingCard()));
   let initialMove=rollMove();
@@ -1571,7 +1575,7 @@ function choosePendingMoveTarget(i){
   pendingMove.idx=i;
   const targets=targetOptionsFor(pendingMove.sel);
   if(targets&&targets.length)renderFloatingChoiceTray(targets,i);
-  renderFloatingHandDock();
+  render();
 }
 function cancelPendingMove(){
   pendingMove=null;
@@ -1892,6 +1896,7 @@ function renderFloatingHandDock(){
 }
 
 function render(){
+  forceValueBacktracking();
   if(!state)return;
   $('debugline').innerHTML='<b>Current landed tile:</b> '+(state.pos+1)+' / '+totalTiles+' &nbsp; <b>Current refill Move:</b> '+state.currentMove+' &nbsp; <b>Status:</b> '+(state.autoStatus||'—');
   $('stats').innerHTML=[
@@ -1918,7 +1923,11 @@ function render(){
         if(r%2===0 && i===rowEnd)link=`<span class="rowEndLink" title="Continues to tile ${rowEnd+2}">${rowEnd+1} ↴ ${rowEnd+2}</span>`;
         if(r%2===1 && i===rowEnd)link=`<span class="rowEndLink left" title="Continues to tile ${rowEnd+2}">${rowEnd+1} ↵ ${rowEnd+2}</span>`;
       }
-      return `<button class="tile ${t.type} ${t.type==='chest'?'chest chest-'+t.rarity:''} ${t.rarity||''} ${i<state.pos?'done':''} ${visit>=0?'landed':''} ${i===state.pos?'pos':''} ${targets.includes(i)?'reach':''} ${suggested&&i===suggested.idx?'suggest':''}" onclick="clickTile(${i})"><span class="n">${i+1}</span><span class="c">${icon(t)}</span>${land}${link}</button>`;
+      let spent=visit>=0;
+      let vt=spent?'empty':t.type;
+      let vr=spent?'':(t.rarity||'');
+      let displayIcon=spent?'':icon(t);
+      return `<button class="tile ${vt} ${spent?'spentEmpty':''} ${vt==='chest'?'chest chest-'+vr:''} ${vr} ${i<state.pos?'done':''} ${visit>=0?'landed':''} ${i===state.pos?'pos':''} ${targets.includes(i)?'reach':''} ${pendingMove&&i===pendingMove.idx?'pendingPreview':''} ${suggested&&i===suggested.idx?'suggest':''}" onclick="clickTile(${i})"><span class="n">${i+1}</span><span class="c">${displayIcon}</span>${land}${link}</button>`;
     }).join('');
     rows.push(`<div class="boardRow ${r%2?'reverse':'forward'}">${tileHtml}</div>`);
   }

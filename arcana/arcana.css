@@ -3011,3 +3011,156 @@ body.arcana-page .board {
 .arcana-page.visual-fork .floatingChoiceCard.selected .floatingChoiceTile{
   color:#E6C77A !important;
 }
+
+
+/* ═══════════════════════════════════════════
+   ARCANA VISUAL SITE V1.9 — Value backtracking default
+   Autoplay always assumes value recovery backtracking.
+   ═══════════════════════════════════════════ */
+.arcana-page.visual-fork .backtrackModeControl{
+  display:none !important;
+}
+
+
+/* ═══════════════════════════════════════════
+   ARCANA VISUAL SITE V1.10 — Dock actions
+   Move Recommend/Autoplay into floating dock and remove legacy action row.
+   ═══════════════════════════════════════════ */
+.arcana-page.visual-fork .actionControls{
+  display:none !important;
+}
+
+.arcana-page.visual-fork .floatingDockActions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  align-items:center;
+}
+
+.arcana-page.visual-fork .floatingDockActions .floatingConfirmBtn{
+  grid-column:1 / -1;
+}
+
+.arcana-page.visual-fork .floatingRecommendBtn,
+.arcana-page.visual-fork .floatingAutoBtn{
+  min-height:36px;
+  border-radius:11px;
+  border:1px solid rgba(140,165,210,.28);
+  background:
+    linear-gradient(180deg, rgba(15,28,50,.94), rgba(5,10,22,.98));
+  color:rgba(232,237,246,.88);
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.04em;
+  padding:7px 9px;
+}
+
+.arcana-page.visual-fork .floatingRecommendBtn{
+  border-color:rgba(230,199,122,.38);
+  color:#E6C77A;
+}
+
+.arcana-page.visual-fork .floatingAutoBtn{
+  border-color:rgba(85,215,255,.24);
+}
+
+.arcana-page.visual-fork .floatingRecommendBtn:hover,
+.arcana-page.visual-fork .floatingAutoBtn:hover{
+  transform:translateY(-1px);
+  border-color:rgba(230,199,122,.60);
+  box-shadow:0 0 18px rgba(200,164,93,.16);
+}
+
+@media(max-width:1180px){
+  .arcana-page.visual-fork .floatingDockActions{
+    grid-template-columns:auto auto auto;
+  }
+  .arcana-page.visual-fork .floatingDockActions .floatingConfirmBtn{
+    grid-column:auto;
+  }
+}
+
+@media(max-width:720px){
+  .arcana-page.visual-fork .floatingDockActions{
+    grid-template-columns:1fr;
+  }
+}
+
+
+/* ═══════════════════════════════════════════
+   ARCANA VISUAL SITE V1.11 — Restore pending landing preview
+   The selected card's actual pending landing tile is now highlighted strongly.
+   ═══════════════════════════════════════════ */
+.arcana-page.visual-fork .tile.pendingPreview{
+  border-color:#E6C77A !important;
+  box-shadow:
+    0 0 0 3px rgba(230,199,122,.92),
+    0 0 0 7px rgba(230,199,122,.18),
+    0 0 34px rgba(230,199,122,.42),
+    0 14px 32px rgba(0,0,0,.48) !important;
+  z-index:8;
+}
+
+.arcana-page.visual-fork .tile.pendingPreview::before{
+  border-color:#E6C77A !important;
+  box-shadow:
+    0 0 0 2px rgba(230,199,122,.76),
+    0 0 30px rgba(230,199,122,.65),
+    0 10px 20px rgba(0,0,0,.58) !important;
+  animation:arcanaPendingPulse 1.2s ease-in-out infinite;
+}
+
+.arcana-page.visual-fork .tile.pendingPreview::after{
+  box-shadow:
+    inset 0 0 18px rgba(0,0,0,.80),
+    0 0 22px rgba(230,199,122,.44) !important;
+}
+
+@keyframes arcanaPendingPulse{
+  0%,100%{filter:brightness(1);}
+  50%{filter:brightness(1.35);}
+}
+
+/* Reachable-but-not-selected tiles should be softer than the actual preview. */
+.arcana-page.visual-fork .tile.reach:not(.pendingPreview){
+  opacity:.88;
+}
+
+
+/* ═══════════════════════════════════════════
+   ARCANA VISUAL SITE V1.12 — Landed tiles become spent/empty
+   Previously landed tiles lose their tile icon but keep the small landing token.
+   ═══════════════════════════════════════════ */
+.arcana-page.visual-fork .tile.spentEmpty .c{
+  display:none !important;
+}
+
+.arcana-page.visual-fork .tile.spentEmpty::before{
+  background:
+    linear-gradient(145deg, rgba(38,58,87,.52), rgba(9,15,28,.82) 54%, rgba(4,8,15,.92)),
+    radial-gradient(circle at 50% 20%, rgba(200,164,93,.07), transparent 50%) !important;
+  border-color:rgba(140,165,210,.18) !important;
+  box-shadow:
+    0 8px 18px rgba(0,0,0,.42),
+    inset 0 1px 0 rgba(255,255,255,.05) !important;
+}
+
+.arcana-page.visual-fork .tile.spentEmpty::after{
+  opacity:.55;
+}
+
+/* Current tile can be spent-empty but still needs to read as current position. */
+.arcana-page.visual-fork .tile.spentEmpty.pos::before{
+  border-color:#FFFFFF !important;
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,.88),
+    0 0 0 5px rgba(200,164,93,.16),
+    0 10px 20px rgba(0,0,0,.55) !important;
+}
+
+/* The small move/landing token stays visible and becomes the main history marker. */
+.arcana-page.visual-fork .tile.spentEmpty .land{
+  display:flex !important;
+  opacity:1 !important;
+  z-index:10;
+}
