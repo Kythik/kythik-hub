@@ -1508,13 +1508,33 @@ function pendingMoveSummary(){
   return moveChoiceText(pendingMove.sel,pendingMove.idx);
 }
 
+function choiceActionShort(sel,i){
+  if(!sel||!state)return 'Move';
+  if(sel.type==='current')return 'Move '+state.currentMove;
+  const resolved=actionWithChoice(sel,i);
+  if(resolved?.choice){
+    const dir=resolved.choice.dir<0?'Back':'Move';
+    return dir+' '+resolved.choice.n;
+  }
+  const c=state.hand?.[sel.idx];
+  if(c?.name)return c.name;
+  return 'Move';
+}
+function targetRewardShort(i){
+  const t=state.tiles[i]||{};
+  if(t.type==='chest')return lootLevelLabel(t.rarity)+' '+lootPrettyName(t.rarity)+' chest';
+  if(t.type==='trap')return 'Trap';
+  if(t.type==='movement')return t.fixedN?'Gain Move '+t.fixedN:'Gain mapping card';
+  if(t.type==='upgrade')return 'Gain upgrade card';
+  if(t.type==='life')return t.fixedN?('Gain +'+t.fixedN+' life'):'Gain life';
+  if(t.type==='question')return 'Mystery tile';
+  if(t.type==='start')return 'Start tile';
+  return 'Empty tile';
+}
 function floatingChoiceCardHtml(sel,i,active=false){
-  const txt=moveChoiceText(sel,i);
   const tile=state.tiles[i]||{};
   const kind=tile.type==='chest'?('chest '+(tile.rarity||'')):tile.type;
-  const title='Tile '+(i+1);
-  const sub=txt.replace(selectedActionLabel(sel)+' → ','');
-  return `<button class="floatingChoiceCard ${active?'selected':''} kind-${kind}" data-target="${i}" onclick="choosePendingMoveTarget(${i})"><span class="floatingChoiceTile">${title}</span><span class="floatingChoiceName">${sub}</span></button>`;
+  return `<button class="floatingChoiceCard ${active?'selected':''} kind-${kind}" data-target="${i}" onclick="choosePendingMoveTarget(${i})"><span class="floatingChoiceTile">${choiceActionShort(sel,i)}</span><span class="floatingChoiceName">Tile ${i+1} · ${targetRewardShort(i)}</span></button>`;
 }
 function renderFloatingChoiceTray(targets=[],activeIdx=-1){
   const tray=$('floatingChoiceTray');
@@ -1867,7 +1887,7 @@ function renderFloatingHandDock(){
     confirmBtn.textContent='Confirm Use';
   }
   if(confirmText){
-    confirmText.textContent=pendingMove?pendingMoveSummary():'Select a card to preview the landing tile, then confirm use.';
+    confirmText.textContent=pendingMove?(choiceActionShort(pendingMove.sel,pendingMove.idx)+' → Tile '+(pendingMove.idx+1)+' · '+targetRewardShort(pendingMove.idx)):'Select a card to preview the landing tile, then confirm use.';
   }
 }
 

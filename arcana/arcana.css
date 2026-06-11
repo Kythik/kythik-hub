@@ -2980,3 +2980,34 @@ body.arcana-page .board {
     max-width:none;
   }
 }
+
+
+/* ═══════════════════════════════════════════
+   ARCANA VISUAL SITE V1.8 — Clean choice-card labels
+   Slide-up selector cards now show simple actions: Move 1, Back 2, etc.
+   ═══════════════════════════════════════════ */
+.arcana-page.visual-fork .floatingChoiceCard{
+  min-height:72px !important;
+  justify-content:center !important;
+  text-align:center !important;
+  align-items:center !important;
+}
+
+.arcana-page.visual-fork .floatingChoiceTile{
+  font-size:15px !important;
+  letter-spacing:.04em !important;
+  color:#F5F7FB !important;
+  text-transform:none !important;
+}
+
+.arcana-page.visual-fork .floatingChoiceName{
+  margin-top:5px;
+  color:rgba(199,208,222,.78) !important;
+  font-size:10px !important;
+  line-height:1.2 !important;
+  font-weight:700 !important;
+}
+
+.arcana-page.visual-fork .floatingChoiceCard.selected .floatingChoiceTile{
+  color:#E6C77A !important;
+}
