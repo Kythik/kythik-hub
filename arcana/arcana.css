@@ -3326,3 +3326,24 @@ body.arcana-page .board {
   background-color:#07111F !important;
   opacity:.75;
 }
+
+
+/* ARCANA VISUAL SITE V1.22 — Human strategy text */
+.arcana-page.visual-fork #strategyProfileText{
+  min-height:0 !important;
+  max-width:78ch;
+  line-height:1.55;
+  font-size:14px;
+  color:#E9EDF5 !important;
+}
+.arcana-page.visual-fork .strategyLightbox .profile,
+.arcana-page.visual-fork .strategyLightbox [id="strategyProfileText"]{
+  margin-bottom:12px !important;
+}
+.arcana-page.visual-fork .strategyWalkthrough h4{
+  color:#E6C77A !important;
+  letter-spacing:.02em;
+}
+.arcana-page.visual-fork .strategyWalkthrough li{
+  margin-bottom:6px;
+}
