@@ -24,6 +24,34 @@
 </style>
 </head>
 <body class="arcana-page">
+<svg class="hex-bg" aria-hidden="true" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="kh-hex-grid" width="48" height="42" patternUnits="userSpaceOnUse">
+      <path d="M24 1 L46 13 L46 29 L24 41 L2 29 L2 13 Z" fill="none" stroke="rgba(200,164,93,.32)" stroke-width="1"/>
+      <path d="M24 1 L24 41 M2 13 L46 29 M46 13 L2 29" fill="none" stroke="rgba(38,58,87,.18)" stroke-width=".75"/>
+    </pattern>
+    <radialGradient id="kh-arcana-glow" cx="50%" cy="0%" r="75%">
+      <stop offset="0%" stop-color="rgba(230,199,122,.18)"/>
+      <stop offset="50%" stop-color="rgba(38,58,87,.08)"/>
+      <stop offset="100%" stop-color="rgba(4,8,15,0)"/>
+    </radialGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#kh-hex-grid)"/>
+  <rect width="100%" height="100%" fill="url(#kh-arcana-glow)"/>
+</svg>
+
+<header class="site-header arcana-site-header">
+  <div class="header-inner">
+    <div class="header-left">
+      <a class="header-name arcana-home-link" href="/" aria-label="Back to Kythik.com">Kythik.com</a>
+      <div class="header-live"><span class="live-dot"></span><span>Arcana Tool</span></div>
+    </div>
+    <div class="header-right">
+      <a class="header-link" href="/">← Back to main site</a>
+    </div>
+  </div>
+</header>
+
 
 <section class="strategyDeck" aria-labelledby="strategyDeckTitle">
   <div class="strategyDeckHead">

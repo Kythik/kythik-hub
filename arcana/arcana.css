@@ -15,7 +15,7 @@
   --gold:#C8A45D;--bad:#B75252;--good:#44A36F;--blue:#4A83D8;--purple:#8F63E8;--orange:#D88933;--red:#D84A4A;--rainbow:#E6C77A;
 }
 .arcana-page *{box-sizing:border-box}
-.arcana-page{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Arial,sans-serif}
+.arcana-page{margin:0;background:transparent;color:var(--text);font-family:var(--font-body,Inter,system-ui,Segoe UI,Arial,sans-serif)}
 .arcana-page .wrap{display:grid;grid-template-columns:460px 1fr;gap:16px;padding:16px}
 .arcana-page .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
 .arcana-page h1{font-size:20px;margin:0 0 8px}.arcana-page .sub{color:var(--muted);font-size:13px;line-height:1.35;margin-bottom:12px}
@@ -394,14 +394,15 @@ body.arcana-page .board {
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
   gap:14px;
+  justify-items:center;
 }
 .arcana-page .strategyCard{
   display:flex;
   flex-direction:column;
   gap:8px;
-  align-items:flex-start;
+  align-items:center;
   justify-content:flex-start;
-  text-align:left;
+  text-align:center;
   background:linear-gradient(180deg,rgba(13,24,40,.94),rgba(11,21,36,.98));
   border:1px solid var(--border-soft);
   border-radius:var(--radius-lg);
@@ -581,4 +582,119 @@ body.arcana-page .board {
   color:var(--gold);
   opacity:.9;
   margin:.25rem 0 .15rem;
+}
+
+
+/* ── Kythik.com root-style restoration patch ─────────────────────────────── */
+.arcana-page{
+  background: transparent !important;
+  color: var(--text-primary);
+  font-family: var(--font-body, 'DM Sans', Inter, system-ui, Segoe UI, Arial, sans-serif);
+  min-height: 100vh;
+}
+.arcana-page .arcana-site-header{
+  margin-bottom: 8px;
+}
+.arcana-page .arcana-home-link{
+  text-decoration: none;
+}
+.arcana-page .arcana-home-link:hover{
+  color: var(--gold-bright);
+}
+.arcana-page .strategyDeckHead{
+  text-align: center;
+}
+.arcana-page .strategyDeckHead p{
+  margin-left: auto;
+  margin-right: auto;
+}
+.arcana-page .strategyCards{
+  justify-items: center;
+}
+.arcana-page .strategyCard{
+  align-items: center !important;
+  text-align: center !important;
+  justify-content: flex-start;
+}
+.arcana-page .strategyCard p{
+  text-align: center !important;
+}
+.arcana-page .strategyMeta{
+  text-align: center;
+}
+.arcana-page .strategyMiniStats{
+  justify-content: center;
+}
+.arcana-page .wrap,
+.arcana-page .strategyDeck,
+.arcana-page .strategyLightbox{
+  position: relative;
+}
+.arcana-page .wrap,
+.arcana-page .strategyDeck{
+  z-index: 1;
+}
+/* Fallback header rules for local/offline preview when /styles.css is not present. */
+.arcana-page .site-header{
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: rgba(4,8,15,0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-soft, rgba(200,164,93,0.18));
+  height: var(--header-h, 52px);
+}
+.arcana-page .header-inner{
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 28px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.arcana-page .header-left,
+.arcana-page .header-right,
+.arcana-page .header-live,
+.arcana-page .header-link{
+  display: flex;
+  align-items: center;
+}
+.arcana-page .header-left{gap:20px}
+.arcana-page .header-right{gap:24px}
+.arcana-page .header-name{
+  font-family: var(--font-display, Cinzel, serif);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gold-primary, #C8A45D);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.arcana-page .header-live{
+  gap:6px;
+  font-size:11px;
+  color:var(--text-faint, #5E6A7D);
+  letter-spacing:.06em;
+}
+.arcana-page .header-link{
+  gap:6px;
+  font-size:12px;
+  color:var(--text-muted, #8996AA);
+  letter-spacing:.04em;
+  text-decoration:none;
+}
+.arcana-page .header-link:hover{color:var(--text-soft, #C7D0DE)}
+.arcana-page .live-dot{
+  width:6px;
+  height:6px;
+  background:var(--green-recording, #2FD36B);
+  border-radius:50%;
+  animation:kh-pulse 1.4s ease-in-out infinite;
+  flex-shrink:0;
+}
+@keyframes kh-pulse{0%,100%{opacity:1}50%{opacity:.25}}
+@media(max-width:700px){
+  .arcana-page .header-live{display:none}
+  .arcana-page .header-inner{padding:0 18px}
 }
