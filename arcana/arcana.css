@@ -3174,3 +3174,113 @@ body.arcana-page .board {
   opacity:1 !important;
   filter:none !important;
 }
+
+
+/* ═══════════════════════════════════════════
+   ARCANA VISUAL SITE V1.14 — Diamond landing marker
+   Shows a clearer player/landing marker on tiles actually landed on.
+   ═══════════════════════════════════════════ */
+.arcana-page.visual-fork .tile .land{
+  position:absolute;
+  right:6px;
+  top:6px;
+  width:18px;
+  min-width:18px;
+  height:18px;
+  display:flex !important;
+  align-items:center;
+  justify-content:center;
+  border-radius:0;
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+  background:linear-gradient(145deg,rgba(230,199,122,.98),rgba(200,164,93,.95));
+  border:1px solid rgba(255,255,255,.70);
+  color:#07111F;
+  font-size:9px;
+  line-height:1;
+  font-weight:900;
+  z-index:10;
+  box-shadow:
+    0 0 0 1px rgba(4,8,15,.45),
+    0 6px 16px rgba(0,0,0,.42);
+  text-shadow:none;
+}
+
+.arcana-page.visual-fork .tile.pos .land{
+  background:linear-gradient(145deg,#FFFFFF,#E6C77A);
+  box-shadow:
+    0 0 0 1px rgba(4,8,15,.52),
+    0 0 16px rgba(255,255,255,.28),
+    0 6px 18px rgba(0,0,0,.46);
+}
+
+.arcana-page.visual-fork .tile.spentEmpty .land{
+  display:flex !important;
+  opacity:1 !important;
+}
+
+/* Slightly offset number to look visually centered in the diamond. */
+.arcana-page.visual-fork .tile .land{
+  padding-top:1px;
+}
+
+
+/* ═══════════════════════════════════════════
+   ARCANA VISUAL SITE V1.15 — Current position diamond only
+   Landing history stays as small numbered tokens; diamond marks current position.
+   ═══════════════════════════════════════════ */
+
+/* Revert the visited/landed history token back to a small round move token. */
+.arcana-page.visual-fork .tile .land{
+  position:absolute !important;
+  right:4px !important;
+  top:4px !important;
+  width:auto !important;
+  min-width:20px !important;
+  height:20px !important;
+  padding:0 5px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  border-radius:999px !important;
+  clip-path:none !important;
+  background:rgba(4,8,15,.88) !important;
+  border:1px solid rgba(230,199,122,.75) !important;
+  color:#E6C77A !important;
+  font-size:11px !important;
+  line-height:20px !important;
+  font-weight:900 !important;
+  z-index:10 !important;
+  box-shadow:0 6px 16px rgba(0,0,0,.34) !important;
+}
+
+/* Current position marker: separate diamond/player indicator. */
+.arcana-page.visual-fork .tile .playerMarker{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:18px;
+  height:18px;
+  transform:translate(-50%,-50%) rotate(45deg);
+  border:2px solid rgba(255,255,255,.96);
+  background:linear-gradient(145deg,#FFFFFF,#E6C77A);
+  box-shadow:
+    0 0 0 2px rgba(4,8,15,.78),
+    0 0 18px rgba(230,199,122,.72),
+    0 8px 18px rgba(0,0,0,.48);
+  z-index:12;
+  pointer-events:none;
+}
+
+.arcana-page.visual-fork .tile .playerMarker::after{
+  content:"";
+  position:absolute;
+  inset:4px;
+  border-radius:999px;
+  background:#07111F;
+  box-shadow:0 0 10px rgba(4,8,15,.70) inset;
+}
+
+/* Current spent-empty tile should show player marker without needing old icon. */
+.arcana-page.visual-fork .tile.spentEmpty.pos .playerMarker{
+  display:block !important;
+}

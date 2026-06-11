@@ -1917,7 +1917,7 @@ function render(){
     let items=state.tiles.slice(start,start+4);
     let tileHtml=items.map((t,off)=>{
       let i=start+off;
-      let visit=state.path.indexOf(i+1),land=visit>=0?`<span class="land">${visit+1}</span>`:'';
+      let visit=state.path.indexOf(i+1),land=visit>=0?`<span class="land">${visit+1}</span>`:'',player=i===state.pos?'<span class="playerMarker" aria-label="Current position"></span>':'';
       let link='';
       if(rowEnd<state.tiles.length-1){
         if(r%2===0 && i===rowEnd)link=`<span class="rowEndLink" title="Continues to tile ${rowEnd+2}">${rowEnd+1} ↴ ${rowEnd+2}</span>`;
@@ -1927,7 +1927,7 @@ function render(){
       let vt=spent?'empty':t.type;
       let vr=spent?'':(t.rarity||'');
       let displayIcon=spent?'':icon(t);
-      return `<button class="tile ${vt} ${spent?'spentEmpty':''} ${vt==='chest'?'chest chest-'+vr:''} ${vr} ${visit>=0?'landed':''} ${i===state.pos?'pos':''} ${targets.includes(i)?'reach':''} ${pendingMove&&i===pendingMove.idx?'pendingPreview':''} ${suggested&&i===suggested.idx?'suggest':''}" onclick="clickTile(${i})"><span class="n">${i+1}</span><span class="c">${displayIcon}</span>${land}${link}</button>`;
+      return `<button class="tile ${vt} ${spent?'spentEmpty':''} ${vt==='chest'?'chest chest-'+vr:''} ${vr} ${visit>=0?'landed':''} ${i===state.pos?'pos':''} ${targets.includes(i)?'reach':''} ${pendingMove&&i===pendingMove.idx?'pendingPreview':''} ${suggested&&i===suggested.idx?'suggest':''}" onclick="clickTile(${i})"><span class="n">${i+1}</span><span class="c">${displayIcon}</span>${land}${player}${link}</button>`;
     }).join('');
     rows.push(`<div class="boardRow ${r%2?'reverse':'forward'}">${tileHtml}</div>`);
   }
