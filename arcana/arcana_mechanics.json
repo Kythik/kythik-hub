@@ -194,8 +194,24 @@
       "note": "Legacy special board 2 remains code-defined."
     },
     "special3": {
-      "totalTiles": 96,
-      "note": "Legacy special board 3 remains code-defined."
+      "shape": "96 tiles, 24 rows, 4 columns; rarity bands climb from green to rainbow.",
+      "rarityBands": {
+        "rows1to4": "green",
+        "rows5to8": "blue",
+        "rows9to12": "purple",
+        "rows13to16": "orange",
+        "rows17to20": "red",
+        "rows21to24": "rainbow"
+      },
+      "movementRows": [
+        6,
+        12,
+        18,
+        24
+      ],
+      "coreMechanic": "slot preservation",
+      "coreRule": "Preserve slots for the late bands.",
+      "default": "Special3_RainbowRed_HighCeiling"
     }
   },
   "targeting": {
@@ -204,6 +220,54 @@
     "notes": {
       "upgradeCard": "Upgrade cards check the highest eligible rarity tier first, then lower tiers; target is random within the first eligible tier found.",
       "questionUpgrade": "? upgrade effects randomly choose eligible chests; they do not highest-tier-prioritize."
+    }
+  },
+  "strategyNotes": {
+    "special2HandManagement": {
+      "principle": "movement cards are access; red upgrade cards are payoff",
+      "finding": "heavy hand-pressure penalties underperformed in a directional 1,000-run test; current strategy keeps hand pressure as guidance",
+      "currentDefault": "Special2_Aggro_Cross"
+    },
+    "special2StartingHandImpact": {
+      "baseline": "4–6 cards",
+      "baselineFrequencyEstimate": "about 98% of starts, per user experience",
+      "finding": "Board 2 EV is heavily starting-hand dependent. 7+ card starts tested much higher but are rare/special setup cases.",
+      "default": "Special2_Bank_And_Cross",
+      "variant": "Special2_Aggro_Cross for rare high-hand/high-access starts"
+    },
+    "special1WallStaging": {
+      "coreRule": "Stage first. Cross second.",
+      "stagingZone": "tiles 24–30",
+      "finding": "Staging increased Board 1 realistic 4–6 EV from about 30 to about 91 in the sim.",
+      "default": "Special1_Staging_Loaded",
+      "warning": "Immediate-cross/no-staging routes under-cross Board 1 badly."
+    },
+    "special2VsSpecial1Staging": {
+      "special1": "Staging works because early chests are already owned payload.",
+      "special2": "Staging increased wall success but did not improve EV because it can weaken upgrade/access payoff.",
+      "special2Rule": "Bank first. Cross decisively."
+    },
+    "special3SlotPreservation": {
+      "coreRule": "Preserve slots for red/rainbow bands.",
+      "finding": "High-ceiling slot preservation beat safer completion routes on EV.",
+      "tradeoff": "The EV route completes 7 chests less often; safer variants are included for consistency.",
+      "bestTested": "Special3_RainbowRed_HighCeiling",
+      "balanced": "Special3_RedPlus_Dynamic",
+      "consistent": "Special3_RedPlus_SofterFill"
+    },
+    "startingHandEVLightboxPatch": {
+      "purpose": "Lightboxes now expose per-starting-hand EV where tests were run.",
+      "baselineHands": [
+        4,
+        5,
+        6
+      ],
+      "boards": {
+        "special1": "Board 1 staging route is relatively stable from 4–6; staging matters more than starting hand.",
+        "special2": "Board 2 is meaningfully better at 6 than 4–5; 7+ remains rare/high-setup.",
+        "special3": "Board 3 scales strongly with starting hand because extra cards improve late-band access and slot preservation."
+      },
+      "label": "Starting hand size EV"
     }
   }
 }
