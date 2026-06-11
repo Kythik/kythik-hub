@@ -416,10 +416,11 @@ select:focus{border-color:var(--gold-muted)}
     <div style="font-size:13px;color:var(--text-muted);line-height:1.7;display:flex;flex-direction:column;gap:12px">
       <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">The Mechanic</div>
         Randomly removes 1 or 2 cogs from the stage (50/50) and upgrades all remaining cogs by +1 rarity. Fewer cogs = lower rating at turnin, but every remaining cog gives better vouchers.</div>
-      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Why It Ranks High</div>
-        The upgrade value on all remaining cogs exceeds the loss from fewer cogs. On a 6-gear run: remove 1 → 5 upgraded cogs at S rating (1.3×). Remove 2 → 4 upgraded cogs at A rating (1.25×). Both outcomes beat a normal 6-cog SS run in expected voucher value.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Why It Ranks Low</div>
+        The removal is random — your best cogs can be taken. Losing cogs also drops your rating (6→5 = SS→S, 6→4 = SS→A), reducing the multiplier on all remaining cogs. The upgrade value rarely compensates for the combined cog loss and rating downgrade.</div>
       <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">EV Model</div>
-        <div style="background:var(--bg-card);border-radius:var(--radius);padding:10px;font-size:12px;font-family:monospace">50% × (5 upgraded cogs × S rating − base)<br>+ 50% × (4 upgraded cogs × A rating − base)</div></div>
+        <div style="background:var(--bg-card);border-radius:var(--radius);padding:10px;font-size:12px;font-family:monospace">50% × (cr × upgraded_value × 5 cogs × S rating − base)<br>+ 50% × (cr × upgraded_value × 4 cogs × A rating − base)</div>
+        Remove-to-4 is near break-even. Remove-to-5 adds modest value. Net result: low B-tier in most configurations.</div>
     </div>
   </div>
 </div>
