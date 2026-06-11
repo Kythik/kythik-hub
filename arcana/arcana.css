@@ -2370,3 +2370,72 @@ body.arcana-page .board {
     padding-top:8px;
   }
 }
+
+
+/* ═══════════════════════════════════════════
+   ARCANA VISUAL SITE V1.3 — Board-attached card dock
+   Hide legacy left-panel card controls and attach active card controls to the board panel.
+   ═══════════════════════════════════════════ */
+.arcana-page.visual-fork .legacyHandBlock{
+  display:none !important;
+}
+
+.arcana-page.visual-fork{
+  padding-bottom:32px !important;
+}
+
+/* Override previous fixed bottom dock and make it part of the board experience. */
+.arcana-page.visual-fork .boardFrame > .floatingHandDock{
+  position:sticky !important;
+  left:auto !important;
+  bottom:14px !important;
+  transform:none !important;
+  width:min(980px, 100%) !important;
+  margin:18px auto 0 !important;
+  z-index:30 !important;
+  opacity:1 !important;
+  pointer-events:auto !important;
+}
+
+.arcana-page.visual-fork .boardFrame > .floatingHandDock:not(.open){
+  opacity:.78 !important;
+}
+
+.arcana-page.visual-fork .boardFrame > .floatingHandDock.open{
+  transform:none !important;
+  opacity:1 !important;
+}
+
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandInner{
+  background:
+    radial-gradient(circle at 50% 0%, rgba(200,164,93,.14), transparent 42%),
+    linear-gradient(180deg, rgba(11,21,36,.96), rgba(4,8,15,.985)) !important;
+  border-color:rgba(230,199,122,.34) !important;
+  box-shadow:
+    0 18px 58px rgba(0,0,0,.50),
+    inset 0 0 0 1px rgba(255,255,255,.045),
+    inset 0 0 55px rgba(38,58,87,.18) !important;
+}
+
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandTitle::before{
+  content:"✦ ";
+  color:rgba(230,199,122,.85);
+}
+
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingConfirmPanel{
+  background:rgba(4,8,15,.20);
+  border-radius:14px;
+  padding:8px 0 8px 10px;
+}
+
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingMoveCard,
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard{
+  min-height:46px;
+}
+
+@media(max-width:980px){
+  .arcana-page.visual-fork .boardFrame > .floatingHandDock{
+    position:sticky !important;
+    bottom:10px !important;
+  }
+}

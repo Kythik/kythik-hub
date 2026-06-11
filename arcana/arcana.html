@@ -32,6 +32,7 @@
 
 
 
+
 <div class="moveConfirmOverlay" id="moveConfirmOverlay" hidden>
   <div class="moveConfirmBox" role="dialog" aria-modal="true" aria-labelledby="moveConfirmTitle">
     <button class="moveConfirmClose" onclick="cancelPendingMove()" aria-label="Cancel move">×</button>
@@ -46,22 +47,6 @@
   </div>
 </div>
 
-<div class="floatingHandDock" id="floatingHandDock" aria-live="polite">
-  <div class="floatingHandInner">
-    <div class="floatingHandHead">
-      <span class="floatingHandTitle">Cards in Play</span>
-      <span class="floatingHandHint">Current move + stored hand</span>
-    </div>
-    <div class="floatingHandRows">
-      <button class="floatingMoveCard" id="floatingCurrentMoveBtn" onclick="selectCurrentMove()">Move —</button>
-      <div class="floatingHandCards" id="floatingHand"></div>
-      <div class="floatingConfirmPanel">
-        <div class="floatingConfirmText" id="floatingConfirmText">Select a card to preview its landing tile.</div>
-        <button class="floatingConfirmBtn" id="floatingConfirmMoveBtn" onclick="confirmPendingMove()" disabled>Confirm Use</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <section class="strategyDeck" aria-labelledby="strategyDeckTitle">
   <div class="strategyDeckHead">
@@ -149,13 +134,14 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
     </div>
     <div class="debugline" id="debugline">Loading...</div>
 
-    <h3>Current refilling move card</h3>
-    <div class="hand"><button class="arc-card" id="currentMoveBtn" onclick="selectCurrentMove()"></button></div>
+    <div class="legacyHandBlock" aria-hidden="true">
+      <h3>Current refilling move card</h3>
+      <div class="hand"><button class="arc-card" id="currentMoveBtn" onclick="selectCurrentMove()"></button></div>
 
-    <h3>Stored mapping hand</h3>
-    <div class="small">Movement/back cards are consumed. Utility cards apply immediately. Upgrade cards upgrade any chest equal to or below the shown rarity by +1.</div>
-    <div class="hand" id="hand"></div>
-
+      <h3>Stored mapping hand</h3>
+      <div class="small">Movement/back cards are consumed. Utility cards apply immediately. Upgrade cards upgrade any chest equal to or below the shown rarity by +1.</div>
+      <div class="hand" id="hand"></div>
+    </div>
 
     <div class="autoplaySetup">
       <div class="autoplaySetupHead">
@@ -193,6 +179,23 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
         </div>
       </div>
       <div class="board" id="board" style="margin-left:auto;margin-right:auto;"></div>
+<div class="floatingHandDock" id="floatingHandDock" aria-live="polite">
+  <div class="floatingHandInner">
+    <div class="floatingHandHead">
+      <span class="floatingHandTitle">Cards in Play</span>
+      <span class="floatingHandHint">Current move + stored hand</span>
+    </div>
+    <div class="floatingHandRows">
+      <button class="floatingMoveCard" id="floatingCurrentMoveBtn" onclick="selectCurrentMove()">Move —</button>
+      <div class="floatingHandCards" id="floatingHand"></div>
+      <div class="floatingConfirmPanel">
+        <div class="floatingConfirmText" id="floatingConfirmText">Select a card to preview its landing tile.</div>
+        <button class="floatingConfirmBtn" id="floatingConfirmMoveBtn" onclick="confirmPendingMove()" disabled>Confirm Use</button>
+      </div>
+    </div>
+  </div>
+</div>
+
     </div>
   </div>
 </div>
