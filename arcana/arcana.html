@@ -1806,6 +1806,20 @@ function renderLootColumns(){
 }
 
 
+
+function updateFloatingDockBounds(){
+  const dock=$('floatingHandDock');
+  const boardFrame=document.querySelector('.boardFrame');
+  if(!dock||!boardFrame)return;
+  const rect=boardFrame.getBoundingClientRect();
+  const pad=12;
+  const left=Math.max(pad, rect.left);
+  const right=Math.min(window.innerWidth-pad, rect.right);
+  const width=Math.max(280, right-left);
+  dock.style.setProperty('--dock-left', left+'px');
+  dock.style.setProperty('--dock-width', width+'px');
+}
+
 function floatingCardMeta(card){
   const name=(card&&card.name)||'';
   const lower=name.toLowerCase();
@@ -1825,6 +1839,7 @@ function renderFloatingHandDock(){
   const confirmBtn=$('floatingConfirmMoveBtn');
   const confirmText=$('floatingConfirmText');
   if(!dock||!moveBtn||!handRoot||!state)return;
+  updateFloatingDockBounds();
   const active=!!state && !state.dead && !state.done;
   dock.classList.toggle('open',active);
   dock.classList.toggle('hasCards',state.hand&&state.hand.length>0);
@@ -1894,6 +1909,8 @@ function render(){
 function openInfoModal(){$('infoModal').classList.add('open')}
 function closeInfoModal(){$('infoModal').classList.remove('open')}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeInfoModal();cancelPendingMove();}});
+window.addEventListener('resize',updateFloatingDockBounds,{passive:true});
+window.addEventListener('scroll',updateFloatingDockBounds,{passive:true});
 
 function escapeHtml(s){
   return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));

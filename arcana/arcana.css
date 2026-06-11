@@ -2648,3 +2648,51 @@ body.arcana-page .board {
     min-height:88px !important;
   }
 }
+
+
+/* ═══════════════════════════════════════════
+   ARCANA VISUAL SITE V1.5 — Board-limited floating dock
+   Dock remains fixed/floating, but is clamped to the board panel width/position.
+   ═══════════════════════════════════════════ */
+.arcana-page.visual-fork .boardFrame > .floatingHandDock{
+  left:var(--dock-left, 50%) !important;
+  width:var(--dock-width, min(1080px, calc(100vw - 30px))) !important;
+  max-width:var(--dock-width, min(1080px, calc(100vw - 30px))) !important;
+  transform:none !important;
+}
+
+.arcana-page.visual-fork .boardFrame > .floatingHandDock.open{
+  transform:none !important;
+}
+
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandInner{
+  width:100% !important;
+  box-sizing:border-box;
+}
+
+/* If the board is narrow, compress the dock instead of escaping its column. */
+@media(max-width:1180px){
+  .arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandInner{
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+  }
+  .arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandRows{
+    grid-template-columns:1fr !important;
+  }
+  .arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingConfirmPanel{
+    max-width:none !important;
+    min-width:0 !important;
+    border-left:0 !important;
+    border-top:1px solid rgba(230,199,122,.16) !important;
+    padding:10px 0 0 0 !important;
+  }
+}
+
+/* On very small screens, let the board column be nearly full viewport width. */
+@media(max-width:720px){
+  .arcana-page.visual-fork .boardFrame > .floatingHandDock{
+    left:9px !important;
+    width:calc(100vw - 18px) !important;
+    max-width:calc(100vw - 18px) !important;
+  }
+}
