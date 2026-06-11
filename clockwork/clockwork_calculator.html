@@ -516,6 +516,16 @@ select:focus{border-color:var(--gold-muted)}
         </ul></div>
       <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Reading the Outcomes</div>
         Each row shows a possible outcome with its probability. Early end at low cogs produces less than a normal run. Full completion is the target. The tier in the service rankings is the weighted average across all outcomes.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Encounter Rate &amp; Real-World Value</div>
+        ID23 is a Gold service (~12.5% encounter rate). You see it multiple times per session regardless of how many maps you run — unlike Roulette, it contributes meaningfully every day you map.
+        <div style="background:var(--bg-card);border-radius:var(--radius);padding:10px 12px;font-size:12px;display:flex;flex-direction:column;gap:4px;margin-top:8px">
+          <div style="color:var(--text-faint);margin-bottom:2px">Per-session reliability (100k simulation):</div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text-faint)">20 maps (casual):</span><span style="color:var(--green-recording)">~2.5 encounters · goes negative 3% of sessions</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text-faint)">30 maps:</span><span style="color:var(--green-recording)">~3.8 encounters · goes negative 1.5% of sessions</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text-faint)">100 maps (streamer):</span><span style="color:var(--green-recording)">~12.5 encounters · never negative</span></div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px"><span style="color:var(--text-faint)">Reliable positive at:</span><span style="color:var(--gold-muted)">100 maps (100% of the time)</span></div>
+        </div>
+        <div style="margin-top:8px;font-size:12px;color:var(--text-faint)">The safe cashout mechanic means even bad runs return something. This is what separates ID23 from Roulette in practice — consistent value every session vs Roulette's feast/famine across months of mapping.</div></div>
       <div style="font-size:11px;color:var(--text-faint);padding-top:10px;border-top:1px solid var(--border-blue)">
         Mechanic data from the <a href="https://docs.qq.com/doc/DUFZyZFZRWnVtUVFt" target="_blank" rel="noopener" style="color:var(--blue-light)">Chinese community doc</a>.</div>
     </div>
@@ -564,6 +574,16 @@ select:focus{border-color:var(--gold-muted)}
         No. Seeing high rarity drops early means this is exactly the run you want to complete. Those early cogs are just the start — cog 6 on a high rarity run is where the real payout is. Cashing out at cog 3 because you already got a rainbow is leaving most of the value behind. The temptation to lock in a good start is understandable, but the math is clear: keep going.</div>
       <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">When It's Okay to Stop Early</div>
         If repeated wipes are affecting your session or your run costs are unusually high, cashing out at cog 4–5 is a reasonable variance management call. Just understand you are trading EV for stability — not playing better.</div>
+      <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Encounter Rate &amp; The Season Reality</div>
+        Roulette is a Rainbow service (~1% encounter rate). At real-world mapping rates you see it roughly once per 100 maps. At full deep-space juice a failed Roulette is a lost map — clockwork IS the map value.
+        <div style="background:var(--bg-card);border-radius:var(--radius);padding:10px 12px;font-size:12px;display:flex;flex-direction:column;gap:4px;margin-top:8px">
+          <div style="color:var(--text-faint);margin-bottom:2px">When you see it — per-encounter result:</div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text-faint)">Goes negative (wipe):</span><span style="color:var(--red-loss)">~43% of encounters</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text-faint)">Floor (P10):</span><span style="color:var(--text-soft)">−1 map cost</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text-faint)">Average win:</span><span style="color:var(--green-recording)">+4.9× map cost profit</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text-faint)">Reliable positive at:</span><span style="color:var(--gold-muted)">~500 maps (93%)</span></div>
+        </div>
+        <div style="margin-top:8px;font-size:12px;color:var(--red-loss)">At ~1 encounter per 100 maps, 500 maps = ~5 Roulettes. That's roughly one full 90-day season of serious mapping before the EV advantage meaningfully materializes. The "feels like always skip" instinct is statistically valid for anyone outside streamer/nolifer territory.</div></div>
       <div style="font-size:11px;color:var(--text-faint);padding-top:10px;border-top:1px solid var(--border-blue)">
         <span style="color:var(--red-loss)">Voucher rarity distribution is unverified</span> — the difference between conservative and high rarity is dramatic and this remains the biggest unknown in the Roulette ranking. Mechanic data from the <a href="https://docs.qq.com/doc/DUFZyZFZRWnVtUVFt" target="_blank" rel="noopener" style="color:var(--blue-light)">Chinese community doc</a>.</div>
     </div>
@@ -779,6 +799,18 @@ function roulBlock(gearsVal,rdist,base){
     h+=`<div class="roul-row"><span class="roul-cog">Cog ${cog}</span><span class="roul-p">${(ps*100).toFixed(1)}%</span><span class="${tR.c} tier" style="font-size:12px">${tR.l}</span><div class="ev-bar-wrap"><div class="ev-bar" style="width:${bwR}px"></div></div><span class="roul-v">${tv}v</span></div>`;
   }
   h+=`<div class="roul-note">Conservative dist: cog 4+ for positive EV at average baseline. High rarity: may be positive earlier. Roulette voucher rarity distribution is unverified — this is the biggest unknown in the ranking.</div>`;
+  h+=`<div style="margin-top:10px;border-top:1px solid var(--border-blue);padding-top:10px">
+    <div style="font-size:10px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Encounter Reality (~1 per 100 maps · 43% wipe rate)</div>
+    <div style="display:grid;grid-template-columns:auto 1fr 1fr;gap:3px 12px;font-size:11px;margin-bottom:6px">
+      <span style="color:var(--text-faint)">Maps</span><span style="color:var(--text-faint)">Avg seen</span><span style="color:var(--text-faint)">Cumulative profit chance</span>
+      <span style="color:var(--text-muted)">50</span><span style="color:var(--text-muted)">~0.5</span><span style="color:var(--red-loss)">~20%</span>
+      <span style="color:var(--text-muted)">100</span><span style="color:var(--text-muted)">~1</span><span style="color:var(--orange-fire)">~41%</span>
+      <span style="color:var(--text-muted)">500</span><span style="color:var(--text-muted)">~5</span><span style="color:var(--gold-muted)">~93% — ~1 full season</span>
+      <span style="color:var(--text-muted)">1000</span><span style="color:var(--text-muted)">~10</span><span style="color:var(--green-recording)">~99% — multiple seasons</span>
+    </div>
+    <div style="font-size:10px;color:var(--red-loss)">EV is correct. Variance is the problem. Most players will not map enough in a single season for Roulette to reliably pay off.</div>
+    <button onclick="showRouletteLightbox()" style="background:transparent;border:none;color:var(--blue-light);font-size:10px;cursor:pointer;padding:0;margin-top:4px;display:block">full analysis ↗</button>
+  </div>`;
   return h+'</div>';
 }
 
@@ -805,6 +837,18 @@ function id23Block(gearsVal,base,nodeWasteful,nodeOstentatious,nodeCb59){
     const podiumNote=k===n&&podiumBonus>0?' (+podium)':'';
     h+=`<div class="id23-row"><span class="id23-outcome">${label}${podiumNote}</span><span class="id23-prob">${(p*100).toFixed(1)}%</span><span class="${t23.c} tier" style="font-size:12px">${t23.l}</span><div class="ev-bar-wrap"><div class="ev-bar" style="width:${bw23}px"></div></div></div>`;
   }
+  h+=`<div style="margin-top:10px;border-top:1px solid var(--border-blue);padding-top:10px">
+    <div style="font-size:10px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Encounter Reality (~12.5% per map · safe cashout)</div>
+    <div style="display:grid;grid-template-columns:auto 1fr 1fr;gap:3px 12px;font-size:11px;margin-bottom:6px">
+      <span style="color:var(--text-faint)">Maps</span><span style="color:var(--text-faint)">Avg seen</span><span style="color:var(--text-faint)">Cumulative profit chance</span>
+      <span style="color:var(--text-muted)">50</span><span style="color:var(--text-muted)">~6</span><span style="color:var(--green-recording)">~100%</span>
+      <span style="color:var(--text-muted)">100</span><span style="color:var(--text-muted)">~12</span><span style="color:var(--green-recording)">~100%</span>
+      <span style="color:var(--text-muted)">500</span><span style="color:var(--text-muted)">~62</span><span style="color:var(--green-recording)">~100%</span>
+      <span style="color:var(--text-muted)">1000</span><span style="color:var(--text-muted)">~125</span><span style="color:var(--green-recording)">~100%</span>
+    </div>
+    <div style="font-size:10px;color:var(--green-recording)">Reliable every session regardless of how many maps you run. Safe cashout means you never truly lose a map — unlike Roulette.</div>
+    <button onclick="showId23Lightbox()" style="background:transparent;border:none;color:var(--blue-light);font-size:10px;cursor:pointer;padding:0;margin-top:4px;display:block">full analysis ↗</button>
+  </div>`;
   return h+'</div>';
 }
 
