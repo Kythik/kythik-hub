@@ -1534,7 +1534,21 @@ function suggestMove(){
   }
   render();
 }
-function takeSuggestion(){if(!suggested){suggestMove();if(!suggested)return}selected=suggested.first;let tgt=targetFor(selected);if(tgt<0)return;clickTile(tgt)}
+function takeSuggestion(){
+  if(!suggested){
+    suggestMove();
+    if(!suggested)return;
+  }
+  const first=clone(suggested.first);
+  const tgt=suggested.idx>=0?suggested.idx:targetFor(first);
+  if(tgt<0)return;
+
+  // Auto Play must execute the recommendation immediately.
+  // Manual clicks use clickTile() to preview + confirm, but autoplay cannot wait on Confirm Use.
+  pendingMove=null;
+  selected=first;
+  resolveConfirmedMove(first,tgt);
+}
 
 function selectedActionLabel(sel=selected){
   if(!sel)return 'No card selected';
