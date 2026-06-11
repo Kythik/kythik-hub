@@ -175,8 +175,8 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
       <div class="floatingConfirmPanel">
         <div class="floatingConfirmText" id="floatingConfirmText">Select a card to preview its landing tile.</div>
         <div class="floatingDockActions">
-          <button class="floatingRecommendBtn" onclick="suggestMove()">Recommend</button>
-          <button class="floatingAutoBtn" onclick="autoPlay(300)">Auto Play</button>
+          <button class="floatingRecommendBtn" onclick="requestRecommendMove()">Recommend</button>
+          <button class="floatingAutoBtn" onclick="requestAutoPlay(300)">Auto Play</button>
           <button class="floatingConfirmBtn" id="floatingConfirmMoveBtn" onclick="confirmPendingMove()" disabled>Confirm Use</button>
         </div>
       </div>
@@ -321,7 +321,10 @@ function specialStrategyEntry(board=boardType()){
   const cfg=specialBoardConfig(board);
   if(!cfg)return null;
   const list=cfg.strategies||[];
-  const desired=(SPECIAL_STRATEGY_DATA?.defaultByBoard||{})[board]||list[0]?.id;
+  const selected=$('strategyInput')?.value;
+  const desired=(selected&&list.some(s=>s.id===selected))
+    ? selected
+    : ((SPECIAL_STRATEGY_DATA?.defaultByBoard||{})[board]||list[0]?.id);
   let entry=list.find(s=>s.id===desired)||list[0]||null;
   if(entry&&entry.rules&&entry.rules.extends){
     const parent=list.find(s=>s.id===entry.rules.extends);
@@ -555,8 +558,9 @@ function changeBoardType(){
   pendingMove=null;cancelPendingMove();
   selected=null;
   suggested=null;
-  renderStrategyUI();
   newGame(false);
+  renderStrategyUI();
+  render();
 }
 function newGame(same=false){
   forceValueBacktracking();
@@ -650,15 +654,13 @@ function playUpgradeCard(idx,reason=''){
   let c=state.hand[idx];
   if(!c||c.type!=='upgrade'||state.done||state.dead)return false;
 
-  // Special Board 1: upgrade cards are valued as owned-chest conversion pieces.
-  if(isSpecialBoard1()&&playOwnedUpgradeCard(idx,reason||'Special 1 owned chest upgrade'))return true;
+  // Hand upgrade cards only apply to already-secured reward chests.
+  // If no eligible owned chest exists, the card has no effect and does not upgrade the board.
+  let owned=ownedUpgradeTargetForCard(c);
+  if(!owned)return false;
 
-  let bucket=highestEligibleMapUpgradeBucket(c);
-  if(!bucket)return false;
-  let best=bucket.targets[randint(0,bucket.targets.length)];
-  let old=state.tiles[best].rarity;
-  state.tiles[best].rarity=upgrade(old);
-  log('Used '+c.name+' on highest eligible map tier '+rarityLabel(bucket.rarity)+'; random tile '+(best+1)+' of '+bucket.targets.length+': '+old+' → '+state.tiles[best].rarity+(reason?' ('+reason+')':'')+'.');
+  state.collected[owned.idx]=owned.next;
+  log('Used '+c.name+' on secured '+rarityLabel(owned.rarity)+' chest slot #'+(owned.idx+1)+' of '+owned.count+': '+owned.old+' → '+owned.next+(reason?' ('+reason+')':'')+'.');
   state.hand.splice(idx,1);
   selected=null;
   suggested=null;
@@ -668,17 +670,9 @@ function playBestUpgradeCard(reason='autoplay fallback'){
   let bestIdx=-1,bestValue=-1;
   state.hand.forEach((c,idx)=>{
     if(c.type!=='upgrade')return;
-
-    if(isSpecialBoard1()){
-      let owned=highestEligibleOwnedUpgradeBucket(c);
-      if(owned&&owned.value>bestValue){
-        bestValue=owned.value;bestIdx=idx;
-      }
-    }
-
-    let bucket=highestEligibleMapUpgradeBucket(c);
-    if(bucket&&bucket.value>bestValue){
-      bestValue=bucket.value;bestIdx=idx;
+    let owned=highestEligibleOwnedUpgradeBucket(c);
+    if(owned&&owned.value>bestValue){
+      bestValue=owned.value;bestIdx=idx;
     }
   });
   if(bestIdx<0)return false;
@@ -687,7 +681,11 @@ function playBestUpgradeCard(reason='autoplay fallback'){
 function useUtility(idx){
   let c=state.hand[idx];if(!c||state.done)return;
   if(c.type==='upgrade'){
-    if(!playUpgradeCard(idx,''))log('No valid chest at or below '+c.from+' for '+c.name+'.');
+    if(!state.collected.length){
+      log(c.name+' has no effect: no secured chest slots to upgrade. Board chests are not upgraded by hand cards.');
+    }else if(!playUpgradeCard(idx,'')){
+      log('No eligible secured chest at or below '+rarityLabel(c.from)+' for '+c.name+'. Board chests are not upgraded by hand cards.');
+    }
   }
   render();
 }
@@ -722,6 +720,20 @@ function movableActions(){
     }
   });
   return a;
+}
+function plannerActions(depth=comboDepthValue()){
+  let acts=movableActions();
+  const maxActs=depth>=4?14:depth>=3?18:24;
+  if(acts.length<=maxActs)return acts;
+  return acts.map(a=>{
+    const idx=actionTargetFrom(state.pos,a);
+    let sc=-9999;
+    if(idx>=0){
+      try{sc=tileScore(idx,null,plannerMode(depth)).score}catch(e){sc=-9999}
+    }
+    if(a.type==='current')sc+=1.5;
+    return {a,sc};
+  }).sort((x,y)=>y.sc-x.sc).slice(0,maxActs).map(x=>x.a);
 }
 function tileScore(i,ctx=null,mode='normal'){
   const sim=ctx||{
@@ -905,7 +917,7 @@ function seqScore(seq,depth=2){
   return{score:total,why,tiles,life:ctx.life,trapCount,death,mode};
 }
 function buildSequences(depth){
-  const acts=movableActions();
+  const acts=plannerActions(depth);
   const mode=plannerMode(depth);
   const out=[];
 
@@ -1454,6 +1466,43 @@ function finalTileRecoveryPlan(){
   }
   return best;
 }
+
+function setPlannerBusy(label){
+  state.autoStatus=label;
+  const notes=$('routeNotes');
+  if(notes)notes.innerHTML='<b>'+escapeHtml(label)+'</b>';
+  const text=$('floatingConfirmText');
+  if(text)text.textContent=label;
+  const rec=document.querySelector('.floatingRecommendBtn');
+  const auto=document.querySelector('.floatingAutoBtn');
+  if(rec)rec.disabled=true;
+  if(auto)auto.disabled=true;
+}
+function clearPlannerBusy(){
+  const rec=document.querySelector('.floatingRecommendBtn');
+  const auto=document.querySelector('.floatingAutoBtn');
+  if(rec)rec.disabled=false;
+  if(auto)auto.disabled=false;
+}
+function requestRecommendMove(){
+  if(!state||state.done||state.dead)return;
+  setPlannerBusy('Calculating recommended move...');
+  renderFloatingHandDock();
+  setTimeout(()=>{
+    try{suggestMove()}
+    finally{clearPlannerBusy();renderFloatingHandDock()}
+  },0);
+}
+function requestAutoPlay(limit=300){
+  if(!state||state.done||state.dead)return;
+  setPlannerBusy('Auto Play running...');
+  renderFloatingHandDock();
+  setTimeout(()=>{
+    try{autoPlay(limit)}
+    finally{clearPlannerBusy();renderFloatingHandDock()}
+  },0);
+}
+
 function suggestMove(){
   if(isSpecialBoard1()){
     suggested=special1ChooseAction();
@@ -1479,6 +1528,10 @@ function suggestMove(){
   let opts=buildSequences(depth).sort((a,b)=>b.score-a.score);
   suggested=opts[0]||null;
   if(!suggested){$('routeNotes').innerHTML='No legal move options.';render();return}
+  if(boardType()==='special3'&&suggested){
+    suggested.why=(suggested.why||[]).concat(['Special strategy: '+(specialStrategyEntry()?.label||specialStrategyEntry()?.title||'Special 3')]);
+    suggested.mode=suggested.mode? suggested.mode+' + special3' : 'special3';
+  }
   render();
 }
 function takeSuggestion(){if(!suggested){suggestMove();if(!suggested)return}selected=suggested.first;let tgt=targetFor(selected);if(tgt<0)return;clickTile(tgt)}
@@ -1984,7 +2037,12 @@ function activeStrategyList(){
   return strategyList();
 }
 function strategyByIdAny(id){
-  return STRATEGIES[id]||activeStrategyList().find(s=>s.id===id)||specialStrategyList('special1').find(s=>s.id===id)||specialStrategyList('special2').find(s=>s.id===id)||null;
+  return STRATEGIES[id]
+    || activeStrategyList().find(s=>s.id===id)
+    || specialStrategyList('special1').find(s=>s.id===id)
+    || specialStrategyList('special2').find(s=>s.id===id)
+    || specialStrategyList('special3').find(s=>s.id===id)
+    || null;
 }
 function strategyMetricTable(s){
   const m=s.metrics||{};
@@ -2010,9 +2068,20 @@ function strategyMetricTable(s){
 function renderStrategyDropdown(){
   const sel=$('strategyInput');
   if(!sel)return;
-  const current=sel.value||STRATEGY_DATA.defaultStrategy;
-  sel.innerHTML=strategyList().map(s=>'<option value="'+escapeHtml(s.id)+'">'+escapeHtml(s.label||s.title||s.id)+'</option>').join('');
-  sel.value=STRATEGIES[current]?current:(STRATEGY_DATA.defaultStrategy||strategyList()[0]?.id||'');
+  const current=sel.value;
+  const bt=boardType();
+  const list=activeStrategyList();
+  sel.innerHTML=list.map(s=>'<option value="'+escapeHtml(s.id)+'">'+escapeHtml(s.label||s.title||s.id)+'</option>').join('');
+  const ids=list.map(s=>s.id);
+  let desired=current&&ids.includes(current)?current:null;
+  if(!desired&&bt&&bt!=='normal'){
+    const specialDefault=(SPECIAL_STRATEGY_DATA?.defaultByBoard||{})[bt];
+    desired=ids.includes(specialDefault)?specialDefault:(ids[0]||'');
+  }
+  if(!desired){
+    desired=ids.includes(STRATEGY_DATA.defaultStrategy)?STRATEGY_DATA.defaultStrategy:(ids[0]||'');
+  }
+  sel.value=desired;
 }
 function renderStrategyCards(){
   const wrap=$('strategyCards');

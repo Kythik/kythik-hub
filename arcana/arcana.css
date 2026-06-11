@@ -3347,3 +3347,11 @@ body.arcana-page .board {
 .arcana-page.visual-fork .strategyWalkthrough li{
   margin-bottom:6px;
 }
+
+
+/* ARCANA VISUAL SITE V1.23 — Planner status / disabled buttons */
+.arcana-page.visual-fork .floatingDockActions button:disabled{
+  opacity:.55 !important;
+  cursor:wait !important;
+  filter:saturate(.75);
+}
