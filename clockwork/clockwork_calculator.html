@@ -786,6 +786,17 @@ function roulBlock(gearsVal,rdist,base){
   const maxCog=isAvg?6:parseInt(gearsVal);
   const dl=rdist===RDIST_HIGH?'high rarity (observed, unverified)':'expected (conservative)';
   let h=`<div class="roul-block"><div class="roul-header">Dist: <span style="color:#a78bfa">${dl}</span> · Compounding 10% fail per cog start · Fail = entire event ends · <span style="color:var(--gold-muted)">Math says: always go to max cogs</span> <button onclick="showRouletteLightbox()" style="background:transparent;border:none;color:var(--blue-light);font-size:10px;cursor:pointer;padding:0;margin-left:4px">why? ↗</button></div>`;
+  h+=`<div style="background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.25);border-radius:var(--radius);padding:8px 10px;margin:6px 0">
+    <div style="font-size:10px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Encounter Reality (~1 per 100 maps · 43% wipe rate)</div>
+    <div style="display:grid;grid-template-columns:60px 70px 1fr;gap:2px 10px;font-size:11px;margin-bottom:5px">
+      <span style="color:var(--text-faint)">Maps</span><span style="color:var(--text-faint)">Avg seen</span><span style="color:var(--text-faint)">Chance of net profit</span>
+      <span style="color:var(--text-muted)">50</span><span style="color:var(--text-muted)">~0.5</span><span style="color:var(--red-loss)">~20% — most sessions zero</span>
+      <span style="color:var(--text-muted)">100</span><span style="color:var(--text-muted)">~1</span><span style="color:var(--orange-fire)">~41% — coin flip</span>
+      <span style="color:var(--text-muted)">500</span><span style="color:var(--text-muted)">~5</span><span style="color:var(--gold-muted)">~93% — ~1 full season</span>
+      <span style="color:var(--text-muted)">1000</span><span style="color:var(--text-muted)">~10</span><span style="color:var(--green-recording)">~99% — multiple seasons</span>
+    </div>
+    <div style="font-size:10px;color:var(--red-loss)">EV is mathematically correct. Variance is the real problem — most players will not map enough in one season for Roulette to reliably pay off.</div>
+  </div>`;
   h+=`<div class="roul-row roul-row-head"><span class="roul-cog">Cash out</span><span class="roul-p">P(survive)</span><span class="roul-ev">EV vs base</span><span class="roul-v">Vouchers</span></div>`;
   for(let cog=1;cog<=maxCog;cog++){
     const ps=Math.pow(0.90,cog);
@@ -799,24 +810,23 @@ function roulBlock(gearsVal,rdist,base){
     h+=`<div class="roul-row"><span class="roul-cog">Cog ${cog}</span><span class="roul-p">${(ps*100).toFixed(1)}%</span><span class="${tR.c} tier" style="font-size:12px">${tR.l}</span><div class="ev-bar-wrap"><div class="ev-bar" style="width:${bwR}px"></div></div><span class="roul-v">${tv}v</span></div>`;
   }
   h+=`<div class="roul-note">Conservative dist: cog 4+ for positive EV at average baseline. High rarity: may be positive earlier. Roulette voucher rarity distribution is unverified — this is the biggest unknown in the ranking.</div>`;
-  h+=`<div style="margin-top:10px;border-top:1px solid var(--border-blue);padding-top:10px">
-    <div style="font-size:10px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Encounter Reality (~1 per 100 maps · 43% wipe rate)</div>
-    <div style="display:grid;grid-template-columns:auto 1fr 1fr;gap:3px 12px;font-size:11px;margin-bottom:6px">
-      <span style="color:var(--text-faint)">Maps</span><span style="color:var(--text-faint)">Avg seen</span><span style="color:var(--text-faint)">Cumulative profit chance</span>
-      <span style="color:var(--text-muted)">50</span><span style="color:var(--text-muted)">~0.5</span><span style="color:var(--red-loss)">~20%</span>
-      <span style="color:var(--text-muted)">100</span><span style="color:var(--text-muted)">~1</span><span style="color:var(--orange-fire)">~41%</span>
-      <span style="color:var(--text-muted)">500</span><span style="color:var(--text-muted)">~5</span><span style="color:var(--gold-muted)">~93% — ~1 full season</span>
-      <span style="color:var(--text-muted)">1000</span><span style="color:var(--text-muted)">~10</span><span style="color:var(--green-recording)">~99% — multiple seasons</span>
-    </div>
-    <div style="font-size:10px;color:var(--red-loss)">EV is correct. Variance is the problem. Most players will not map enough in a single season for Roulette to reliably pay off.</div>
-    <button onclick="showRouletteLightbox()" style="background:transparent;border:none;color:var(--blue-light);font-size:10px;cursor:pointer;padding:0;margin-top:4px;display:block">full analysis ↗</button>
-  </div>`;
   return h+'</div>';
 }
 
 function id23Block(gearsVal,base,nodeWasteful,nodeOstentatious,nodeCb59){
   const n=gearsVal==='avg'?6:parseInt(gearsVal);
   let h=`<div class="id23-block"><div class="roul-header">Early end (cogs 1 to n-1): safe cashout, bypasses podium. Full completion (last cog): normal podium turnin, all procs fire. <button onclick="showId23Lightbox()" style="background:transparent;border:none;color:var(--blue-light);font-size:10px;cursor:pointer;padding:0;margin-left:4px">how this works ↗</button></div>`;
+  h+=`<div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:var(--radius);padding:8px 10px;margin-bottom:8px">
+    <div style="font-size:10px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Encounter Reality (~12.5% per map · safe cashout)</div>
+    <div style="display:grid;grid-template-columns:60px 70px 1fr;gap:2px 10px;font-size:11px;margin-bottom:5px">
+      <span style="color:var(--text-faint)">Maps</span><span style="color:var(--text-faint)">Avg seen</span><span style="color:var(--text-faint)">Chance of net profit</span>
+      <span style="color:var(--text-muted)">50</span><span style="color:var(--text-muted)">~6</span><span style="color:var(--green-recording)">~100% — reliable every session</span>
+      <span style="color:var(--text-muted)">100</span><span style="color:var(--text-muted)">~12</span><span style="color:var(--green-recording)">~100%</span>
+      <span style="color:var(--text-muted)">500</span><span style="color:var(--text-muted)">~62</span><span style="color:var(--green-recording)">~100%</span>
+      <span style="color:var(--text-muted)">1000</span><span style="color:var(--text-muted)">~125</span><span style="color:var(--green-recording)">~100%</span>
+    </div>
+    <div style="font-size:10px;color:var(--green-recording)">Safe cashout means you never truly lose a map. Reliable value every session — unlike Roulette.</div>
+  </div>`;
   h+=`<div class="id23-row roul-row-head"><span class="id23-outcome">Outcome</span><span class="id23-prob">Prob</span><span class="id23-ev">Tier</span></div>`;
   for(let k=1;k<=n;k++){
     const p=k<n?Math.pow(0.90,k-1)*0.10:Math.pow(0.90,n);
@@ -837,18 +847,6 @@ function id23Block(gearsVal,base,nodeWasteful,nodeOstentatious,nodeCb59){
     const podiumNote=k===n&&podiumBonus>0?' (+podium)':'';
     h+=`<div class="id23-row"><span class="id23-outcome">${label}${podiumNote}</span><span class="id23-prob">${(p*100).toFixed(1)}%</span><span class="${t23.c} tier" style="font-size:12px">${t23.l}</span><div class="ev-bar-wrap"><div class="ev-bar" style="width:${bw23}px"></div></div></div>`;
   }
-  h+=`<div style="margin-top:10px;border-top:1px solid var(--border-blue);padding-top:10px">
-    <div style="font-size:10px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Encounter Reality (~12.5% per map · safe cashout)</div>
-    <div style="display:grid;grid-template-columns:auto 1fr 1fr;gap:3px 12px;font-size:11px;margin-bottom:6px">
-      <span style="color:var(--text-faint)">Maps</span><span style="color:var(--text-faint)">Avg seen</span><span style="color:var(--text-faint)">Cumulative profit chance</span>
-      <span style="color:var(--text-muted)">50</span><span style="color:var(--text-muted)">~6</span><span style="color:var(--green-recording)">~100%</span>
-      <span style="color:var(--text-muted)">100</span><span style="color:var(--text-muted)">~12</span><span style="color:var(--green-recording)">~100%</span>
-      <span style="color:var(--text-muted)">500</span><span style="color:var(--text-muted)">~62</span><span style="color:var(--green-recording)">~100%</span>
-      <span style="color:var(--text-muted)">1000</span><span style="color:var(--text-muted)">~125</span><span style="color:var(--green-recording)">~100%</span>
-    </div>
-    <div style="font-size:10px;color:var(--green-recording)">Reliable every session regardless of how many maps you run. Safe cashout means you never truly lose a map — unlike Roulette.</div>
-    <button onclick="showId23Lightbox()" style="background:transparent;border:none;color:var(--blue-light);font-size:10px;cursor:pointer;padding:0;margin-top:4px;display:block">full analysis ↗</button>
-  </div>`;
   return h+'</div>';
 }
 
