@@ -72,7 +72,53 @@
           "lossRate": 0.14572
         }
       },
-      "summary": "This now represents your actual normal-board route more accurately than the earlier write-up: strong value routing, disciplined chest quality, and practical upgrade pressure."
+      "summary": "This now represents your actual normal-board route more accurately than the earlier write-up: strong value routing, disciplined chest quality, and practical upgrade pressure.",
+      "profile": "This is the clarified Kythik route: play for real value instead of blindly collecting every chest. It favors chest quality, useful upgrade lines, and efficient mystery/card tiles. It is not pure 7-chest greed; it is the practical route you were describing, but now expressed more accurately in the solver.",
+      "cardSummary": "Your clarified route: value-first chest quality, smart upgrades, and practical routing.",
+      "notes": [
+        [
+          "Identity",
+          "This is the strategy we are treating as what you were actually doing, just explained correctly."
+        ],
+        [
+          "Core idea",
+          "Do not blindly fill chest slots. Take value-positive chests, preserve room when quality can improve, and use upgrades when they actually convert into payoff."
+        ],
+        [
+          "Strength",
+          "Very close to the best discovered EV profile while remaining human-readable and practical."
+        ],
+        [
+          "Weakness",
+          "Slightly lower 7-chest completion than the more chest-count leaning profile."
+        ]
+      ],
+      "walkthrough": [
+        {
+          "heading": "Early board",
+          "steps": [
+            "Take efficient chest access, but do not overvalue weak chest filler.",
+            "Pick up cards and mystery tiles when they improve routing or upgrade access.",
+            "Avoid empty tiles hard unless they unlock a clearly better line."
+          ]
+        },
+        {
+          "heading": "Mid board",
+          "steps": [
+            "Use upgrade cards when they create meaningful chest quality gains.",
+            "Backtrack for value recovery instead of treating backtracking as a panic button.",
+            "Prefer controlled value over forcing 7 chests at any cost."
+          ]
+        },
+        {
+          "heading": "Late board",
+          "steps": [
+            "Stop chasing low-value mystery lines too late.",
+            "Protect upgraded chest value.",
+            "Finish with the best value package available, not necessarily the prettiest full board."
+          ]
+        }
+      ]
     },
     "Kythiks": {
       "label": "Best Found",
@@ -138,7 +184,53 @@
           "lossRate": 0.18284
         }
       },
-      "summary": "The strongest discovered normal-board profile in the retune. It edges out the clarified Kythik route on average value and is the new top-end recommendation when you want the best tested EV."
+      "summary": "The strongest discovered normal-board profile in the retune. It edges out the clarified Kythik route on average value and is the new top-end recommendation when you want the best tested EV.",
+      "profile": "This is the new Best Found strategy from the discovery and retune pass. It is the strongest tested normal-board profile by average value. It plays a more aggressive value-tempo style than the clarified Kythik route: it takes efficient early payoff, pushes upgrade conversion harder, avoids empty movement hard, and cuts off weak late mystery chasing.",
+      "cardSummary": "The strongest discovered route: highest tested EV, aggressive value tempo, upgrade-heavy payoff.",
+      "notes": [
+        [
+          "Identity",
+          "This is the new solver-found profile that tested slightly better than the clarified Kythik route."
+        ],
+        [
+          "Core idea",
+          "Convert movement into value as early as possible, then use upgrades and routing pressure to raise chest quality."
+        ],
+        [
+          "Strength",
+          "Highest average value in the 25,000 paired-seed finalist retest."
+        ],
+        [
+          "Weakness",
+          "It may look less intuitive than a human route because it is optimizing expected value rather than a clean-looking board."
+        ]
+      ],
+      "walkthrough": [
+        {
+          "heading": "Early board",
+          "steps": [
+            "Prioritize value tempo over pretty pathing.",
+            "Take efficient chests and useful card/mystery access.",
+            "Avoid empty tiles more aggressively than older profiles."
+          ]
+        },
+        {
+          "heading": "Mid board",
+          "steps": [
+            "Spend upgrade cards aggressively when the gain is real.",
+            "Do not sit on value tools waiting for a perfect future.",
+            "Use value recovery backtracking to convert awkward movement into payoff."
+          ]
+        },
+        {
+          "heading": "Late board",
+          "steps": [
+            "Cut weak late mystery chasing.",
+            "Favor secured upgraded chest value.",
+            "Accept that the best EV line may not always maximize visible chest count."
+          ]
+        }
+      ]
     },
     "Seven_Chests_Rarity": {
       "label": "7 Chests → Rarity",
@@ -204,7 +296,53 @@
           "lossRate": 0.15828
         }
       },
-      "summary": "The completion-leaning finalist. It still cares about value, but carries the strongest 7-chest completion rate among the final retuned policies."
+      "summary": "The completion-leaning finalist. It still cares about value, but carries the strongest 7-chest completion rate among the final retuned policies.",
+      "profile": "This is the completion-leaning profile. It still uses the retuned value model, but it cares more about reaching 7 chests than the other two. Use it when you want the strongest 7-chest completion behavior among the normal-board finalists, while still preserving enough quality logic to avoid pure low-value chest spam.",
+      "cardSummary": "Completion-leaning route: best 7-chest rate among the retuned normal-board finalists.",
+      "notes": [
+        [
+          "Identity",
+          "This is the 7-chest leaning public strategy."
+        ],
+        [
+          "Core idea",
+          "Push chest count harder, but still avoid treating every low chest as equally good."
+        ],
+        [
+          "Strength",
+          "Highest 7-chest rate among the three visible normal-board strategies."
+        ],
+        [
+          "Weakness",
+          "Lower average value than Best Found and slightly lower value than the clarified Kythik route."
+        ]
+      ],
+      "walkthrough": [
+        {
+          "heading": "Early board",
+          "steps": [
+            "Secure chest access sooner than the other profiles.",
+            "Still pick up strong upgrade/card support when it improves the final chest package.",
+            "Avoid pure empty movement unless it unlocks chest count."
+          ]
+        },
+        {
+          "heading": "Mid board",
+          "steps": [
+            "Balance upgrades against the need to finish chest slots.",
+            "Prefer routes that keep 7-chest completion alive.",
+            "Use backtracking to recover value and access missed chest opportunities."
+          ]
+        },
+        {
+          "heading": "Late board",
+          "steps": [
+            "Finish the chest package when possible.",
+            "Do not throw away a nearly complete 7-chest line for marginal value.",
+            "Accept slightly lower EV in exchange for better completion pressure."
+          ]
+        }
+      ]
     }
   }
 }
