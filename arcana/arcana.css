@@ -2696,3 +2696,135 @@ body.arcana-page .board {
     max-width:calc(100vw - 18px) !important;
   }
 }
+
+
+/* ═══════════════════════════════════════════
+   ARCANA VISUAL SITE V1.6 — Full hand dock, no scroll
+   Shows the full stored hand without horizontal scrolling.
+   Random/refilling card is pinned at the far right.
+   ═══════════════════════════════════════════ */
+.arcana-page.visual-fork .boardFrame > .floatingHandDock{
+  width:var(--dock-width, min(1280px, calc(100vw - 30px))) !important;
+  max-width:var(--dock-width, min(1280px, calc(100vw - 30px))) !important;
+}
+
+/* The bounds now use the game panel width, so the dock can hold the full hand. */
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandInner{
+  grid-template-columns:1fr !important;
+  gap:10px !important;
+  padding:12px 14px !important;
+}
+
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandRows{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto minmax(210px,270px) !important;
+  gap:12px !important;
+  align-items:center !important;
+}
+
+/* Stored hand: no carousel. Wrap to show every card. */
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCards{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:8px !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  overflow:visible !important;
+  padding:0 !important;
+  min-width:0 !important;
+  scrollbar-width:none !important;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCards::-webkit-scrollbar{
+  display:none !important;
+}
+
+/* Smaller game-card tiles so 11 stored cards can fit/wrap cleanly. */
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard{
+  width:62px !important;
+  min-width:62px !important;
+  max-width:62px !important;
+  min-height:78px !important;
+  padding:8px 6px 6px !important;
+  border-radius:11px !important;
+}
+
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingMoveCard.randomCard{
+  width:82px !important;
+  min-width:82px !important;
+  max-width:82px !important;
+  min-height:86px !important;
+  padding:8px 7px 7px !important;
+  border-color:rgba(230,199,122,.62) !important;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(230,199,122,.30), transparent 36%),
+    linear-gradient(180deg, rgba(66,50,24,.98), rgba(13,17,31,.98)) !important;
+  box-shadow:
+    0 0 0 1px rgba(230,199,122,.25),
+    0 12px 26px rgba(0,0,0,.42),
+    inset 0 0 20px rgba(230,199,122,.08) !important;
+}
+
+.arcana-page.visual-fork .floatingCardKicker{
+  font-size:8px !important;
+}
+
+.arcana-page.visual-fork .floatingCardName{
+  font-size:11px !important;
+}
+
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingMoveCard.randomCard .floatingCardKicker{
+  color:#E6C77A !important;
+}
+
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingMoveCard.randomCard .floatingCardName{
+  font-size:12px !important;
+}
+
+/* Confirm panel is compact and stays to the right of random card. */
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingConfirmPanel{
+  min-width:210px !important;
+  max-width:270px !important;
+  border-left:1px solid rgba(230,199,122,.16) !important;
+  border-top:0 !important;
+  padding:0 0 0 12px !important;
+}
+
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingConfirmText{
+  -webkit-line-clamp:3 !important;
+}
+
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingConfirmBtn{
+  min-height:42px !important;
+}
+
+/* Medium widths: cards still show all, confirm drops below rather than creating scroll. */
+@media(max-width:1180px){
+  .arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandRows{
+    grid-template-columns:minmax(0,1fr) auto !important;
+  }
+  .arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingConfirmPanel{
+    grid-column:1 / -1;
+    max-width:none !important;
+    min-width:0 !important;
+    border-left:0 !important;
+    border-top:1px solid rgba(230,199,122,.16) !important;
+    padding:9px 0 0 0 !important;
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) auto !important;
+    gap:10px !important;
+    align-items:center !important;
+  }
+}
+
+/* Small screens: preserve no-scroll by wrapping vertically. */
+@media(max-width:720px){
+  .arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandRows{
+    grid-template-columns:1fr !important;
+  }
+  .arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingMoveCard.randomCard{
+    justify-self:end;
+  }
+  .arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingConfirmPanel{
+    grid-template-columns:1fr !important;
+  }
+}

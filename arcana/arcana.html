@@ -186,8 +186,8 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
       <span class="floatingHandHint">Current move + stored hand</span>
     </div>
     <div class="floatingHandRows">
-      <button class="floatingMoveCard" id="floatingCurrentMoveBtn" onclick="selectCurrentMove()">Move —</button>
       <div class="floatingHandCards" id="floatingHand"></div>
+      <button class="floatingMoveCard randomCard" id="floatingCurrentMoveBtn" onclick="selectCurrentMove()">Random Move —</button>
       <div class="floatingConfirmPanel">
         <div class="floatingConfirmText" id="floatingConfirmText">Select a card to preview its landing tile.</div>
         <button class="floatingConfirmBtn" id="floatingConfirmMoveBtn" onclick="confirmPendingMove()" disabled>Confirm Use</button>
@@ -1809,7 +1809,7 @@ function renderLootColumns(){
 
 function updateFloatingDockBounds(){
   const dock=$('floatingHandDock');
-  const boardFrame=document.querySelector('.boardFrame');
+  const boardFrame=document.querySelector('.gamePanel')||document.querySelector('.boardFrame');
   if(!dock||!boardFrame)return;
   const rect=boardFrame.getBoundingClientRect();
   const pad=12;
@@ -1844,8 +1844,8 @@ function renderFloatingHandDock(){
   dock.classList.toggle('open',active);
   dock.classList.toggle('hasCards',state.hand&&state.hand.length>0);
   dock.classList.toggle('hasPendingMove',!!pendingMove);
-  moveBtn.innerHTML=`<span class="floatingCardKicker">Current</span><span class="floatingCardName">Move ${state.currentMove}</span>`;
-  moveBtn.className='floatingMoveCard current kind-move '+(selected&&selected.type==='current'?'selected':'');
+  moveBtn.innerHTML=`<span class="floatingCardKicker">Random refill</span><span class="floatingCardName">Move ${state.currentMove}</span>`;
+  moveBtn.className='floatingMoveCard randomCard current kind-move '+(selected&&selected.type==='current'?'selected':'');
   handRoot.innerHTML=state.hand.map((c,i)=>{
     const meta=floatingCardMeta(c);
     return `<button class="floatingHandCard kind-${meta.kind} ${selected&&selected.type==='hand'&&selected.idx===i?'selected':''}" onclick="selectHand(${i})"><span class="floatingCardKicker">${meta.kicker}</span><span class="floatingCardName">${c.name}</span></button>`;
