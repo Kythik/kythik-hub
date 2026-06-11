@@ -246,7 +246,8 @@ select:focus{border-color:var(--gold-muted)}
 <div class="main">
 
 
-  <div class="slabel">Setup</div>
+  <div class="ctrl-card">
+  <div class="ctrl-card-title">Setup</div>
   <div class="ctrls">
     <div class="ctrl-group">
       <label>Cogwheels</label>
@@ -390,8 +391,7 @@ select:focus{border-color:var(--gold-muted)}
   </div>
 </div>
 
-<div class="slabel">Service Rankings</div>
-  <div class="tbl-wrap"><table class="svc-table tbl-sticky">
+<div class="tbl-wrap"><table class="svc-table tbl-sticky">
     <thead>
       <tr>
         <th style="width:24px">#</th>
@@ -967,14 +967,10 @@ function render(){
       <td><div class="ev-bar-wrap"><div class="ev-bar" style="width:${Math.min(bw,100)}px;max-width:100px"></div><span style="font-size:10px;color:var(--text-faint);margin-left:4px">${bw}% of top</span></div></td>
     `;
     tbody.appendChild(tr);
-    if(i>0&&svcs[i-1].tier!==s.tier){
+    if(i===0||svcs[i-1].tier!==s.tier){
       const sepRow=document.createElement('tr');
       sepRow.innerHTML=`<td colspan="5" style="padding:0"><div class="tier-sep-label">${s.tier} Tier</div></td>`;
       tbody.insertBefore(sepRow,tr);
-    } else if(i===0){
-      const firstSep=document.createElement('tr');
-      firstSep.innerHTML=`<td colspan="5" style="padding:0"><div class="tier-sep-label">${s.tier} Tier</div></td>`;
-      tbody.insertBefore(firstSep,tr);
     }
   });
 
