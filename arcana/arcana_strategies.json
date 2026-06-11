@@ -1,8 +1,9 @@
 {
-  "defaultStrategy": "Kythiks",
+  "defaultStrategy": "Math_Says_Best",
   "version": "normal_board_retuned_v2_25000",
   "notes": [
     "Normal-board autoplay strategies retuned after broad discovery, local mutation search, and 25,000 paired-seed finalist validation.",
+    "Only the three public normal-board strategies are displayed.",
     "Autoplay assumes value recovery backtracking.",
     "Special board strategy JSON is unchanged in this package."
   ],
@@ -204,141 +205,6 @@
         }
       },
       "summary": "The completion-leaning finalist. It still cares about value, but carries the strongest 7-chest completion rate among the final retuned policies."
-    },
-    "Old_Discovered_Best": {
-      "label": "Old Discovered Best",
-      "kicker": "Previous v1 winner",
-      "role": "Kept for comparison",
-      "sourcePolicy": "random_policy_015",
-      "weights": {
-        "q": 5.373500348126823,
-        "chest": 1.4293442075833318,
-        "low_chest_penalty": 0.36427625353210913,
-        "purple_bonus": 5.977470771869479,
-        "gold_bonus": 14.119672263138389,
-        "upgrade": 1.875151470956053,
-        "card": 2.5549209126498607,
-        "life": 0.4620672734490411,
-        "low_life": 6.798959575017025,
-        "trap": 12.967181570884764,
-        "empty": -9.412707944245616,
-        "q_after4": 3.6987272460116056,
-        "q_late": 0.974294692487879,
-        "upgrade_bias": 2.089897331820201,
-        "chest_count_bias": 4.621385949547245,
-        "distance_cost": 0.10294218972977244,
-        "avoid_low_chests_after": 2,
-        "late_low_chest_penalty": 8.342257785987012,
-        "upgrade_card_lookahead": 12,
-        "upgrade_card_min_gain": 1.090770140241799,
-        "pre_move_upgrade_always": true
-      },
-      "metrics": {
-        "source": "normal_board_tune_highconf_v2_stageC_25000_paired_seeds",
-        "runs": 25000,
-        "avgValue": 23.18716,
-        "medianValue": 20.0,
-        "p25Value": 11.0,
-        "p75Value": 31.2,
-        "completion7Rate": 0.1188,
-        "deadRate": 0.0,
-        "avgChests": 3.9616,
-        "avgQuestions": 2.07768,
-        "avgQuestionFizzle": 0.06696,
-        "avgUpgradeCardsUsed": 3.73448,
-        "avgTrapsHit": 1.0202,
-        "avgLifeEnd": 6.09176,
-        "avgRainbow": 0.07888,
-        "avgRed": 0.26672,
-        "avgGold": 0.99636,
-        "avgPurple": 1.42272,
-        "rankByAvgValue": 8,
-        "rankByCompletion7": 8,
-        "pairwiseVsOldKythiks": {
-          "avgDelta": 12.12908,
-          "medianDelta": 10.0,
-          "winRate": 0.80044,
-          "tieRate": 0.04688,
-          "lossRate": 0.15268
-        },
-        "pairwiseVsRandomPolicy015": {
-          "avgDelta": 0.0,
-          "medianDelta": 0.0,
-          "winRate": 0.0,
-          "tieRate": 1.0,
-          "lossRate": 0.0
-        }
-      },
-      "summary": "The first discovery-pass winner. Still strong, but the v2 local search found materially better finalists."
-    },
-    "Old_Public_Baseline": {
-      "label": "Old Public Baseline",
-      "kicker": "Comparison only",
-      "role": "Original public strategy baseline",
-      "sourcePolicy": "Kythiks",
-      "weights": {
-        "q": 10,
-        "chest": 1.0,
-        "low_chest_penalty": 6,
-        "purple_bonus": 12,
-        "gold_bonus": 18,
-        "upgrade": 7,
-        "card": 3,
-        "life": 2,
-        "low_life": 8,
-        "trap": 20,
-        "empty": -6,
-        "q_after4": 4,
-        "q_late": -1,
-        "upgrade_bias": 1.45,
-        "chest_count_bias": 0.5,
-        "distance_cost": 0.25,
-        "value_target_min_rank": 2,
-        "value_target_count": 4,
-        "target_before_tile": 60,
-        "target_bonus": 9,
-        "target_deficit_bonus": 1.25,
-        "q_before_target": 3,
-        "q_after_target": 10,
-        "low_chest_extra_penalty_after_target": 2
-      },
-      "metrics": {
-        "source": "normal_board_tune_highconf_v2_stageC_25000_paired_seeds",
-        "runs": 25000,
-        "avgValue": 11.05808,
-        "medianValue": 6.2,
-        "p25Value": 2.0,
-        "p75Value": 15.2,
-        "completion7Rate": 0.02576,
-        "deadRate": 0.0,
-        "avgChests": 2.37804,
-        "avgQuestions": 1.63572,
-        "avgQuestionFizzle": 0.09044,
-        "avgUpgradeCardsUsed": 1.8506,
-        "avgTrapsHit": 0.16704,
-        "avgLifeEnd": 6.3552,
-        "avgRainbow": 0.04796,
-        "avgRed": 0.11224,
-        "avgGold": 0.3622,
-        "avgPurple": 0.81904,
-        "rankByAvgValue": 9,
-        "rankByCompletion7": 9,
-        "pairwiseVsOldKythiks": {
-          "avgDelta": 0.0,
-          "medianDelta": 0.0,
-          "winRate": 0.0,
-          "tieRate": 1.0,
-          "lossRate": 0.0
-        },
-        "pairwiseVsRandomPolicy015": {
-          "avgDelta": -12.12908,
-          "medianDelta": -10.0,
-          "winRate": 0.15268,
-          "tieRate": 0.04688,
-          "lossRate": 0.80044
-        }
-      },
-      "summary": "The previous public weighting, kept only as a comparison baseline after the retune."
     }
   }
 }
