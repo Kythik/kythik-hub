@@ -259,11 +259,23 @@ let STRATEGY_CARD_DATA=null;
 let SPECIAL_STRATEGY_DATA=null;
 let SPECIAL_STRATEGY_CARD_DATA=null;
 let STRATEGIES={};
+function normalStrategyArray(data=STRATEGY_DATA){
+  const raw=data?.strategies||[];
+  if(Array.isArray(raw))return raw;
+  if(raw&&typeof raw==='object')return Object.entries(raw).map(([id,s])=>({id,...s}));
+  return [];
+}
+
 function mergeStrategyCards(){
-  const cardMap={};
-  (STRATEGY_CARD_DATA?.cards||[]).forEach(c=>{cardMap[c.id]=c;});
   STRATEGIES={};
-  (STRATEGY_DATA?.strategies||[]).forEach(s=>{STRATEGIES[s.id]=Object.assign({},s,cardMap[s.id]||{});});
+  normalStrategyArray(STRATEGY_DATA).forEach(s=>{
+    if(!s||!s.id)return;
+    STRATEGIES[s.id]={...s};
+  });
+  (STRATEGY_CARD_DATA?.cards||[]).forEach(c=>{
+    if(!c||!c.id)return;
+    STRATEGIES[c.id]={...(STRATEGIES[c.id]||{}),...c};
+  });
 }
 function applyStrategyCards(data){
   STRATEGY_CARD_DATA=data||clone(FALLBACK_STRATEGY_CARD_DATA);
@@ -1956,7 +1968,9 @@ window.addEventListener('scroll',updateFloatingDockBounds,{passive:true});
 function escapeHtml(s){
   return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
-function strategyList(){return (STRATEGY_DATA?.strategies||[]).map(s=>STRATEGIES[s.id]||s)}
+function strategyList(){
+  return normalStrategyArray(STRATEGY_DATA).map(s=>STRATEGIES[s.id]||s);
+}
 function specialStrategyList(board=boardType()){
   const cfg=specialBoardConfig(board);
   return cfg?(cfg.strategies||[]):[];
@@ -2039,7 +2053,7 @@ async function loadStrategyData(){
     const res=await fetch('arcana_strategies.json',{cache:'no-store'});
     if(!res.ok)throw new Error('HTTP '+res.status);
     const data=await res.json();
-    if(!data||!Array.isArray(data.strategies)||!data.strategies.length)throw new Error('Invalid strategy JSON');
+    if(!data||!data.strategies||!normalStrategyArray(data).length)throw new Error('Invalid strategy JSON');
     applyStrategyData(data);
     console.info('Loaded arcana_strategies.json');
   }catch(err){
