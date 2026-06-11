@@ -2439,3 +2439,212 @@ body.arcana-page .board {
     bottom:10px !important;
   }
 }
+
+
+/* ═══════════════════════════════════════════
+   ARCANA VISUAL SITE V1.4 — True floating card tiles
+   Fixed in-viewport dock, more like the game hand.
+   ═══════════════════════════════════════════ */
+.arcana-page.visual-fork{
+  padding-bottom:180px !important;
+}
+
+.arcana-page.visual-fork .boardFrame > .floatingHandDock{
+  position:fixed !important;
+  left:50% !important;
+  bottom:14px !important;
+  transform:translateX(-50%) !important;
+  width:min(1080px, calc(100vw - 30px)) !important;
+  max-width:calc(100vw - 30px);
+  margin:0 !important;
+  z-index:650 !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock.open{
+  opacity:1 !important;
+  pointer-events:auto !important;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock:not(.open){
+  opacity:0 !important;
+}
+
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandInner{
+  display:grid !important;
+  grid-template-columns: minmax(0,1fr) auto !important;
+  gap:14px !important;
+  align-items:end !important;
+  padding:14px 16px 12px !important;
+  border-radius:22px !important;
+  border:1px solid rgba(230,199,122,.30) !important;
+  background:linear-gradient(180deg, rgba(7,17,31,.54), rgba(4,8,15,.76)) !important;
+  box-shadow:0 18px 48px rgba(0,0,0,.42), 0 0 0 1px rgba(255,255,255,.035) inset !important;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandHead{
+  display:none !important;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandRows{
+  display:grid !important;
+  grid-template-columns:auto minmax(0,1fr) !important;
+  gap:12px !important;
+  align-items:end !important;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingConfirmPanel{
+  min-width:260px;
+  max-width:320px;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:8px !important;
+  border-left:1px solid rgba(230,199,122,.16) !important;
+  padding:4px 0 4px 14px !important;
+  background:transparent !important;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingConfirmText{
+  font-size:11px !important;
+  line-height:1.35 !important;
+  color:rgba(232,237,246,.82) !important;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingConfirmBtn{
+  min-height:48px !important;
+  width:100%;
+}
+
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingMoveCard,
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard{
+  min-height:92px !important;
+  width:76px;
+  min-width:76px !important;
+  max-width:76px !important;
+  padding:10px 8px 8px !important;
+  border-radius:12px !important;
+  border:1px solid rgba(200,164,93,.26) !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:6px;
+  white-space:normal !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+  text-align:center !important;
+  font-weight:800 !important;
+  position:relative;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingMoveCard::before,
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06), inset 0 10px 24px rgba(255,255,255,.04);
+  pointer-events:none;
+}
+.arcana-page.visual-fork .floatingCardKicker{
+  display:block;
+  font-size:9px;
+  line-height:1;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:rgba(230,199,122,.92);
+  font-weight:900;
+}
+.arcana-page.visual-fork .floatingCardName{
+  display:block;
+  font-size:13px;
+  line-height:1.05;
+  color:#F5F7FB;
+  font-weight:900;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingMoveCard.current,
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard.kind-move{
+  background:
+    radial-gradient(circle at 50% 18%, rgba(92,151,255,.26), transparent 34%),
+    linear-gradient(180deg, rgba(24,46,82,.98), rgba(8,18,36,.98)) !important;
+  border-color:rgba(100,151,234,.46) !important;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard.kind-back,
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard.kind-choice{
+  background:
+    radial-gradient(circle at 50% 18%, rgba(150,126,255,.22), transparent 34%),
+    linear-gradient(180deg, rgba(31,30,78,.98), rgba(10,12,34,.98)) !important;
+  border-color:rgba(140,129,231,.44) !important;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard.kind-upgrade{
+  background:
+    radial-gradient(circle at 50% 18%, rgba(230,199,122,.24), transparent 34%),
+    linear-gradient(180deg, rgba(72,48,19,.98), rgba(21,15,9,.98)) !important;
+  border-color:rgba(230,199,122,.52) !important;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard.kind-life{
+  background:
+    radial-gradient(circle at 50% 18%, rgba(95,200,255,.20), transparent 34%),
+    linear-gradient(180deg, rgba(23,60,82,.98), rgba(8,18,24,.98)) !important;
+  border-color:rgba(113,192,224,.46) !important;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard.kind-question,
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard.kind-utility{
+  background:
+    radial-gradient(circle at 50% 18%, rgba(236,236,255,.14), transparent 34%),
+    linear-gradient(180deg, rgba(33,38,62,.98), rgba(10,12,22,.98)) !important;
+  border-color:rgba(186,194,228,.32) !important;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCards{
+  display:flex !important;
+  gap:10px !important;
+  align-items:flex-end !important;
+  overflow-x:auto !important;
+  overflow-y:visible !important;
+  padding:2px 2px 8px !important;
+  scrollbar-width:thin;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingMoveCard:hover,
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard:hover{
+  transform:translateY(-6px) !important;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingMoveCard.selected,
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard.selected{
+  transform:translateY(-8px) !important;
+  border-color:#E6C77A !important;
+  box-shadow:0 0 0 1px rgba(230,199,122,.6), 0 12px 26px rgba(0,0,0,.45), 0 0 24px rgba(230,199,122,.22) !important;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingEmpty{
+  display:flex;
+  align-items:center;
+  min-height:92px;
+  padding:0 10px;
+}
+
+@media(max-width:980px){
+  .arcana-page.visual-fork{
+    padding-bottom:216px !important;
+  }
+  .arcana-page.visual-fork .boardFrame > .floatingHandDock{
+    width:calc(100vw - 18px) !important;
+    bottom:8px !important;
+  }
+  .arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandInner{
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+    padding:12px !important;
+  }
+  .arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandRows{
+    grid-template-columns:1fr !important;
+  }
+  .arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingConfirmPanel{
+    border-left:0 !important;
+    border-top:1px solid rgba(230,199,122,.16) !important;
+    padding:10px 0 0 0 !important;
+    max-width:none;
+    min-width:0;
+  }
+  .arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingMoveCard,
+  .arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard{
+    width:72px;
+    min-width:72px !important;
+    max-width:72px !important;
+    min-height:88px !important;
+  }
+}

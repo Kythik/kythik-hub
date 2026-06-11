@@ -1806,6 +1806,18 @@ function renderLootColumns(){
 }
 
 
+function floatingCardMeta(card){
+  const name=(card&&card.name)||'';
+  const lower=name.toLowerCase();
+  if(lower.startsWith('back')) return {kind:'back', kicker:'Backtrack'};
+  if(lower.startsWith('choose')) return {kind:'choice', kicker:'Choice'};
+  if(lower.startsWith('move')) return {kind:'move', kicker:'Advance'};
+  if(lower.includes('up ')||lower.startsWith('up')) return {kind:'upgrade', kicker:'Upgrade'};
+  if(lower.includes('life')) return {kind:'life', kicker:'Life'};
+  if(lower.includes('?')) return {kind:'question', kicker:'Mystery'};
+  return {kind:'utility', kicker:'Card'};
+}
+
 function renderFloatingHandDock(){
   const dock=$('floatingHandDock');
   const moveBtn=$('floatingCurrentMoveBtn');
@@ -1817,15 +1829,18 @@ function renderFloatingHandDock(){
   dock.classList.toggle('open',active);
   dock.classList.toggle('hasCards',state.hand&&state.hand.length>0);
   dock.classList.toggle('hasPendingMove',!!pendingMove);
-  moveBtn.textContent='Current Move '+state.currentMove;
-  moveBtn.className='floatingMoveCard '+(selected&&selected.type==='current'?'selected':'');
-  handRoot.innerHTML=state.hand.map((c,i)=>`<button class="floatingHandCard ${selected&&selected.type==='hand'&&selected.idx===i?'selected':''}" onclick="selectHand(${i})">${c.name}</button>`).join('')||'<span class="floatingEmpty">No stored cards.</span>';
+  moveBtn.innerHTML=`<span class="floatingCardKicker">Current</span><span class="floatingCardName">Move ${state.currentMove}</span>`;
+  moveBtn.className='floatingMoveCard current kind-move '+(selected&&selected.type==='current'?'selected':'');
+  handRoot.innerHTML=state.hand.map((c,i)=>{
+    const meta=floatingCardMeta(c);
+    return `<button class="floatingHandCard kind-${meta.kind} ${selected&&selected.type==='hand'&&selected.idx===i?'selected':''}" onclick="selectHand(${i})"><span class="floatingCardKicker">${meta.kicker}</span><span class="floatingCardName">${c.name}</span></button>`;
+  }).join('')||'<span class="floatingEmpty">No stored cards.</span>';
   if(confirmBtn){
     confirmBtn.disabled=!pendingMove;
     confirmBtn.textContent='Confirm Use';
   }
   if(confirmText){
-    confirmText.textContent=pendingMove?pendingMoveSummary():'Select a card to preview its landing tile.';
+    confirmText.textContent=pendingMove?pendingMoveSummary():'Select a card to preview the landing tile, then confirm use.';
   }
 }
 
