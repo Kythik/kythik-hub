@@ -1927,7 +1927,7 @@ function render(){
       let vt=spent?'empty':t.type;
       let vr=spent?'':(t.rarity||'');
       let displayIcon=spent?'':icon(t);
-      return `<button class="tile ${vt} ${spent?'spentEmpty':''} ${vt==='chest'?'chest chest-'+vr:''} ${vr} ${i<state.pos?'done':''} ${visit>=0?'landed':''} ${i===state.pos?'pos':''} ${targets.includes(i)?'reach':''} ${pendingMove&&i===pendingMove.idx?'pendingPreview':''} ${suggested&&i===suggested.idx?'suggest':''}" onclick="clickTile(${i})"><span class="n">${i+1}</span><span class="c">${displayIcon}</span>${land}${link}</button>`;
+      return `<button class="tile ${vt} ${spent?'spentEmpty':''} ${vt==='chest'?'chest chest-'+vr:''} ${vr} ${visit>=0?'landed':''} ${i===state.pos?'pos':''} ${targets.includes(i)?'reach':''} ${pendingMove&&i===pendingMove.idx?'pendingPreview':''} ${suggested&&i===suggested.idx?'suggest':''}" onclick="clickTile(${i})"><span class="n">${i+1}</span><span class="c">${displayIcon}</span>${land}${link}</button>`;
     }).join('');
     rows.push(`<div class="boardRow ${r%2?'reverse':'forward'}">${tileHtml}</div>`);
   }

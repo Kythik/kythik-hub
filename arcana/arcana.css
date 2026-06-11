@@ -3164,3 +3164,13 @@ body.arcana-page .board {
   opacity:1 !important;
   z-index:10;
 }
+
+
+/* ═══════════════════════════════════════════
+   ARCANA VISUAL SITE V1.13 — Do not grey passed-over tiles
+   Only landed tiles become spent/empty. Tiles skipped over stay readable.
+   ═══════════════════════════════════════════ */
+.arcana-page.visual-fork .tile.done:not(.landed):not(.spentEmpty){
+  opacity:1 !important;
+  filter:none !important;
+}
