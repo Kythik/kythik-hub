@@ -11,7 +11,7 @@
     display:none !important;
   }
 </style>
-<title>Arcana Tarot Minigame</title>
+<title>Arcana Tarot Minigame — Visual Site v1</title>
 <style id="arcana-board-layout-guard">
   .arcana-page .gamePanel{display:flex!important;justify-content:center!important;align-items:flex-start!important;overflow-x:auto}
   .arcana-page .boardFrame,.arcana-page .board{margin-left:auto!important;margin-right:auto!important}
@@ -23,7 +23,7 @@
   .arcana-page .rowEndLink.left{left:-18px;right:auto}
 </style>
 </head>
-<body class="arcana-page">
+<body class="arcana-page visual-fork">
 <div class="page-bg-img" aria-hidden="true"></div>
 
 <div class="resource-backline">
@@ -106,6 +106,14 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
     </div>
 
     <div class="stats" id="stats"></div>
+    <div class="lootStage" id="lootStage">
+      <div class="lootStageHead">
+        <h3>Reward chest slots</h3>
+        <div class="small">Live loot in the same 4 + 3 chest layout used by the game.</div>
+      </div>
+      <div class="lootColumns" id="lootColumns"></div>
+      <div class="lootLegend" id="lootLegend">No chests collected yet.</div>
+    </div>
     <div class="debugline" id="debugline">Loading...</div>
 
     <h3>Current refilling move card</h3>
@@ -1647,6 +1655,28 @@ function icon(t){
   if(t.type==='question')return '?';
   return '·';
 }
+
+function lootLevelLabel(r){
+  return ({green:'LV.1',blue:'LV.2',purple:'LV.3',orange:'LV.4',red:'LV.5',rainbow:'LV.6'})[r]||'—';
+}
+function lootPrettyName(r){
+  return ({green:'Green',blue:'Blue',purple:'Purple',orange:'Gold',red:'Ultimate',rainbow:'Rainbow'})[r]||'Empty';
+}
+function renderLootColumns(){
+  const root=$('lootColumns');
+  const legend=$('lootLegend');
+  if(!root||!state)return;
+  const slots=Array.from({length:7},(_,i)=>state.collected[i]||null);
+  const cols=[slots.slice(0,4),slots.slice(4,7)];
+  function slotHtml(r){
+    if(!r)return `<div class="lootChestSlot empty"><div class="lootChestMini"><span class="lootBands"></span></div><div class="lootMeta"><span class="lootLv">Empty</span><span class="lootName">Open slot</span></div></div>`;
+    const bandClass=r==='rainbow'?'lootBands rainbow':'lootBands';
+    return `<div class="lootChestSlot filled ${r}"><div class="lootChestMini ${r}"><span class="lootGem"></span><span class="${bandClass}"></span></div><div class="lootMeta"><span class="lootLv">${lootLevelLabel(r)}</span><span class="lootName">${lootPrettyName(r)}</span></div></div>`;
+  }
+  root.innerHTML=cols.map((col,idx)=>`<div class="lootCol ${idx===1?'right':''}">${col.map(slotHtml).join('')}</div>`).join('');
+  legend.textContent = state.collected.length ? ('Collected: ' + state.collected.map(lootPrettyName).join(' • ')) : 'No chests collected yet.';
+}
+
 function render(){
   if(!state)return;
   $('debugline').innerHTML='<b>Current landed tile:</b> '+(state.pos+1)+' / '+totalTiles+' &nbsp; <b>Current refill Move:</b> '+state.currentMove+' &nbsp; <b>Status:</b> '+(state.autoStatus||'—');
@@ -1678,6 +1708,7 @@ function render(){
     rows.push(`<div class="boardRow ${r%2?'reverse':'forward'}">${tileHtml}</div>`);
   }
   $('board').innerHTML=rows.join('');
+  renderLootColumns();
   $('log').innerHTML=state.log.map(x=>'<div>'+x+'</div>').join('');
   if(suggested){
     let rows=(suggested.tiles||[]).join(' → ');
