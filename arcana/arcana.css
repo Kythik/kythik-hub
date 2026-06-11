@@ -2828,3 +2828,155 @@ body.arcana-page .board {
     grid-template-columns:1fr !important;
   }
 }
+
+
+/* ═══════════════════════════════════════════
+   ARCANA VISUAL SITE V1.7 — Slide-up dock selector
+   Multiple landing choices slide up from the dock as card tiles.
+   ═══════════════════════════════════════════ */
+.arcana-page.visual-fork .boardFrame > .floatingHandDock{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:8px !important;
+}
+
+.arcana-page.visual-fork .floatingChoiceTray{
+  width:100%;
+  box-sizing:border-box;
+  border:1px solid rgba(230,199,122,.24);
+  border-radius:18px 18px 14px 14px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(230,199,122,.10), transparent 40%),
+    linear-gradient(180deg, rgba(11,21,36,.95), rgba(4,8,15,.985));
+  box-shadow:
+    0 -16px 42px rgba(0,0,0,.42),
+    inset 0 0 0 1px rgba(255,255,255,.035);
+  padding:10px 12px 12px;
+  transform:translateY(8px);
+  opacity:0;
+  transition:opacity .16s ease, transform .16s ease;
+}
+
+.arcana-page.visual-fork .floatingChoiceTray[hidden]{
+  display:none!important;
+}
+
+.arcana-page.visual-fork .floatingChoiceTray.open{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.arcana-page.visual-fork .floatingChoiceHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:9px;
+  color:var(--vf-gold-bright,#E6C77A);
+  font-family:var(--font-display,Cinzel,serif);
+  font-size:12px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+
+.arcana-page.visual-fork .floatingChoiceClose{
+  width:28px;
+  height:28px;
+  min-height:0;
+  padding:0;
+  border-radius:999px;
+  border:1px solid rgba(140,165,210,.24);
+  background:rgba(7,17,31,.76);
+  color:rgba(232,237,246,.88);
+  font-size:18px;
+  line-height:1;
+}
+
+.arcana-page.visual-fork .floatingChoiceCards{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  align-items:stretch;
+}
+
+.arcana-page.visual-fork .floatingChoiceCard{
+  flex:1 1 132px;
+  min-width:132px;
+  max-width:220px;
+  min-height:82px;
+  border-radius:13px;
+  border:1px solid rgba(200,164,93,.24);
+  background:
+    radial-gradient(circle at 50% 14%, rgba(200,164,93,.10), transparent 34%),
+    linear-gradient(180deg, rgba(15,28,50,.98), rgba(5,10,22,.99));
+  color:rgba(232,237,246,.92);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:8px;
+  text-align:left;
+  padding:10px;
+  box-shadow:0 10px 22px rgba(0,0,0,.28), inset 0 0 18px rgba(38,58,87,.10);
+}
+
+.arcana-page.visual-fork .floatingChoiceCard:hover{
+  transform:translateY(-3px);
+  border-color:rgba(230,199,122,.58);
+}
+
+.arcana-page.visual-fork .floatingChoiceCard.selected{
+  border-color:#E6C77A;
+  box-shadow:0 0 0 1px rgba(230,199,122,.55),0 0 22px rgba(230,199,122,.20),0 10px 22px rgba(0,0,0,.34);
+}
+
+.arcana-page.visual-fork .floatingChoiceTile{
+  display:block;
+  color:var(--vf-gold-bright,#E6C77A);
+  font-size:11px;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+  font-weight:900;
+}
+
+.arcana-page.visual-fork .floatingChoiceName{
+  display:block;
+  color:#F5F7FB;
+  font-size:12px;
+  line-height:1.25;
+  font-weight:800;
+}
+
+.arcana-page.visual-fork .floatingChoiceCard.kind-trap{
+  border-color:rgba(255,93,175,.38);
+  background:linear-gradient(180deg, rgba(62,23,32,.96), rgba(12,7,12,.99));
+}
+.arcana-page.visual-fork .floatingChoiceCard.kind-life{
+  border-color:rgba(85,215,255,.38);
+  background:linear-gradient(180deg, rgba(20,61,82,.96), rgba(6,14,22,.99));
+}
+.arcana-page.visual-fork .floatingChoiceCard.kind-question{
+  border-color:rgba(197,107,255,.38);
+  background:linear-gradient(180deg, rgba(38,28,76,.96), rgba(8,8,24,.99));
+}
+.arcana-page.visual-fork .floatingChoiceCard.kind-chest{
+  border-color:rgba(230,199,122,.40);
+}
+.arcana-page.visual-fork .floatingChoiceCard.kind-chest.red{
+  border-color:rgba(212,92,92,.52);
+}
+.arcana-page.visual-fork .floatingChoiceCard.kind-chest.rainbow{
+  border-color:rgba(240,220,255,.58);
+  background:linear-gradient(135deg, rgba(245,228,200,.18), rgba(208,244,255,.12), rgba(255,204,235,.10)), linear-gradient(180deg, rgba(18,28,48,.98), rgba(5,10,22,.99));
+}
+
+/* The old modal styles remain harmless, but this build should not use the lightbox for card choice. */
+.arcana-page.visual-fork .moveConfirmOverlay{
+  display:none!important;
+}
+
+@media(max-width:720px){
+  .arcana-page.visual-fork .floatingChoiceCard{
+    flex:1 1 100%;
+    max-width:none;
+  }
+}

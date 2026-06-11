@@ -33,21 +33,6 @@
 
 
 
-<div class="moveConfirmOverlay" id="moveConfirmOverlay" hidden>
-  <div class="moveConfirmBox" role="dialog" aria-modal="true" aria-labelledby="moveConfirmTitle">
-    <button class="moveConfirmClose" onclick="cancelPendingMove()" aria-label="Cancel move">×</button>
-    <div class="moveConfirmKicker">Choose target</div>
-    <h3 id="moveConfirmTitle">Choose target and confirm</h3>
-    <div class="moveConfirmBody" id="moveConfirmBody"></div>
-    <div class="moveOptionList" id="moveOptionList"></div>
-    <div class="moveConfirmActions">
-      <button class="alt" onclick="cancelPendingMove()">Cancel</button>
-      <button onclick="confirmPendingMove()">Confirm Use</button>
-    </div>
-  </div>
-</div>
-
-
 <section class="strategyDeck" aria-labelledby="strategyDeckTitle">
   <div class="strategyDeckHead">
     <div>
@@ -180,6 +165,13 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
       </div>
       <div class="board" id="board" style="margin-left:auto;margin-right:auto;"></div>
 <div class="floatingHandDock" id="floatingHandDock" aria-live="polite">
+  <div class="floatingChoiceTray" id="floatingChoiceTray" hidden>
+    <div class="floatingChoiceHead">
+      <span>Choose landing</span>
+      <button class="floatingChoiceClose" onclick="closeFloatingChoiceTray()" aria-label="Close target choices">×</button>
+    </div>
+    <div class="floatingChoiceCards" id="floatingChoiceCards"></div>
+  </div>
   <div class="floatingHandInner">
     <div class="floatingHandHead">
       <span class="floatingHandTitle">Cards in Play</span>
@@ -1515,42 +1507,62 @@ function pendingMoveSummary(){
   if(!pendingMove||!state)return 'Select a card to preview its landing tile.';
   return moveChoiceText(pendingMove.sel,pendingMove.idx);
 }
+
+function floatingChoiceCardHtml(sel,i,active=false){
+  const txt=moveChoiceText(sel,i);
+  const tile=state.tiles[i]||{};
+  const kind=tile.type==='chest'?('chest '+(tile.rarity||'')):tile.type;
+  const title='Tile '+(i+1);
+  const sub=txt.replace(selectedActionLabel(sel)+' → ','');
+  return `<button class="floatingChoiceCard ${active?'selected':''} kind-${kind}" data-target="${i}" onclick="choosePendingMoveTarget(${i})"><span class="floatingChoiceTile">${title}</span><span class="floatingChoiceName">${sub}</span></button>`;
+}
+function renderFloatingChoiceTray(targets=[],activeIdx=-1){
+  const tray=$('floatingChoiceTray');
+  const cards=$('floatingChoiceCards');
+  if(!tray||!cards)return;
+  if(!targets.length){
+    tray.hidden=true;
+    tray.classList.remove('open');
+    cards.innerHTML='';
+    return;
+  }
+  cards.innerHTML=targets.map(t=>floatingChoiceCardHtml(selected,t,t===activeIdx)).join('');
+  tray.hidden=false;
+  tray.classList.add('open');
+}
+function closeFloatingChoiceTray(){
+  const tray=$('floatingChoiceTray');
+  if(tray){
+    tray.hidden=true;
+    tray.classList.remove('open');
+  }
+}
+
 function openMoveSelector(i){
   if(!selected||state.done||state.dead)return;
   const targets=targetOptionsFor(selected);
   if(!targets.includes(i))return;
   pendingMove={sel:clone(selected),idx:i};
-  const overlay=$('moveConfirmOverlay'),body=$('moveConfirmBody'),list=$('moveOptionList'),title=$('moveConfirmTitle');
-  if(!overlay||!body||!list||!title)return;
-  title.textContent='Choose target and confirm';
-  body.innerHTML='<b>'+selectedActionLabel(selected)+'</b><br><span class="small">This card has multiple landing options. Pick the tile, then confirm use.</span>';
-  list.innerHTML=targets.map(t=>`<button class="moveOption ${t===i?'selected':''}" data-target="${t}" onclick="choosePendingMoveTarget(${t})">${moveChoiceText(selected,t)}</button>`).join('');
-  overlay.hidden=false;
-  overlay.classList.add('open');
+  renderFloatingChoiceTray(targets,i);
   renderFloatingHandDock();
 }
 function choosePendingMoveTarget(i){
   if(!pendingMove)return;
   pendingMove.idx=i;
-  const body=$('moveConfirmBody'),list=$('moveOptionList');
-  if(body)body.innerHTML='<b>'+selectedActionLabel(pendingMove.sel)+'</b><br>'+moveChoiceText(pendingMove.sel,i)+'<br><span class="small">Press Confirm Use to spend the card.</span>';
-  if(list){
-    [...list.querySelectorAll('.moveOption')].forEach(btn=>btn.classList.toggle('selected',+btn.dataset.target===i));
-  }
+  const targets=targetOptionsFor(pendingMove.sel);
+  if(targets&&targets.length)renderFloatingChoiceTray(targets,i);
   renderFloatingHandDock();
 }
 function cancelPendingMove(){
   pendingMove=null;
-  const overlay=$('moveConfirmOverlay');
-  if(overlay){overlay.classList.remove('open');overlay.hidden=true;}
+  closeFloatingChoiceTray();
   if($('floatingHandDock'))renderFloatingHandDock();
 }
 function confirmPendingMove(){
   if(!pendingMove)return;
   const p=pendingMove;
   pendingMove=null;
-  const overlay=$('moveConfirmOverlay');
-  if(overlay){overlay.classList.remove('open');overlay.hidden=true;}
+  closeFloatingChoiceTray();
   resolveConfirmedMove(p.sel,p.idx);
 }
 
