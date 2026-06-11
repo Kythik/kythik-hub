@@ -94,7 +94,7 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
       Arcana minigame route testing, upgrade timing, final-tile cycling, and special board setup support.</div>
     <div class="controls">
       <label>Starting hand <input id="handInput" type="number" min="0" max="12" value="4"></label>
-      <label>Board <select id="boardTypeInput" onchange="renderStrategyUI();suggested=null;render()">
+      <label>Board <select id="boardTypeInput" onchange="changeBoardType()">
         <option value="normal" selected>Normal 80: 10–13 chests</option>
         <option value="special1">Special 1: Chest → Traps → Upgrades</option>
         <option value="special2">Special 2: Upgrades → Traps → Chest</option>
@@ -501,12 +501,18 @@ function actionWithChoice(sel,idx,pos=state.pos){
   return sel;
 }
 function log(s){state.log.unshift(s)}
+function changeBoardType(){
+  selected=null;
+  suggested=null;
+  renderStrategyUI();
+  newGame(false);
+}
 function newGame(same=false){
   if(!same){initRng((getSeedValue())+'-'+Date.now());originalTiles=makeBoard()}
   let hand=[];for(let i=0;i<(getStartingHandValue());i++)hand.push(normalizeCard(drawMappingCard()));
   let initialMove=rollMove();
   state={tiles:clone(originalTiles),pos:0,currentMove:initialMove,hand,life:getLifeValue(),collected:[],dead:false,done:false,futureUpgrade:0,path:[1],log:[],autoStatus:'Ready on tile 1'};
-  selected=null;suggested=null;log('Current refilling move rolled: '+initialMove+'.');log('New board. Starting on tile 1.');render();
+  selected=null;suggested=null;log('Current refilling move rolled: '+initialMove+'.');log('New '+boardType()+' board. Starting on tile 1.');render();
 }
 function resetSame(){
   if(!originalTiles){newGame(false);return}
