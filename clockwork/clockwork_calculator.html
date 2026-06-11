@@ -310,7 +310,7 @@ select:focus{border-color:var(--gold-muted)}
 
   <div class="node-group">
     <div class="node-group-title">Clockwork Tree Nodes</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 28px">
 
       <label class="chk-row">
         <input type="checkbox" id="node-indulgent" onchange="render()">
@@ -402,7 +402,9 @@ select:focus{border-color:var(--gold-muted)}
       </tr>
     </thead>
     <tbody id="tbody"></tbody>
-  </table></div><!-- /tbl-wrap -->
+  </table>
+  <div style="padding:10px 18px;font-size:10px;color:var(--text-faint);border-top:1px solid var(--border-blue)">* Roulette's per-encounter EV is mathematically correct, but at ~1 encounter per 100 maps the tier is misleading within a single season. Sorted last regardless of tier — see breakdown for the full picture.</div>
+  </div><!-- /tbl-wrap -->
 
 </div>
 
@@ -930,8 +932,9 @@ function render(){
   });
   const showCombat=document.getElementById('showz')&&document.getElementById('showz').checked;
   if(!showCombat)svcs=svcs.filter(s=>s.tier!=='F'||s.tag==='conditional'||s.tag==='builddep'||s.isRoulette||s.isID23);
-  if(sort==='ev'||sort==='tier')svcs.sort((a,b)=>a.rank-b.rank);
-  else if(sort==='rarity')svcs.sort((a,b)=>(RORD[a.rarity]||9)-(RORD[b.rarity]||9)||a.rank-b.rank);
+  // Roulette always sorts last regardless of EV — encounter rate makes its tier misleading
+  if(sort==='ev'||sort==='tier')svcs.sort((a,b)=>(a.isRoulette?1:0)-(b.isRoulette?1:0)||a.rank-b.rank);
+  else if(sort==='rarity')svcs.sort((a,b)=>(a.isRoulette?1:0)-(b.isRoulette?1:0)||(RORD[a.rarity]||9)-(RORD[b.rarity]||9)||a.rank-b.rank);
   const maxEV=1; // unused in lookup mode
 
   const tagMap={combat:'<span class="svc-tag tag-combat">combat</span>',conditional:'<span class="svc-tag tag-conditional">conditional</span>',nonviable:'<span class="svc-tag tag-nonviable">not viable</span>',builddep:'<span class="svc-tag tag-builddep">build-dep</span>'};
@@ -953,8 +956,8 @@ function render(){
     if(s.id===11)extra=lbBtn('id11','why SSS matters here');
     if(s.id===29)extra=lbBtn('id29','how this is calculated');
     if(s.id===32)extra=lbBtn('id32','how this is calculated');
-    if(s.isRoulette)extra=roulBlock(gearsVal,rdist,base);
-    if(s.isID23)extra=id23Block(gearsVal,base,nodeWasteful,nodeOstentatious,nodeCb59);
+    if(s.isRoulette)extra=`<button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="background:transparent;border:1px solid var(--border-blue);border-radius:var(--radius-sm);color:var(--text-faint);font-size:10px;cursor:pointer;padding:3px 8px;margin-top:6px">show cog-by-cog breakdown ▾</button><div style="display:none">`+roulBlock(gearsVal,rdist,base)+`</div>`;
+    if(s.isID23)extra=`<button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="background:transparent;border:1px solid var(--border-blue);border-radius:var(--radius-sm);color:var(--text-faint);font-size:10px;cursor:pointer;padding:3px 8px;margin-top:6px">show outcome breakdown ▾</button><div style="display:none">`+id23Block(gearsVal,base,nodeWasteful,nodeOstentatious,nodeCb59)+`</div>`;
     if(s.id===35){const nt=NUT[parseInt(gearsVal)]||NUT[6];extra=`<div class="svc-info">P(0 proc): ${(nt.p0*100).toFixed(1)}% · P(1 proc): ${(nt.p1*100).toFixed(1)}% · P(2 procs): ${(nt.p2*100).toFixed(1)}%</div>`+lbBtn('id35','how this is calculated');}
     const tr=document.createElement('tr');
     if(s.isRoulette)tr.className='svc-row-roulette';
@@ -963,11 +966,15 @@ function render(){
       <td style="color:var(--text-faint);font-size:11px">${i+1}</td>
       <td>${nameHtml}${eff}${inlineWarn}${noteHtml}${extra}</td>
       <td><span class="badge ${RCLS[s.rarity]||'badge-blue'}">${RLABEL[s.rarity]||s.rarity}</span></td>
-      <td><span class="${t2.c} tier">${t2.l}</span></td>
-      <td><div class="ev-bar-wrap"><div class="ev-bar" style="width:${Math.min(bw,100)}px;max-width:100px"></div><span style="font-size:10px;color:var(--text-faint);margin-left:4px">${bw}% of top</span></div></td>
+      <td><span class="${t2.c} tier">${t2.l}${s.isRoulette?'*':''}</span></td>
+      <td><div class="ev-bar-wrap"><div class="ev-bar" style="width:${Math.min(bw,100)}px;max-width:100px"></div><span style="font-size:10px;color:var(--text-faint);margin-left:4px">${bw}% of top${s.isRoulette?' *':''}</span></div></td>
     `;
     tbody.appendChild(tr);
-    if(i===0||svcs[i-1].tier!==s.tier){
+    if(s.isRoulette){
+      const sepRow=document.createElement('tr');
+      sepRow.innerHTML=`<td colspan="5" style="padding:0"><div class="tier-sep-label" style="color:var(--red-loss)">High Variance — See Note Below</div></td>`;
+      tbody.insertBefore(sepRow,tr);
+    } else if(i===0||svcs[i-1].tier!==s.tier||(i>0&&svcs[i-1].isRoulette)){
       const sepRow=document.createElement('tr');
       sepRow.innerHTML=`<td colspan="5" style="padding:0"><div class="tier-sep-label">${s.tier} Tier</div></td>`;
       tbody.insertBefore(sepRow,tr);

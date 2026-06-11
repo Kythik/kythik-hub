@@ -19,7 +19,7 @@ button{cursor:pointer;font-family:var(--font-body)}
 /* ── PAGE HEADER ── */
 .page-header{
   border-bottom:1px solid var(--border-soft);
-  padding:36px 28px 28px;
+  padding:40px 28px 32px;
   max-width:1100px;margin:0 auto;
 }
 .page-eyebrow{
@@ -27,7 +27,7 @@ button{cursor:pointer;font-family:var(--font-body)}
   display:flex;align-items:center;gap:8px;margin-bottom:12px;
 }
 .page-eyebrow::before{content:'';display:block;width:16px;height:1px;background:var(--gold-muted)}
-.page-title{font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--gold-primary);letter-spacing:.02em;margin-bottom:8px}
+.page-title{font-family:var(--font-display);font-size:32px;font-weight:700;color:var(--gold-primary);letter-spacing:.02em;margin-bottom:10px}
 .page-sub{font-size:13px;color:var(--text-muted);line-height:1.6;max-width:600px}
 .calib-tag{
   display:inline-flex;align-items:center;gap:6px;
@@ -37,7 +37,7 @@ button{cursor:pointer;font-family:var(--font-body)}
 }
 
 /* ── MAIN ── */
-.main{max-width:1100px;margin:0 auto;padding:28px 28px 0}
+.main{max-width:1100px;margin:0 auto;padding:32px 28px 0}
 
 /* ── SECTION LABEL ── */
 .slabel{
@@ -53,11 +53,12 @@ button{cursor:pointer;font-family:var(--font-body)}
 .ctrl-group{display:flex;flex-direction:column;gap:4px}
 .ctrl-group label{font-size:11px;color:var(--text-faint);letter-spacing:.03em}
 select{
-  background:var(--bg-panel);border:1px solid var(--border-blue);
-  color:var(--text-primary);padding:8px 12px;border-radius:var(--radius);
+  background:var(--bg-card);border:1px solid var(--border-blue);
+  color:var(--text-primary);padding:10px 14px;border-radius:var(--radius);
   font-family:var(--font-body);font-size:12px;outline:none;
-  transition:border-color .15s;
+  transition:all .15s;
 }
+select:hover{border-color:var(--border-strong)}
 select:focus{border-color:var(--gold-muted)}
 
 /* ── PRESET PILLS ── */
@@ -75,13 +76,13 @@ select:focus{border-color:var(--gold-muted)}
 .svc-table{width:100%;border-collapse:collapse}
 .svc-table th{
   font-size:10px;color:var(--text-faint);text-align:left;
-  padding:8px 12px;border-bottom:1px solid var(--border-blue);
-  font-weight:500;letter-spacing:.05em;text-transform:uppercase;
+  padding:14px 18px;border-bottom:1px solid var(--border-soft);
+  font-weight:600;letter-spacing:.08em;text-transform:uppercase;
 }
-.svc-table td{padding:10px 12px;border-bottom:1px solid rgba(140,165,210,0.07);vertical-align:middle}
+.svc-table td{padding:16px 18px;border-bottom:1px solid rgba(140,165,210,0.06);vertical-align:middle}
 .svc-table tr:hover td{background:rgba(13,24,40,0.6)}
-.svc-name{font-size:13px;color:var(--text-soft);font-weight:500}
-.svc-effect{font-size:11px;color:var(--text-faint);margin-top:2px;line-height:1.4}
+.svc-name{font-size:14px;color:var(--text-primary);font-weight:600;letter-spacing:.01em}
+.svc-effect{font-size:11.5px;color:var(--text-muted);margin-top:4px;line-height:1.5}
 .svc-note{font-size:10px;color:var(--red-loss);margin-top:3px;font-style:italic}
 .svc-info{font-size:10px;color:var(--blue-light);margin-top:3px}
 
@@ -165,10 +166,11 @@ select:focus{border-color:var(--gold-muted)}
 .tip-icon{width:14px;height:14px;border-radius:50%;background:var(--blue-steel);color:var(--blue-light);font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;cursor:help}
 .tip-text{visibility:hidden;opacity:0;position:absolute;bottom:calc(100% + 6px);left:0;background:var(--bg-panel);border:1px solid var(--border-soft);border-radius:var(--radius);padding:8px 10px;font-size:11px;color:var(--text-muted);line-height:1.5;width:260px;z-index:100;pointer-events:none;transition:opacity .15s}
 .tip:hover .tip-text{visibility:visible;opacity:1}
-.chk-row{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--text-muted);padding:4px 0}
+.chk-row{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:12.5px;color:var(--text-muted);padding:6px 0;transition:color .15s}
+.chk-row:hover{color:var(--text-soft)}
 .chk-row input[type=checkbox]{accent-color:var(--gold-primary);width:14px;height:14px;cursor:pointer;flex-shrink:0}
 .chk-label-text{color:var(--text-soft);font-weight:500}
-.node-group{background:var(--bg-card);border:1px solid var(--border-blue);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px}
+.node-group{padding-top:4px}
 .node-group-title{font-size:10px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
 .node-exclusive-note{font-size:10px;color:var(--orange-fire);margin-top:6px;padding-top:6px;border-top:1px solid var(--border-blue)}
 .reroll-panel{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px}
@@ -199,16 +201,16 @@ select:focus{border-color:var(--gold-muted)}
 
 
 /* ── CONTROLS CARD ── */
-.ctrl-card{background:var(--bg-panel);border:1px solid var(--border-blue);border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:14px}
-.ctrl-card-title{font-size:10px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ctrl-card{background:var(--bg-panel-soft);border:1px solid var(--border-soft);border-radius:var(--radius-lg);padding:22px 24px;margin-bottom:24px;box-shadow:0 4px 24px rgba(0,0,0,0.3)}
+.ctrl-card-title{font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.14em;margin-bottom:18px;display:flex;align-items:center;gap:8px;font-weight:600}
 .ctrl-card-title::before{content:'';display:block;width:12px;height:1px;background:var(--gold-muted)}
-.ctrl-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+.ctrl-row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px}
 .ctrl-row:last-child{margin-bottom:0}
-.ctrl-divider{height:1px;background:var(--border-blue);margin:12px 0}
+.ctrl-divider{height:1px;background:var(--border-soft);margin:18px 0}
 
 /* ── TIER GROUP SEPARATORS ── */
 .tier-sep{height:1px;background:rgba(140,165,210,0.06);margin:0 14px}
-.tier-sep-label{font-size:9px;color:var(--blue-steel);text-transform:uppercase;letter-spacing:.12em;padding:5px 14px;background:rgba(7,17,31,0.5);font-weight:600}
+.tier-sep-label{font-size:10px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.16em;padding:10px 18px;background:rgba(200,164,93,0.06);font-weight:700;border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft)}
 
 /* ── SERVICE ROW VARIANTS ── */
 .svc-row-roulette td{background:rgba(216,90,78,0.04)!important}
@@ -218,7 +220,7 @@ select:focus{border-color:var(--gold-muted)}
 .svc-inline-ok{font-size:10px;color:var(--green-recording);margin-top:3px;line-height:1.4}
 
 /* ── TABLE WRAPPER ── */
-.tbl-wrap{background:var(--bg-panel);border:1px solid var(--border-blue);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px}
+.tbl-wrap{background:var(--bg-panel-soft);border:1px solid var(--border-soft);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:24px;box-shadow:0 4px 24px rgba(0,0,0,0.3)}
 .tbl-sticky th{position:sticky;top:0;background:rgba(7,17,31,0.95);backdrop-filter:blur(4px);z-index:2}
 
 /* ── VERDICT CARD UPGRADE ── */
