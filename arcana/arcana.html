@@ -1635,10 +1635,32 @@ function targetRewardShort(i){
   if(t.type==='start')return 'Start tile';
   return 'Empty tile';
 }
+function floatingChoiceTone(tile){
+  if(!tile)return 'slate';
+  if(tile.type==='chest') return tile.rarity||'orange';
+  if(tile.type==='upgrade') return tile.fixedFrom==='red'?'red':(tile.fixedFrom==='orange'?'gold':(tile.fixedFrom==='purple'?'purple':'blue'));
+  if(tile.type==='movement') return 'yellow';
+  if(tile.type==='life') return 'cyan';
+  if(tile.type==='question') return 'purple';
+  if(tile.type==='trap') return 'red';
+  return 'slate';
+}
+function floatingChoiceVisualHtml(tile){
+  if(!tile)return `<span class="floatingChoiceVisual emptyArt">✧</span>`;
+  if(tile.type==='chest') return `<span class="floatingChoiceVisual chestArt rarity-${tile.rarity||'orange'}"><span class="lid"></span><span class="body"></span><span class="lock"></span></span>`;
+  if(tile.type==='upgrade') return `<span class="floatingChoiceVisual cardArt upgradeArt"><span class="cardGlyph">⇧</span></span>`;
+  if(tile.type==='movement') return `<span class="floatingChoiceVisual cardArt moveArt"><span class="cardStep">${Number.isFinite(tile.fixedN)?('+'+tile.fixedN):'CARD'}</span></span>`;
+  if(tile.type==='life') return `<span class="floatingChoiceVisual lifeChip"><span>♥</span><em>${Number.isFinite(tile.fixedN)?('+'+tile.fixedN):'+'}</em></span>`;
+  if(tile.type==='question') return `<span class="floatingChoiceVisual mysteryChip">?</span>`;
+  if(tile.type==='trap') return `<span class="floatingChoiceVisual trapChip">◆</span>`;
+  if(tile.type==='start') return `<span class="floatingChoiceVisual startArt"></span>`;
+  return `<span class="floatingChoiceVisual emptyArt">✧</span>`;
+}
 function floatingChoiceCardHtml(sel,i,active=false){
   const tile=state.tiles[i]||{};
   const kind=tile.type==='chest'?('chest '+(tile.rarity||'')):tile.type;
-  return `<button class="floatingChoiceCard ${active?'selected':''} kind-${kind}" data-target="${i}" onclick="choosePendingMoveTarget(${i})"><span class="floatingChoiceTile">${choiceActionShort(sel,i)}</span><span class="floatingChoiceName">Tile ${i+1} · ${targetRewardShort(i)}</span></button>`;
+  const tone=floatingChoiceTone(tile);
+  return `<button class="floatingChoiceCard ${active?'selected':''} kind-${kind} tone-${tone}" data-target="${i}" onclick="choosePendingMoveTarget(${i})"><span class="floatingChoiceTile">${choiceActionShort(sel,i)}</span>${floatingChoiceVisualHtml(tile)}<span class="floatingChoiceName">Tile ${i+1} · ${targetRewardShort(i)}</span></button>`;
 }
 function renderFloatingChoiceTray(targets=[],activeIdx=-1){
   const tray=$('floatingChoiceTray');
@@ -1933,9 +1955,8 @@ function renderLootColumns(){
   const slots=Array.from({length:7},(_,i)=>state.collected[i]||null);
   const cols=[slots.slice(0,4),slots.slice(4,7)];
   function slotHtml(r){
-    if(!r)return `<div class="lootChestSlot empty"><div class="lootChestMini"><span class="lootBands"></span></div><div class="lootMeta"><span class="lootLv">Empty</span><span class="lootName">Open slot</span></div></div>`;
-    const bandClass=r==='rainbow'?'lootBands rainbow':'lootBands';
-    return `<div class="lootChestSlot filled ${r}"><div class="lootChestMini ${r}"><span class="lootGem"></span><span class="${bandClass}"></span></div><div class="lootMeta"><span class="lootLv">${lootLevelLabel(r)}</span><span class="lootName">${lootPrettyName(r)}</span></div></div>`;
+    if(!r)return `<div class="lootChestSlot empty"><div class="lootChestMini emptyMini"><span class="emptyArt">✧</span></div><div class="lootMeta"><span class="lootLv">Empty</span><span class="lootName">Open slot</span></div></div>`;
+    return `<div class="lootChestSlot filled ${r} rarity-${r}"><div class="lootChestMini chestArt"><span class="lid"></span><span class="body"></span><span class="lock"></span></div><div class="lootMeta"><span class="lootLv">${lootLevelLabel(r)}</span><span class="lootName">${lootPrettyName(r)}</span></div></div>`;
   }
   root.innerHTML=cols.map((col,idx)=>`<div class="lootCol ${idx===1?'right':''}">${col.map(slotHtml).join('')}</div>`).join('');
   legend.textContent = state.collected.length ? ('Collected: ' + state.collected.map(lootPrettyName).join(' • ')) : 'No chests collected yet.';
@@ -1957,15 +1978,28 @@ function updateFloatingDockBounds(){
 }
 
 function floatingCardMeta(card){
-  const name=(card&&card.name)||'';
+  if(!card)return {kind:'utility', kicker:'Card', tone:'slate', face:'✧'};
+  const name=(card.name)||'';
   const lower=name.toLowerCase();
-  if(lower.startsWith('back')) return {kind:'back', kicker:'Backtrack'};
-  if(lower.startsWith('choose')) return {kind:'choice', kicker:'Choice'};
-  if(lower.startsWith('move')) return {kind:'move', kicker:'Advance'};
-  if(lower.includes('up ')||lower.startsWith('up')) return {kind:'upgrade', kicker:'Upgrade'};
-  if(lower.includes('life')) return {kind:'life', kicker:'Life'};
-  if(lower.includes('?')) return {kind:'question', kicker:'Mystery'};
-  return {kind:'utility', kicker:'Card'};
+  if(card.type==='back') return {kind:'back', kicker:'Backtrack', tone:'purple', face:'+'+(card.n||'?')};
+  if(card.type==='move') return {kind:'move', kicker:'Advance', tone:'yellow', face:'+'+(card.n||'?')};
+  if(card.type==='move_any') return {kind:'choice', kicker:'Advance', tone:'yellow', face:'1–6'};
+  if(card.type==='move_even') return {kind:'choice', kicker:'Advance', tone:'yellow', face:'Even'};
+  if(card.type==='move_odd') return {kind:'choice', kicker:'Advance', tone:'yellow', face:'Odd'};
+  if(card.type==='back_any') return {kind:'choice', kicker:'Backtrack', tone:'purple', face:'1–3'};
+  if(card.type==='upgrade'){
+    const tone=card.from==='red'?'red':(card.from==='orange'?'gold':(card.from==='purple'?'purple':'blue'));
+    return {kind:'upgrade', kicker:'Upgrade', tone, face:'⇧'};
+  }
+  if(lower.includes('life')) return {kind:'life', kicker:'Life', tone:'cyan', face:'+1'};
+  if(lower.includes('?')) return {kind:'question', kicker:'Mystery', tone:'purple', face:'?'};
+  return {kind:'utility', kicker:'Card', tone:'slate', face:'✧'};
+}
+function floatingCardVisual(meta){
+  if(meta.kind==='upgrade') return `<span class="floatingCardVisual cardArt upgradeArt"><span class="cardGlyph">⇧</span></span>`;
+  if(meta.kind==='life') return `<span class="floatingCardVisual lifeChip"><span>♥</span><em>${meta.face||'+1'}</em></span>`;
+  if(meta.kind==='question') return `<span class="floatingCardVisual mysteryChip">?</span>`;
+  return `<span class="floatingCardVisual cardArt moveArt"><span class="cardStep">${meta.face||'?'}</span></span>`;
 }
 
 function renderFloatingHandDock(){
@@ -1980,11 +2014,12 @@ function renderFloatingHandDock(){
   dock.classList.toggle('open',active);
   dock.classList.toggle('hasCards',state.hand&&state.hand.length>0);
   dock.classList.toggle('hasPendingMove',!!pendingMove);
-  moveBtn.innerHTML=`<span class="floatingCardKicker">Random refill</span><span class="floatingCardName">Move ${state.currentMove}</span>`;
-  moveBtn.className='floatingMoveCard randomCard current kind-move '+(selected&&selected.type==='current'?'selected':'');
+  const currentMeta={kind:'move', kicker:'Random refill', tone:'yellow', face:'+'+state.currentMove};
+  moveBtn.innerHTML=`<span class="floatingCardKicker">${currentMeta.kicker}</span>${floatingCardVisual(currentMeta)}<span class="floatingCardName">Move ${state.currentMove}</span>`;
+  moveBtn.className='floatingMoveCard randomCard current kind-move tone-yellow '+(selected&&selected.type==='current'?'selected':'');
   handRoot.innerHTML=state.hand.map((c,i)=>{
     const meta=floatingCardMeta(c);
-    return `<button class="floatingHandCard kind-${meta.kind} ${selected&&selected.type==='hand'&&selected.idx===i?'selected':''}" onclick="selectHand(${i})"><span class="floatingCardKicker">${meta.kicker}</span><span class="floatingCardName">${c.name}</span></button>`;
+    return `<button class="floatingHandCard kind-${meta.kind} tone-${meta.tone||'slate'} ${selected&&selected.type==='hand'&&selected.idx===i?'selected':''}" onclick="selectHand(${i})"><span class="floatingCardKicker">${meta.kicker}</span>${floatingCardVisual(meta)}<span class="floatingCardName">${c.name}</span></button>`;
   }).join('')||'<span class="floatingEmpty">No stored cards.</span>';
   if(confirmBtn){
     confirmBtn.disabled=!pendingMove;

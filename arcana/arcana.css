@@ -3455,3 +3455,241 @@ body.arcana-page .board {
 .arcana-page .sidebarDisclosure:not([open]) .autoplaySetup{
   display:none !important;
 }
+
+
+/* Board-style reward slots and dock card visuals */
+.arcana-page.visual-fork .lootChestMini.chestArt{
+  width:52px;
+  height:46px;
+  top:auto;
+  left:auto;
+  transform:none;
+  position:relative;
+  display:block;
+  filter:drop-shadow(0 8px 10px rgba(0,0,0,.38));
+}
+.arcana-page.visual-fork .lootChestMini.chestArt::before,
+.arcana-page.visual-fork .lootChestMini.chestArt::after{
+  display:none;
+}
+.arcana-page.visual-fork .lootChestMini.emptyMini{
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  border:1px solid rgba(74,94,128,.42);
+  background:radial-gradient(circle at 50% 42%, rgba(16,26,43,.86), rgba(3,7,13,.98) 70%);
+  box-shadow:inset 0 0 0 2px rgba(4,8,15,.82), 0 8px 13px rgba(0,0,0,.38);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:rgba(217,224,235,.70);
+  font-size:22px;
+}
+.arcana-page.visual-fork .lootChestSlot .lootMeta{ margin-top:10px; }
+.arcana-page.visual-fork .lootChestSlot.rarity-green .lootLv{ color:#8FD2A6; }
+.arcana-page.visual-fork .lootChestSlot.rarity-blue .lootLv{ color:#9FC4FF; }
+.arcana-page.visual-fork .lootChestSlot.rarity-purple .lootLv{ color:#D1B6FF; }
+.arcana-page.visual-fork .lootChestSlot.rarity-orange .lootLv{ color:#F2D68A; }
+.arcana-page.visual-fork .lootChestSlot.rarity-red .lootLv{ color:#FFB2B2; }
+.arcana-page.visual-fork .lootChestSlot.rarity-rainbow .lootLv{ color:#FFF2C6; }
+
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingMoveCard,
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard{
+  justify-content:flex-start !important;
+  gap:4px !important;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingCardKicker{
+  order:1;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingCardVisual{
+  order:2;
+  position:relative;
+  left:auto;
+  top:auto;
+  transform:none;
+  margin:2px auto 3px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingCardName{
+  order:3;
+  font-size:10px !important;
+  line-height:1.08 !important;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingCardVisual.cardArt{
+  width:34px;
+  height:42px;
+  border-radius:8px;
+  flex-direction:column;
+  gap:0;
+  border:1px solid rgba(242,214,138,.46);
+  background:linear-gradient(160deg, rgba(136,96,34,.98), rgba(82,58,22,.98) 62%, rgba(8,12,20,.98));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16), inset 0 -8px 16px rgba(0,0,0,.28), 0 9px 16px rgba(0,0,0,.42),0 0 12px rgba(242,214,138,.12);
+  color:#FFF5D6;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingCardVisual .cardStep{
+  font-size:15px;
+  line-height:1;
+  font-weight:950;
+  color:#fff;
+  text-shadow:0 1px 5px rgba(0,0,0,.75);
+  margin-top:11px;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingCardVisual .cardGlyph{
+  font-size:20px;
+  line-height:1;
+  font-weight:950;
+  margin-top:11px;
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard.kind-upgrade.tone-blue .floatingCardVisual.cardArt{
+  background:linear-gradient(160deg, rgba(25,53,87,.98), rgba(11,39,74,.98) 62%, rgba(5,13,24,.98));
+  border-color:rgba(107,161,232,.46);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 9px 16px rgba(0,0,0,.42),0 0 12px rgba(74,131,216,.18);
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard.kind-upgrade.tone-purple .floatingCardVisual.cardArt,
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard.kind-back .floatingCardVisual.cardArt,
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard.kind-choice.tone-purple .floatingCardVisual.cardArt{
+  background:linear-gradient(160deg, rgba(75,45,130,.98), rgba(33,26,75,.98) 62%, rgba(5,13,24,.98));
+  border-color:rgba(160,120,238,.55);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 9px 16px rgba(0,0,0,.42),0 0 13px rgba(143,99,232,.20);
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard.kind-upgrade.tone-gold .floatingCardVisual.cardArt,
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingMoveCard .floatingCardVisual.cardArt,
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard.kind-move .floatingCardVisual.cardArt,
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard.kind-choice.tone-yellow .floatingCardVisual.cardArt{
+  background:linear-gradient(160deg, rgba(136,96,34,.98), rgba(82,58,22,.98) 62%, rgba(8,12,20,.98));
+  border-color:rgba(242,214,138,.46);
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingHandCard.kind-upgrade.tone-red .floatingCardVisual.cardArt{
+  background:linear-gradient(160deg, rgba(125,31,31,.98), rgba(60,18,18,.98) 62%, rgba(8,11,19,.98));
+  border-color:rgba(216,74,74,.58);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 9px 16px rgba(0,0,0,.42),0 0 13px rgba(216,74,74,.20);
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingCardVisual.lifeChip,
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingCardVisual.mysteryChip{
+  width:34px;
+  height:42px;
+  border-radius:8px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(200,164,93,.40);
+  background:radial-gradient(circle at 50% 35%, rgba(28,44,66,.98), rgba(8,12,20,.98));
+  box-shadow:0 9px 16px rgba(0,0,0,.42);
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingCardVisual.lifeChip{
+  color:#AEEBFF;
+  text-shadow:0 0 16px rgba(100,210,255,.62);
+}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingCardVisual.lifeChip span{font-size:21px; line-height:.9;}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingCardVisual.lifeChip em{font-style:normal;font-size:10px;font-weight:950;color:#fff;}
+.arcana-page.visual-fork .boardFrame > .floatingHandDock .floatingCardVisual.mysteryChip{
+  color:#EFD489;
+  font-size:24px;
+  font-weight:950;
+  text-shadow:0 0 12px rgba(242,214,138,.42);
+}
+
+
+/* Choice tray: board-style visuals */
+.arcana-page.visual-fork .floatingChoiceCard{
+  align-items:center;
+  text-align:center;
+  gap:6px;
+}
+.arcana-page.visual-fork .floatingChoiceVisual{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:2px auto 2px;
+  flex:0 0 auto;
+}
+.arcana-page.visual-fork .floatingChoiceVisual.cardArt{
+  width:38px;
+  height:46px;
+  border-radius:8px;
+  flex-direction:column;
+  gap:0;
+  border:1px solid rgba(242,214,138,.46);
+  background:linear-gradient(160deg, rgba(136,96,34,.98), rgba(82,58,22,.98) 62%, rgba(8,12,20,.98));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16), inset 0 -8px 16px rgba(0,0,0,.28), 0 9px 16px rgba(0,0,0,.38),0 0 12px rgba(242,214,138,.12);
+  color:#FFF5D6;
+}
+.arcana-page.visual-fork .floatingChoiceVisual .cardStep{
+  font-size:16px;
+  line-height:1;
+  font-weight:950;
+  color:#fff;
+  text-shadow:0 1px 5px rgba(0,0,0,.75);
+  margin-top:12px;
+}
+.arcana-page.visual-fork .floatingChoiceVisual .cardGlyph{
+  font-size:21px;
+  line-height:1;
+  font-weight:950;
+  margin-top:12px;
+}
+.arcana-page.visual-fork .floatingChoiceCard.kind-upgrade.tone-blue .floatingChoiceVisual.cardArt{
+  background:linear-gradient(160deg, rgba(25,53,87,.98), rgba(11,39,74,.98) 62%, rgba(5,13,24,.98));
+  border-color:rgba(107,161,232,.46);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 9px 16px rgba(0,0,0,.38),0 0 12px rgba(74,131,216,.18);
+}
+.arcana-page.visual-fork .floatingChoiceCard.kind-upgrade.tone-purple .floatingChoiceVisual.cardArt{
+  background:linear-gradient(160deg, rgba(75,45,130,.98), rgba(33,26,75,.98) 62%, rgba(5,13,24,.98));
+  border-color:rgba(160,120,238,.55);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 9px 16px rgba(0,0,0,.38),0 0 13px rgba(143,99,232,.20);
+}
+.arcana-page.visual-fork .floatingChoiceCard.kind-upgrade.tone-gold .floatingChoiceVisual.cardArt,
+.arcana-page.visual-fork .floatingChoiceCard.kind-movement .floatingChoiceVisual.cardArt{
+  background:linear-gradient(160deg, rgba(136,96,34,.98), rgba(82,58,22,.98) 62%, rgba(8,12,20,.98));
+  border-color:rgba(242,214,138,.46);
+}
+.arcana-page.visual-fork .floatingChoiceCard.kind-upgrade.tone-red .floatingChoiceVisual.cardArt{
+  background:linear-gradient(160deg, rgba(125,31,31,.98), rgba(60,18,18,.98) 62%, rgba(8,11,19,.98));
+  border-color:rgba(216,74,74,.58);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 9px 16px rgba(0,0,0,.38),0 0 13px rgba(216,74,74,.20);
+}
+.arcana-page.visual-fork .floatingChoiceVisual.lifeChip,
+.arcana-page.visual-fork .floatingChoiceVisual.mysteryChip,
+.arcana-page.visual-fork .floatingChoiceVisual.trapChip,
+.arcana-page.visual-fork .floatingChoiceVisual.startArt,
+.arcana-page.visual-fork .floatingChoiceVisual.emptyArt{
+  width:38px;
+  height:46px;
+  border-radius:8px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(200,164,93,.38);
+  background:radial-gradient(circle at 50% 35%, rgba(28,44,66,.98), rgba(8,12,20,.98));
+  box-shadow:0 9px 16px rgba(0,0,0,.38);
+}
+.arcana-page.visual-fork .floatingChoiceVisual.lifeChip{color:#AEEBFF;text-shadow:0 0 16px rgba(100,210,255,.62)}
+.arcana-page.visual-fork .floatingChoiceVisual.lifeChip span{font-size:22px;line-height:.9}
+.arcana-page.visual-fork .floatingChoiceVisual.lifeChip em{font-style:normal;font-size:10px;font-weight:950;color:#fff}
+.arcana-page.visual-fork .floatingChoiceVisual.mysteryChip{color:#EFD489;font-size:26px;font-weight:950;text-shadow:0 0 12px rgba(242,214,138,.42)}
+.arcana-page.visual-fork .floatingChoiceVisual.trapChip{color:#FF5AAB;font-size:24px;font-weight:950;text-shadow:0 0 14px rgba(255,82,165,.52)}
+.arcana-page.visual-fork .floatingChoiceVisual.startArt{background:radial-gradient(circle at 50% 42%, rgba(20,30,47,.92), rgba(4,8,15,.98) 72%)}
+.arcana-page.visual-fork .floatingChoiceVisual.emptyArt{color:rgba(217,224,235,.70);font-size:22px;border-color:rgba(74,94,128,.42);background:radial-gradient(circle at 50% 42%, rgba(16,26,43,.86), rgba(3,7,13,.98) 70%)}
+.arcana-page.visual-fork .floatingChoiceVisual.chestArt{
+  width:48px;
+  height:42px;
+  top:auto;
+  filter:drop-shadow(0 8px 9px rgba(0,0,0,.40));
+}
+.arcana-page.visual-fork .floatingChoiceVisual.chestArt .lid{position:absolute;left:7px;right:7px;top:6px;height:13px;border-radius:9px 9px 2px 2px;background:linear-gradient(180deg,#F1C56C,#9F6423);border:1px solid rgba(255,237,170,.38)}
+.arcana-page.visual-fork .floatingChoiceVisual.chestArt .body{position:absolute;left:4px;right:4px;top:17px;height:21px;border-radius:4px 4px 8px 8px;background:linear-gradient(180deg,#D7973C,#754619);border:1px solid rgba(255,237,170,.32);box-shadow:inset 0 0 0 2px rgba(65,39,16,.45)}
+.arcana-page.visual-fork .floatingChoiceVisual.chestArt .lock{position:absolute;left:20px;top:20px;width:8px;height:10px;border-radius:2px;background:#F8E097;border:1px solid rgba(55,34,11,.52)}
+.arcana-page.visual-fork .floatingChoiceVisual.rarity-green .lid,.arcana-page.visual-fork .floatingChoiceVisual.rarity-green .body{filter:hue-rotate(70deg) saturate(.85) brightness(.92)}
+.arcana-page.visual-fork .floatingChoiceVisual.rarity-blue .lid,.arcana-page.visual-fork .floatingChoiceVisual.rarity-blue .body{filter:hue-rotate(160deg) saturate(.92) brightness(.98)}
+.arcana-page.visual-fork .floatingChoiceVisual.rarity-purple .lid,.arcana-page.visual-fork .floatingChoiceVisual.rarity-purple .body{filter:hue-rotate(235deg) saturate(1.10) brightness(.94)}
+.arcana-page.visual-fork .floatingChoiceVisual.rarity-orange .lid,.arcana-page.visual-fork .floatingChoiceVisual.rarity-orange .body{filter:saturate(1.15) brightness(1.05)}
+.arcana-page.visual-fork .floatingChoiceVisual.rarity-red .lid,.arcana-page.visual-fork .floatingChoiceVisual.rarity-red .body{filter:hue-rotate(315deg) saturate(1.25) brightness(.95)}
+.arcana-page.visual-fork .floatingChoiceVisual.rarity-rainbow{filter:drop-shadow(0 8px 9px rgba(0,0,0,.40)) drop-shadow(0 0 9px rgba(242,214,138,.24))}
+.arcana-page.visual-fork .floatingChoiceVisual.rarity-rainbow .lid{background:linear-gradient(90deg,#E6547A,#9B6BFF,#4A83D8,#44A36F,#F2D68A)}
+.arcana-page.visual-fork .floatingChoiceVisual.rarity-rainbow .body{background:linear-gradient(90deg,#8F2445,#59389E,#1C528D,#24613D,#9C6F23)}
