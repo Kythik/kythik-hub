@@ -4151,3 +4151,144 @@ body.arcana-page .board {
 }
 
 /* Hand cards are allowed to remain card-like. This rule intentionally does not target .floatingHandDock. */
+
+
+/* ARCANA VISUAL SITE V1.30 — Quiet empty nodes, visible route
+   Goal: stop the board from reading as a wall of tiles/cards. */
+
+/* Hide row-link number pills everywhere. They looked like bad tile labels. */
+.arcana-page.visual-fork .rowWrapDot,
+.arcana-page.visual-fork .rowLinkBadge,
+.arcana-page.visual-fork .linkBadge,
+.arcana-page.visual-fork .linkIndex,
+.arcana-page.visual-fork .edgeLabel,
+.arcana-page.visual-fork .rowLink .badge,
+.arcana-page.visual-fork [class*="rowLink"][class*="Badge"],
+.arcana-page.visual-fork [class*="link"][class*="Badge"]{
+  display:none !important;
+  opacity:0 !important;
+  visibility:hidden !important;
+}
+
+/* Make route links more present than empty tiles. */
+.arcana-page.visual-fork .boardFrame .link,
+.arcana-page.visual-fork .boardFrame .rowLink,
+.arcana-page.visual-fork .board .link,
+.arcana-page.visual-fork .board .rowLink,
+.arcana-page.visual-fork #board .link,
+.arcana-page.visual-fork #board .rowLink{
+  opacity:1 !important;
+  height:3px !important;
+  background:linear-gradient(90deg,
+    rgba(200,164,93,.12),
+    rgba(230,199,122,.92),
+    rgba(200,164,93,.12)) !important;
+  border:0 !important;
+  box-shadow:
+    0 0 10px rgba(230,199,122,.34),
+    0 0 18px rgba(86,182,255,.10) !important;
+}
+
+/* Empty/spent/pass-through nodes should be quiet anchors, not full tiles. */
+.arcana-page.visual-fork .boardFrame .tile.empty,
+.arcana-page.visual-fork .boardFrame .tile.spentEmpty,
+.arcana-page.visual-fork .board .tile.empty,
+.arcana-page.visual-fork .board .tile.spentEmpty,
+.arcana-page.visual-fork #board .tile.empty,
+.arcana-page.visual-fork #board .tile.spentEmpty{
+  background:
+    radial-gradient(circle at 50% 50%, rgba(230,199,122,.18) 0 4px, transparent 5px),
+    radial-gradient(circle at 50% 50%, rgba(38,58,87,.10), transparent 42%) !important;
+  border-color:rgba(200,164,93,.12) !important;
+  box-shadow:none !important;
+  opacity:.62 !important;
+}
+.arcana-page.visual-fork .boardFrame .tile.empty:hover,
+.arcana-page.visual-fork .boardFrame .tile.spentEmpty:hover,
+.arcana-page.visual-fork .board .tile.empty:hover,
+.arcana-page.visual-fork .board .tile.spentEmpty:hover,
+.arcana-page.visual-fork #board .tile.empty:hover,
+.arcana-page.visual-fork #board .tile.spentEmpty:hover{
+  opacity:.86 !important;
+  border-color:rgba(230,199,122,.28) !important;
+  box-shadow:0 0 14px rgba(230,199,122,.12) !important;
+}
+
+/* Empty tile icon should be nearly gone; its dot/anchor is enough. */
+.arcana-page.visual-fork .boardFrame .tile.empty .c,
+.arcana-page.visual-fork .boardFrame .tile.spentEmpty .c,
+.arcana-page.visual-fork .board .tile.empty .c,
+.arcana-page.visual-fork .board .tile.spentEmpty .c,
+.arcana-page.visual-fork #board .tile.empty .c,
+.arcana-page.visual-fork #board .tile.spentEmpty .c{
+  opacity:.18 !important;
+  filter:none !important;
+  text-shadow:none !important;
+}
+
+/* Tile numbers should not visually compete with rewards. */
+.arcana-page.visual-fork .boardFrame .tile .n,
+.arcana-page.visual-fork .board .tile .n,
+.arcana-page.visual-fork #board .tile .n{
+  opacity:.28 !important;
+  color:rgba(170,180,196,.48) !important;
+  font-size:9px !important;
+}
+
+/* Meaningful tile types should pop above the quiet route anchors. */
+.arcana-page.visual-fork .boardFrame .tile:not(.empty):not(.spentEmpty),
+.arcana-page.visual-fork .board .tile:not(.empty):not(.spentEmpty),
+.arcana-page.visual-fork #board .tile:not(.empty):not(.spentEmpty){
+  opacity:1 !important;
+  box-shadow:
+    0 12px 26px rgba(0,0,0,.34),
+    0 0 18px rgba(230,199,122,.07),
+    inset 0 0 20px rgba(0,0,0,.22) !important;
+}
+
+/* Meaningful tiles get small medallion feel, not card boxes. */
+.arcana-page.visual-fork .boardFrame .tile.question,
+.arcana-page.visual-fork .boardFrame .tile.life,
+.arcana-page.visual-fork .boardFrame .tile.movement,
+.arcana-page.visual-fork .boardFrame .tile.move,
+.arcana-page.visual-fork .boardFrame .tile.trap,
+.arcana-page.visual-fork .boardFrame .tile.upgrade,
+.arcana-page.visual-fork .boardFrame .tile.chest,
+.arcana-page.visual-fork .board .tile.question,
+.arcana-page.visual-fork .board .tile.life,
+.arcana-page.visual-fork .board .tile.movement,
+.arcana-page.visual-fork .board .tile.move,
+.arcana-page.visual-fork .board .tile.trap,
+.arcana-page.visual-fork .board .tile.upgrade,
+.arcana-page.visual-fork .board .tile.chest,
+.arcana-page.visual-fork #board .tile.question,
+.arcana-page.visual-fork #board .tile.life,
+.arcana-page.visual-fork #board .tile.movement,
+.arcana-page.visual-fork #board .tile.move,
+.arcana-page.visual-fork #board .tile.trap,
+.arcana-page.visual-fork #board .tile.upgrade,
+.arcana-page.visual-fork #board .tile.chest{
+  border-radius:20px !important;
+  transform:scale(.96);
+}
+
+/* Restore selected/current/preview visibility over quiet tiles. */
+.arcana-page.visual-fork .boardFrame .tile.pos,
+.arcana-page.visual-fork .board .tile.pos,
+.arcana-page.visual-fork #board .tile.pos{
+  opacity:1 !important;
+  border-color:rgba(255,255,255,.62) !important;
+}
+.arcana-page.visual-fork .boardFrame .tile.reach,
+.arcana-page.visual-fork .boardFrame .tile.pendingPreview,
+.arcana-page.visual-fork .board .tile.reach,
+.arcana-page.visual-fork .board .tile.pendingPreview,
+.arcana-page.visual-fork #board .tile.reach,
+.arcana-page.visual-fork #board .tile.pendingPreview{
+  opacity:1 !important;
+}
+
+/* The legend should no longer advertise row links. */
+.arcana-page.visual-fork .legendPill:has(.rowWrapDot){
+  display:none !important;
+}
