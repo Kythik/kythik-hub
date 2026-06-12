@@ -1025,7 +1025,7 @@ function render(){
     const inlineWarn=s.isRoulette?(roulFailModel==='escalating'
                        ?`<div class="svc-inline-warn">~1 per 100 maps · ~89% wipe to cog 6 · barely break-even even ignoring variance</div>`
                        :`<div class="svc-inline-warn">~1 per 100 maps · 43% wipe rate · ~500 maps to be reliably profitable</div>`):
-                     s.isID23?`<div class="svc-inline-ok">~12.5% encounter rate · safe cashout · reliable every session</div>`:'';
+                     '';
     let extra='';
     const lbBtn=(id,label)=>`<button onclick="document.getElementById('${id}-lightbox').style.display='flex';document.body.style.overflow='hidden'" style="background:rgba(200,164,93,0.08);border:1px solid rgba(200,164,93,0.25);border-radius:var(--radius-sm);color:var(--gold-muted);font-size:10px;font-weight:600;cursor:pointer;padding:4px 10px;margin-top:6px;display:inline-flex;align-items:center;gap:4px;transition:background .15s,border-color .15s">📊 ${label} ↗</button>`;
     if(s.id===10)extra=lbBtn('id10','how this is calculated');
