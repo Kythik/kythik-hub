@@ -612,11 +612,11 @@ select:focus{border-color:var(--gold-muted)}
         </div></div>
       <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Tier Thresholds</div>
         <div style="display:flex;flex-direction:column;gap:3px;font-size:12px">
-          <div style="display:flex;gap:8px"><span style="width:40px;color:#ff9ef5;font-weight:700">S+</span><span>≥300% of base pool (Roses only)</span></div>
-          <div style="display:flex;gap:8px"><span style="width:40px;color:var(--gold-bright);font-weight:700">S</span><span>100–300% (Nut Trick, Heist, Roulette, All Tabs, Bloody Mary)</span></div>
-          <div style="display:flex;gap:8px"><span style="width:40px;color:#a78bfa;font-weight:700">A</span><span>40–100% (ID23, ID10, ID20, ID9, Hunting Ground)</span></div>
-          <div style="display:flex;gap:8px"><span style="width:40px;color:#60a5fa;font-weight:700">B</span><span>20–40% (ID19, ID26, ID15, ID17)</span></div>
-          <div style="display:flex;gap:8px"><span style="width:40px;color:var(--text-faint);font-weight:700">C</span><span>5–20% (minor utility services)</span></div>
+          <div style="display:flex;gap:8px"><span style="width:40px;color:#ff9ef5;font-weight:700">S+</span><span>≥35% of Roses (Roses, Nut Trick)</span></div>
+          <div style="display:flex;gap:8px"><span style="width:40px;color:var(--gold-bright);font-weight:700">S</span><span>12–35% (Heist, All Tabs, Bloody Mary, ID23)</span></div>
+          <div style="display:flex;gap:8px"><span style="width:40px;color:#a78bfa;font-weight:700">A</span><span>5–12% (ID20, ID9, Hunting Ground, ID19)</span></div>
+          <div style="display:flex;gap:8px"><span style="width:40px;color:#60a5fa;font-weight:700">B</span><span>2–5% (ID26, ID15, ID17, ID21, ID11, ID27...)</span></div>
+          <div style="display:flex;gap:8px"><span style="width:40px;color:var(--text-faint);font-weight:700">C</span><span>1–2% (minor utility services)</span></div>
         </div></div>
       <div><div style="font-size:11px;color:var(--gold-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Caveats</div>
         <ul style="padding-left:16px;display:flex;flex-direction:column;gap:4px">
@@ -774,13 +774,16 @@ function id23CogEV(k,n,base){
 }
 
 function getTier(ev,theorBase){
+  // Tiers based on % of Roses (top S+ service), not % of theorBase
+  // Roses ≈ 6.124x theorBase at default config — used as reference ceiling
   if(ev<=0)return{l:'F',c:'tier-f'};
-  const p=ev/theorBase*100;
-  if(p>=300)return{l:'S+',c:'tier-sp'};
-  if(p>=100)return{l:'S',c:'tier-s'};
-  if(p>=40) return{l:'A',c:'tier-a'};
-  if(p>=20) return{l:'B',c:'tier-b'};
-  if(p>=5)  return{l:'C',c:'tier-c'};
+  const rosesEV=theorBase*6.124;
+  const p=ev/rosesEV*100;
+  if(p>=35)return{l:'S+',c:'tier-sp'};
+  if(p>=12)return{l:'S',c:'tier-s'};
+  if(p>=5) return{l:'A',c:'tier-a'};
+  if(p>=2) return{l:'B',c:'tier-b'};
+  if(p>=1) return{l:'C',c:'tier-c'};
   return{l:'F',c:'tier-f'};
 }
 
