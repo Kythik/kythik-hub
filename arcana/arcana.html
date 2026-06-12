@@ -12,7 +12,6 @@
   }
 </style>
 <title>Arcana Tarot Minigame — Visual Site v1</title>
-
 <style id="arcana-board-layout-guard">
   .arcana-page .gamePanel{display:flex!important;justify-content:center!important;align-items:flex-start!important;overflow-x:auto}
   .arcana-page .boardFrame,.arcana-page .board{margin-left:auto!important;margin-right:auto!important}
@@ -247,6 +246,7 @@ Rule:
   </div>
 </div>
 
+<script src="arcana-board.js?v=board-v1"></script>
 <script>
 const FALLBACK_MECHANICS_DATA={"schemaVersion":1,"updated":"2026-06-10","id":"normal_v1_opener_row3_qsplit","game":{"rarityOrder":["green","blue","purple","orange","red","rainbow"],"rarityValue":{"green":1,"blue":1.2,"purple":4,"orange":10,"red":16,"rainbow":25},"maxChests":7,"startingLife":3,"defaultStartingHand":4,"totalTiles":80},"weights":{"tile":{"empty":0.25,"chest":0.24,"trap":0.12,"movement":0.12,"upgrade":0.1,"life":0.07,"question":0.1},"chestRarity":{"green":0.275544,"blue":0.413316,"purple":0.25295,"orange":0.05399,"red":0.0038,"rainbow":0.0002},"upgradeCardRarity":{"blue":0.54,"purple":0.35,"orange":0.107,"red":0.008},"mappingCardType":{"move_fixed":0.24,"back_fixed":0.1,"move_any":0.13,"move_even":0.08,"move_odd":0.08,"back_any":0.09,"upgrade":0.28},"questionEffects":{"life":0.14,"mapping_card":0.17,"upgrade_random_owned":0.085,"upgrade_random_map":0.085,"upgrade_all_owned":0.03,"upgrade_all_map":0.03,"add_chest":0.13,"add_high":0.08,"rainbow_all":0.005,"remove_traps":0.08},"questionAddHighChestRarity":{"purple":0.45,"orange":0.38,"red":0.14,"rainbow":0.03}},"normalBoard":{"type":"count_based_with_curated_opener","rows":20,"columns":4,"opener":{"rangeTiles":[1,8],"tile1":"start","guaranteed":{"chest":1,"upgrade_at_or_above_chest_rarity":1,"life":1,"movement":[1,2]},"excludedTypes":["trap","question"],"fill":"empty"},"emptyBufferRows":[3],"randomSection":{"startTile":13,"counts":{"chest":[10,12],"empty":[15,25],"trap":[10,13],"movement":[8,11],"upgrade":[8,10],"life":[6,9],"question":[6,9]},"emptyIsRemainder":true,"maxAttempts":500}},"cards":{"rollMove":[1,6],"upgradeCardSearchWindow":12,"storedHandPool":["move","back","move_any","move_even","move_odd","back_any","upgrade"],"upgradeCardsHaveNoGreen":true,"mappingTileFixedMoveRange":[1,3],"lifeTileFixedRange":[1,3]},"questionEffects":{"lifeRange":[1,3],"mappingCardsRange":[1,3],"upgradeRandomOwnedRange":[1,3],"upgradeRandomMapRange":[1,3],"fizzleIfNoTarget":true},"specialBoards":{"special1":{"totalTiles":68,"note":"Legacy special board 1 remains code-defined."},"special2":{"totalTiles":68,"note":"Legacy special board 2 remains code-defined."},"special3":{"shape":"96 tiles, 24 rows, 4 columns; rarity bands climb from green to rainbow.","rarityBands":{"rows1to4":"green","rows5to8":"blue","rows9to12":"purple","rows13to16":"orange","rows17to20":"red","rows21to24":"rainbow"},"movementRows":[6,12,18,24],"coreMechanic":"slot preservation","coreRule":"Preserve slots for the late bands.","default":"Special3_RainbowRed_HighCeiling"}},"targeting":{"upgradeCard":"highest_eligible_rarity_random_within_bucket","questionUpgrade":"random_chest_target","notes":{"upgradeCard":"Upgrade cards check the highest eligible rarity tier first, then lower tiers; target is random within the first eligible tier found.","questionUpgrade":"? upgrade effects randomly choose eligible chests; they do not highest-tier-prioritize."}},"strategyNotes":{"special2HandManagement":{"principle":"movement cards are access; red upgrade cards are payoff","finding":"heavy hand-pressure penalties underperformed in a directional 1,000-run test; current strategy keeps hand pressure as guidance","currentDefault":"Special2_Aggro_Cross"},"special2StartingHandImpact":{"baseline":"4–6 cards","baselineFrequencyEstimate":"about 98% of starts, per user experience","finding":"Board 2 EV is heavily starting-hand dependent. 7+ card starts tested much higher but are rare/special setup cases.","default":"Special2_Bank_And_Cross","variant":"Special2_Aggro_Cross for rare high-hand/high-access starts"},"special1WallStaging":{"coreRule":"Stage first. Cross second.","stagingZone":"tiles 24–30","finding":"Staging increased Board 1 realistic 4–6 EV from about 30 to about 91 in the sim.","default":"Special1_Staging_Loaded","warning":"Immediate-cross/no-staging routes under-cross Board 1 badly."},"special2VsSpecial1Staging":{"special1":"Staging works because early chests are already owned payload.","special2":"Staging increased wall success but did not improve EV because it can weaken upgrade/access payoff.","special2Rule":"Bank first. Cross decisively."},"special3SlotPreservation":{"coreRule":"Preserve slots for red/rainbow bands.","finding":"High-ceiling slot preservation beat safer completion routes on EV.","tradeoff":"The EV route completes 7 chests less often; safer variants are included for consistency.","bestTested":"Special3_RainbowRed_HighCeiling","balanced":"Special3_RedPlus_Dynamic","consistent":"Special3_RedPlus_SofterFill"},"startingHandEVLightboxPatch":{"purpose":"Lightboxes now expose per-starting-hand EV where tests were run.","baselineHands":[4,5,6],"boards":{"special1":"Board 1 staging route is relatively stable from 4–6; staging matters more than starting hand.","special2":"Board 2 is meaningfully better at 6 than 4–5; 7+ remains rare/high-setup.","special3":"Board 3 scales strongly with starting hand because extra cards improve late-band access and slot preservation."},"label":"Starting hand size EV"}}};
 let MECHANICS=null;
@@ -1508,12 +1508,511 @@ function clearPlannerBusy(){
 function requestRecommendMove(){
   if(!state||state.done||state.dead)return;
   setPlannerBusy('Calculating recommended move...');
+  renderFloatingHandDock();
+  setTimeout(()=>{
+    try{suggestMove()}
+    finally{clearPlannerBusy();renderFloatingHandDock()}
+  },0);
+}
+function requestAutoPlay(limit=300){
+  if(!state||state.done||state.dead)return;
+  setPlannerBusy('Auto Play running...');
+  renderFloatingHandDock();
+  setTimeout(()=>{
+    try{autoPlay(limit)}
+    finally{clearPlannerBusy();renderFloatingHandDock()}
+  },0);
+}
 
-renderFloatingHandDock();
-let targets=targetOptionsFor(selected);
-$('board').innerHTML=(window.ArcanaBoard&&window.ArcanaBoard.render)
-  ? window.ArcanaBoard.render({state,totalTiles,targets,pendingMove,suggested})
-  : '';
+function suggestMove(){
+  if(isSpecialBoard1()){
+    suggested=special1ChooseAction();
+    if(!suggested){$('routeNotes').innerHTML='No Special 1 legal move options.';render();return}
+    render(); return;
+  }
+  if(isSpecialBoard2()){
+    suggested=special2ChooseAction();
+    if(!suggested){$('routeNotes').innerHTML='No Special 2 legal move options.';render();return}
+    render(); return;
+  }
+
+  let depth=comboDepthValue();
+  let plan=finalTileRecoveryPlan();
+  if(plan){
+    if(state.currentMove===plan.need){
+      suggested={first:{type:'hand',idx:plan.backIdx},idx:plan.backPos,score:plan.score,why:[plan.why],name:'stored Back '+plan.backN+' → current refill Move '+plan.need,tiles:[plan.backPos+1,plan.target+1],life:state.life,trapCount:0,mode:'recovery'};
+    }else{
+      suggested={first:{type:'current'},idx:state.pos,score:plan.score-1,why:['Cycle current move at final tile until Move '+plan.need+' appears. '+plan.why],name:'Cycle for Move '+plan.need,tiles:[state.pos+1],life:state.life,trapCount:0,mode:'recovery'};
+    }
+    render(); return;
+  }
+  let opts=buildSequences(depth).sort((a,b)=>b.score-a.score);
+  suggested=opts[0]||null;
+  if(!suggested){$('routeNotes').innerHTML='No legal move options.';render();return}
+  if(boardType()==='special3'&&suggested){
+    suggested.why=(suggested.why||[]).concat(['Special strategy: '+(specialStrategyEntry()?.label||specialStrategyEntry()?.title||'Special 3')]);
+    suggested.mode=suggested.mode? suggested.mode+' + special3' : 'special3';
+  }
+  render();
+}
+function takeSuggestion(){
+  if(!suggested){
+    suggestMove();
+    if(!suggested)return;
+  }
+  const first=clone(suggested.first);
+  const tgt=suggested.idx>=0?suggested.idx:targetFor(first);
+  if(tgt<0)return;
+
+  // Auto Play must execute the recommendation immediately.
+  // Manual clicks use clickTile() to preview + confirm, but autoplay cannot wait on Confirm Use.
+  pendingMove=null;
+  selected=first;
+  resolveConfirmedMove(first,tgt);
+}
+
+function selectedActionLabel(sel=selected){
+  if(!sel)return 'No card selected';
+  if(sel.type==='current')return 'Current Move '+state.currentMove;
+  const c=state.hand?.[sel.idx];
+  return c?handActionLabel(sel):'Stored card';
+}
+function targetTileSummary(i){
+  const t=state.tiles[i]||{};
+  const type=t.type||'empty';
+  let reward='';
+  if(type==='chest')reward='Chest: '+lootLevelLabel(t.rarity)+' '+lootPrettyName(t.rarity);
+  else if(type==='trap')reward='Trap: lose 1 life';
+  else if(type==='movement')reward=t.fixedN?'Gain Move '+t.fixedN:'Gain mapping card';
+  else if(type==='upgrade')reward='Gain upgrade card';
+  else if(type==='life')reward=t.fixedN?('Gain +'+t.fixedN+' life'):'Gain life';
+  else if(type==='question')reward='Mystery ? effect';
+  else if(type==='start')reward='Start tile';
+  else reward='Empty tile';
+  return 'Tile '+(i+1)+' — '+reward;
+}
+function moveChoiceText(sel,i){
+  if(!sel||!state)return '';
+  const from=state.pos;
+  const resolved=actionWithChoice(sel,i);
+  const rawTarget=resolved?.type==='current'?from+state.currentMove:(resolved?.choice?from+(resolved.choice.dir*resolved.choice.n):i);
+  const clampNote=rawTarget>=totalTiles?' Final move clamps to the last tile.':'';
+  return selectedActionLabel(resolved)+' → '+targetTileSummary(i)+'.'+clampNote;
+}
+function preparePendingMoveFromSelection(openMulti=true){
+  pendingMove=null;
+  if(!selected||state.done||state.dead)return;
+  const targets=targetOptionsFor(selected);
+  if(!targets.length)return;
+  pendingMove={sel:clone(selected),idx:targets[0]};
+  if(targets.length>1&&openMulti)openMoveSelector(targets[0]);
+}
+function pendingMoveSummary(){
+  if(!pendingMove||!state)return 'Select a card to preview its landing tile.';
+  return moveChoiceText(pendingMove.sel,pendingMove.idx);
+}
+
+function choiceActionShort(sel,i){
+  if(!sel||!state)return 'Move';
+  if(sel.type==='current')return 'Move '+state.currentMove;
+  const resolved=actionWithChoice(sel,i);
+  if(resolved?.choice){
+    const dir=resolved.choice.dir<0?'Back':'Move';
+    return dir+' '+resolved.choice.n;
+  }
+  const c=state.hand?.[sel.idx];
+  if(c?.name)return c.name;
+  return 'Move';
+}
+function targetRewardShort(i){
+  const t=state.tiles[i]||{};
+  if(t.type==='chest')return lootLevelLabel(t.rarity)+' '+lootPrettyName(t.rarity)+' chest';
+  if(t.type==='trap')return 'Trap';
+  if(t.type==='movement')return t.fixedN?'Gain Move '+t.fixedN:'Gain mapping card';
+  if(t.type==='upgrade')return 'Gain upgrade card';
+  if(t.type==='life')return t.fixedN?('Gain +'+t.fixedN+' life'):'Gain life';
+  if(t.type==='question')return 'Mystery tile';
+  if(t.type==='start')return 'Start tile';
+  return 'Empty tile';
+}
+function floatingChoiceCardHtml(sel,i,active=false){
+  const tile=state.tiles[i]||{};
+  const kind=tile.type==='chest'?('chest '+(tile.rarity||'')):tile.type;
+  return `<button class="floatingChoiceCard ${active?'selected':''} kind-${kind}" data-target="${i}" onclick="choosePendingMoveTarget(${i})"><span class="floatingChoiceTile">${choiceActionShort(sel,i)}</span><span class="floatingChoiceName">Tile ${i+1} · ${targetRewardShort(i)}</span></button>`;
+}
+function renderFloatingChoiceTray(targets=[],activeIdx=-1){
+  const tray=$('floatingChoiceTray');
+  const cards=$('floatingChoiceCards');
+  if(!tray||!cards)return;
+  if(!targets.length){
+    tray.hidden=true;
+    tray.classList.remove('open');
+    cards.innerHTML='';
+    return;
+  }
+  cards.innerHTML=targets.map(t=>floatingChoiceCardHtml(selected,t,t===activeIdx)).join('');
+  tray.hidden=false;
+  tray.classList.add('open');
+}
+function closeFloatingChoiceTray(){
+  const tray=$('floatingChoiceTray');
+  if(tray){
+    tray.hidden=true;
+    tray.classList.remove('open');
+  }
+}
+
+function openMoveSelector(i){
+  if(!selected||state.done||state.dead)return;
+  const targets=targetOptionsFor(selected);
+  if(!targets.includes(i))return;
+  pendingMove={sel:clone(selected),idx:i};
+  renderFloatingChoiceTray(targets,i);
+  renderFloatingHandDock();
+}
+function choosePendingMoveTarget(i){
+  if(!pendingMove)return;
+  pendingMove.idx=i;
+  const targets=targetOptionsFor(pendingMove.sel);
+  if(targets&&targets.length)renderFloatingChoiceTray(targets,i);
+  render();
+}
+function cancelPendingMove(){
+  pendingMove=null;
+  closeFloatingChoiceTray();
+  if($('floatingHandDock'))renderFloatingHandDock();
+}
+function confirmPendingMove(){
+  if(!pendingMove)return;
+  const p=pendingMove;
+  pendingMove=null;
+  closeFloatingChoiceTray();
+  resolveConfirmedMove(p.sel,p.idx);
+}
+
+function clickTile(i){
+  if(state.done||state.dead)return;
+  let targets=targetOptionsFor(selected);
+  if(!targets.includes(i))return;
+  pendingMove={sel:clone(selected),idx:i};
+  if(targets.length>1)openMoveSelector(i);
+  else renderFloatingHandDock();
+}
+function resolveConfirmedMove(sel,i){
+  if(state.done||state.dead)return;
+  let targets=targetOptionsFor(sel);
+  if(!targets.includes(i))return;
+  let used=actionWithChoice(sel,i),t=state.tiles[i],from=state.pos,card=used.type==='hand'?state.hand[used.idx]:null;
+  if(used.type==='current'&&from===totalTiles-1&&i===totalTiles-1){
+    let old=state.currentMove;state.currentMove=rollMove();log('Cycled current move at final tile: '+old+' → '+state.currentMove+'.');state.autoStatus='Cycled at final tile.';selected=null;suggested=null;render();return;
+  }
+  let spentName=used.type==='current'?'current Move '+state.currentMove:handActionLabel(used);
+  let rawTarget=used.type==='current'?from+state.currentMove:(used.choice?from+(used.choice.dir*used.choice.n):i);
+  log('Spent '+spentName+': tile '+(from+1)+' → '+(i+1)+(rawTarget>=totalTiles?' (final move clamped)':'')+'.');
+  state.autoStatus='Last landed on tile '+(i+1)+' using '+spentName+'.';
+  state.pos=i; state.path.push(i+1);
+  if(t.used){log('Landed on already-used tile '+(i+1)+'. No reward repeated.')}
+  else{
+    if(t.type==='chest')t.rarity=upgrade(t.rarity,state.futureUpgrade);
+    if(t.type==='chest'){
+      if(state.collected.length<maxChests){
+        state.collected.push(t.rarity);
+        log('Collected '+t.rarity+' chest at tile '+(i+1)+'.');
+        t.used=true;
+      }else{
+        log('Chest cap already reached at tile '+(i+1)+'. No extra chest collected.');
+        t.used=true;
+      }
+    }
+    else if(t.type==='trap'){state.life--;t.used=true;log('Trap at tile '+(i+1)+'. Lost 1 life.');if(state.life<=0){state.dead=true;state.done=true;log('Run bricked at tile '+(i+1)+'.')}}
+    else if(t.type==='movement'){let c=normalizeCard(t.fixedN?{type:'move',n:t.fixedN,name:'Move '+t.fixedN}:drawMappingCard());state.hand.push(c);t.used=true;log('Mapping-card tile gained: '+c.name+'.')}
+    else if(t.type==='upgrade'){
+      let c=normalizeCard({type:'upgrade',from:t.fixedFrom||wc(upgradeCardW)});
+      state.hand.push(c);t.used=true;log('Picked '+c.name+' card.');
+      if(isSpecialBoard1()){
+        let idx=state.hand.length-1;
+        if(playUpgradeCard(idx,'Special 1 upgrade tile'))log('Applied Special 1 upgrade tile immediately.');
+      }
+    }
+    else if(t.type==='life'){let n=t.fixedN||randint(1,4);state.life+=n;t.used=true;log('Life tile: +'+n+' life.')}
+    else if(t.type==='question'){t.used=true;applyQuestion(i)}
+    else t.used=true;
+  }
+  if(card){
+    if(card.type==='upgrade')state.hand.splice(used.idx,1);
+    else if(card.type!=='move_any'&&card.type!=='back_any')state.hand.splice(used.idx,1);
+    else if(card.type==='move_any'||card.type==='back_any')state.hand.splice(used.idx,1);
+  }else{
+    if(used.type==='current')state.currentMove=rollMove();
+  }
+  if(state.collected.length>=maxChests){state.autoStatus='Chest cap reached at tile '+(state.pos+1)+'. Run remains active until manual end or 0 life.';log(state.autoStatus)}
+  selected=null;suggested=null;pendingMove=null;render();
+}
+function collectedUpgradeableIndexes(){
+  let a=[];
+  for(let i=0;i<state.collected.length;i++)if(state.collected[i]!=='rainbow')a.push(i);
+  return a;
+}
+function futureChestIndexes(){
+  let a=[];
+  for(let i=state.pos+1;i<totalTiles;i++)if(state.tiles[i].type==='chest'&&!state.tiles[i].used&&state.tiles[i].rarity!=='rainbow')a.push(i);
+  return a;
+}
+function pickSome(arr,minN=1,maxN=3){
+  let pool=arr.slice();
+  for(let i=pool.length-1;i>0;i--){let j=randint(0,i+1);[pool[i],pool[j]]=[pool[j],pool[i]]}
+  return pool.slice(0,Math.min(pool.length,randint(minN,maxN+1)));
+}
+function gainQuestionCards(){
+  let n=randint((MECHANICS?.questionEffects?.mappingCardsRange?.[0]??1),(MECHANICS?.questionEffects?.mappingCardsRange?.[1]??3)+1);
+  for(let i=0;i<n;i++)state.hand.push(normalizeCard(drawMappingCard()));
+  log('? gained '+n+' stored card'+(n>1?'s':'')+'.');
+}
+function upgradeCollectedRandom(){
+  let picks=pickSome(collectedUpgradeableIndexes(),1,3);
+  if(!picks.length){log('? rolled owned-chest upgrades but no obtained chest could upgrade.');return}
+  for(const i of picks)state.collected[i]=upgrade(state.collected[i]);
+  log('? upgraded '+picks.length+' obtained chest'+(picks.length>1?'s':'')+'.');
+}
+function upgradeAllCollected(){
+  let picks=collectedUpgradeableIndexes();
+  if(!picks.length){log('? rolled all-owned upgrade but no obtained chest could upgrade.');return}
+  for(const i of picks)state.collected[i]=upgrade(state.collected[i]);
+  log('? upgraded all obtained chests.');
+}
+function upgradeMapRandom(){
+  let picks=pickSome(futureChestIndexes(),1,3);
+  if(!picks.length){log('? rolled map-chest upgrades but no map chest could upgrade.');return}
+  for(const i of picks)state.tiles[i].rarity=upgrade(state.tiles[i].rarity);
+  log('? upgraded '+picks.length+' map chest'+(picks.length>1?'s':'')+'.');
+}
+function upgradeAllMap(){
+  let picks=futureChestIndexes();
+  if(!picks.length){log('? rolled all-map upgrade but no map chest could upgrade.');return}
+  for(const i of picks)state.tiles[i].rarity=upgrade(state.tiles[i].rarity);
+  state.futureUpgrade++;
+  log('? upgraded all future map chests.');
+}
+function applyQuestion(){
+  let e=wc(qW);
+  if(e==='life'){
+    let n=randint((MECHANICS?.questionEffects?.lifeRange?.[0]??1),(MECHANICS?.questionEffects?.lifeRange?.[1]??3)+1);
+    state.life+=n;
+    log('? gained '+n+' life.');
+  }
+  else if(e==='mapping_card')gainQuestionCards();
+  else if(e==='upgrade_random_owned')upgradeCollectedRandom();
+  else if(e==='upgrade_all_owned')upgradeAllCollected();
+  else if(e==='upgrade_random_map')upgradeMapRandom();
+  else if(e==='upgrade_all_map')upgradeAllMap();
+  else if(e==='add_chest'||e==='add_high'){
+    let spots=[];
+    for(let i=state.pos+1;i<totalTiles;i++)if(state.tiles[i].type!=='chest'&&state.tiles[i].type!=='start')spots.push(i);
+    if(spots.length){
+      let i=spots[randint(0,spots.length)],r=e==='add_high'?wc(qAddHighChestW):wc(chestW);
+      state.tiles[i]={type:'chest',rarity:upgrade(r,state.futureUpgrade)};
+      log('? added '+rarityLabel(state.tiles[i].rarity)+' chest at tile '+(i+1)+'.');
+    }else log('? rolled add-chest but no open map tile was available.');
+  }
+  else if(e==='rainbow_all'){
+    let ch=futureChestIndexes();
+    if(ch.length){for(const i of ch)state.tiles[i].rarity='rainbow';log('? turned '+ch.length+' remaining map chest'+(ch.length>1?'s':'')+' rainbow.');}
+    else log('? rolled rainbow map chests but no map chest was available.');
+  }
+  else if(e==='remove_traps'){
+    let n=0;
+    for(let i=state.pos+1;i<totalTiles;i++)if(state.tiles[i].type==='trap'){state.tiles[i]={type:'empty'};n++}
+    if(n)log('? removed '+n+' future trap'+(n>1?'s':'')+'.');
+    else log('? rolled remove traps but no future traps were available.');
+  }
+}
+function suggestionTarget(){
+  if(!suggested||!suggested.first)return -1;
+  return targetFor(suggested.first);
+}
+function suggestionFirstTile(){
+  const idx=suggestionTarget();
+  return idx>=0?state.tiles[idx]:null;
+}
+function suggestionFirstMoveWouldKill(){
+  const t=suggestionFirstTile();
+  return !!(t&&t.type==='trap'&&!t.used&&state.life<=1);
+}
+function suggestionFirstMoveIsNonLethalTrap(){
+  const t=suggestionFirstTile();
+  return !!(t&&t.type==='trap'&&!t.used&&state.life>1);
+}
+function suggestionIsEndgameMove(){
+  let idx=suggestionTarget();
+  return idx>=totalTiles-1 || (suggested&&suggested.tiles&&suggested.tiles.some(t=>t>=totalTiles));
+}
+function suggestionIsQuestionMove(){
+  const t=suggestionFirstTile();
+  return !!(t&&t.type==='question'&&!t.used);
+}
+function suggestionIsUnsafeMove(){
+  if(!suggested)return false;
+  if(suggestionFirstMoveWouldKill())return true;
+
+  /*
+    A planned multi-step line can contain a later trap/death and score badly.
+    Autoplay only executes the first move, then replans.
+    So a first trap at 2+ life is legal and should not be treated as death.
+  */
+  if(suggestionFirstMoveIsNonLethalTrap())return false;
+
+  return suggested.score<-12;
+}
+function autoPlay(limit=300){
+  for(let step=0;step<limit;step++){
+    if(state.done||state.dead)break;
+
+    if(state.pos===totalTiles-1){
+      let plan=finalTileRecoveryPlan();
+      if(!plan){
+        if(playBestUpgradeCard('autoplay before final-tile stop')){render();continue}
+        state.autoStatus='Auto stopped at final tile: no Back-card recovery target.';
+        log(state.autoStatus);
+        break;
+      }
+    }
+
+    suggestMove();
+
+    if(!suggested){
+      if(playBestUpgradeCard('autoplay before no-move stop')){render();continue}
+      state.autoStatus='Auto stopped: no suggestion.';
+      log(state.autoStatus);
+      break;
+    }
+
+    if(suggestionIsUnsafeMove()){
+      if(playBestUpgradeCard('autoplay before unsafe/death move')){render();continue}
+      state.autoStatus='Auto stopped: best move score too low / unsafe.';
+      log(state.autoStatus);
+      break;
+    }
+
+    if(suggestionIsEndgameMove()){
+      if(playBestUpgradeCard('autoplay before final/endgame move')){render();continue}
+    }
+
+    if(suggestionIsQuestionMove()){
+      if(playBestUpgradeCard('autoplay before ? tile')){render();continue}
+    }
+
+    takeSuggestion();
+  }
+  render();
+}
+function endRun(){state.done=true;state.autoStatus='Manually ended at tile '+(state.pos+1)+'.';log(state.autoStatus);render()}
+function icon(t){
+  if(t.type==='start')return 'START';
+  if(t.type==='chest'){
+    const label=rarityLabel(t.rarity);
+    return '<span class="chestIcon" aria-hidden="true">▰</span><span class="chestText">'+label+'</span>';
+  }
+  if(t.type==='trap')return '⚠';
+  if(t.type==='movement')return t.fixedN?'Move '+t.fixedN:'Card';
+  if(t.type==='upgrade')return 'Up '+(t.fixedFrom||'?');
+  if(t.type==='life')return t.fixedN?('+'+t.fixedN+' Life'):'+Life';
+  if(t.type==='question')return '?';
+  return '·';
+}
+
+function lootLevelLabel(r){
+  return ({green:'LV.1',blue:'LV.2',purple:'LV.3',orange:'LV.4',red:'LV.5',rainbow:'LV.6'})[r]||'—';
+}
+function lootPrettyName(r){
+  return ({green:'Green',blue:'Blue',purple:'Purple',orange:'Gold',red:'Ultimate',rainbow:'Rainbow'})[r]||'Empty';
+}
+function renderLootColumns(){
+  const root=$('lootColumns');
+  const legend=$('lootLegend');
+  if(!root||!state)return;
+  const slots=Array.from({length:7},(_,i)=>state.collected[i]||null);
+  const cols=[slots.slice(0,4),slots.slice(4,7)];
+  function slotHtml(r){
+    if(!r)return `<div class="lootChestSlot empty"><div class="lootChestMini"><span class="lootBands"></span></div><div class="lootMeta"><span class="lootLv">Empty</span><span class="lootName">Open slot</span></div></div>`;
+    const bandClass=r==='rainbow'?'lootBands rainbow':'lootBands';
+    return `<div class="lootChestSlot filled ${r}"><div class="lootChestMini ${r}"><span class="lootGem"></span><span class="${bandClass}"></span></div><div class="lootMeta"><span class="lootLv">${lootLevelLabel(r)}</span><span class="lootName">${lootPrettyName(r)}</span></div></div>`;
+  }
+  root.innerHTML=cols.map((col,idx)=>`<div class="lootCol ${idx===1?'right':''}">${col.map(slotHtml).join('')}</div>`).join('');
+  legend.textContent = state.collected.length ? ('Collected: ' + state.collected.map(lootPrettyName).join(' • ')) : 'No chests collected yet.';
+}
+
+
+
+function updateFloatingDockBounds(){
+  const dock=$('floatingHandDock');
+  const boardFrame=document.querySelector('.gamePanel')||document.querySelector('.boardFrame');
+  if(!dock||!boardFrame)return;
+  const rect=boardFrame.getBoundingClientRect();
+  const pad=12;
+  const left=Math.max(pad, rect.left);
+  const right=Math.min(window.innerWidth-pad, rect.right);
+  const width=Math.max(280, right-left);
+  dock.style.setProperty('--dock-left', left+'px');
+  dock.style.setProperty('--dock-width', width+'px');
+}
+
+function floatingCardMeta(card){
+  const name=(card&&card.name)||'';
+  const lower=name.toLowerCase();
+  if(lower.startsWith('back')) return {kind:'back', kicker:'Backtrack'};
+  if(lower.startsWith('choose')) return {kind:'choice', kicker:'Choice'};
+  if(lower.startsWith('move')) return {kind:'move', kicker:'Advance'};
+  if(lower.includes('up ')||lower.startsWith('up')) return {kind:'upgrade', kicker:'Upgrade'};
+  if(lower.includes('life')) return {kind:'life', kicker:'Life'};
+  if(lower.includes('?')) return {kind:'question', kicker:'Mystery'};
+  return {kind:'utility', kicker:'Card'};
+}
+
+function renderFloatingHandDock(){
+  const dock=$('floatingHandDock');
+  const moveBtn=$('floatingCurrentMoveBtn');
+  const handRoot=$('floatingHand');
+  const confirmBtn=$('floatingConfirmMoveBtn');
+  const confirmText=$('floatingConfirmText');
+  if(!dock||!moveBtn||!handRoot||!state)return;
+  updateFloatingDockBounds();
+  const active=!!state && !state.dead && !state.done;
+  dock.classList.toggle('open',active);
+  dock.classList.toggle('hasCards',state.hand&&state.hand.length>0);
+  dock.classList.toggle('hasPendingMove',!!pendingMove);
+  moveBtn.innerHTML=`<span class="floatingCardKicker">Random refill</span><span class="floatingCardName">Move ${state.currentMove}</span>`;
+  moveBtn.className='floatingMoveCard randomCard current kind-move '+(selected&&selected.type==='current'?'selected':'');
+  handRoot.innerHTML=state.hand.map((c,i)=>{
+    const meta=floatingCardMeta(c);
+    return `<button class="floatingHandCard kind-${meta.kind} ${selected&&selected.type==='hand'&&selected.idx===i?'selected':''}" onclick="selectHand(${i})"><span class="floatingCardKicker">${meta.kicker}</span><span class="floatingCardName">${c.name}</span></button>`;
+  }).join('')||'<span class="floatingEmpty">No stored cards.</span>';
+  if(confirmBtn){
+    confirmBtn.disabled=!pendingMove;
+    confirmBtn.textContent='Confirm Use';
+  }
+  if(confirmText){
+    confirmText.textContent=pendingMove?(choiceActionShort(pendingMove.sel,pendingMove.idx)+' → Tile '+(pendingMove.idx+1)+' · '+targetRewardShort(pendingMove.idx)):'Select a card to preview the landing tile, then confirm use.';
+  }
+}
+
+function render(){
+  forceValueBacktracking();
+  if(!state)return;
+  $('debugline').innerHTML='<b>Current landed tile:</b> '+(state.pos+1)+' / '+totalTiles+' &nbsp; <b>Current refill Move:</b> '+state.currentMove+' &nbsp; <b>Status:</b> '+(state.autoStatus||'—');
+  $('stats').innerHTML=[
+    ['Tile',Math.min(state.pos+1,totalTiles)+'/'+totalTiles],['Move',state.currentMove],['Life',state.life],
+    ['Hand',state.hand.length],['Chests',state.collected.length+'/7'],['Phase',phase()],
+    ['Combo',$('comboDepthInput').value+'-card'],['Board',boardType()],['Board chests',state.tiles.filter(t=>t&&t.type==='chest').length],['Status',state.dead?'Bricked':state.done?'Manually ended':state.collected.length>=maxChests?'Chest cap reached':state.pos>=totalTiles-1?'Final tile cycling':'Playing'],
+    ['Loot',state.collected.join(', ')||'—'],['Preview',!selected?'None':selected.type==='current'?'Current move target':state.hand[selected.idx]?.name||'—'],['Path',state.path.join(' → ')||'—']
+  ].map(([a,b])=>`<div class="stat"><div class="label">${a}</div><div class="val">${b}</div></div>`).join('');
+  $('currentMoveBtn').textContent='Preview current refill Move '+state.currentMove;
+  $('currentMoveBtn').className='arc-card '+(selected&&selected.type==='current'?'selected':'');
+  $('hand').innerHTML=state.hand.map((c,i)=>`<button class="arc-card ${selected&&selected.type==='hand'&&selected.idx===i?'selected':''}" onclick="selectHand(${i})">${c.name}</button>`).join('')||'<span class="small">No stored cards.</span>';
+  renderFloatingHandDock();
+  let targets=targetOptionsFor(selected);
+  $('board').innerHTML=(window.ArcanaBoard&&window.ArcanaBoard.render)
+    ? window.ArcanaBoard.render({state,totalTiles,targets,pendingMove,suggested})
+    : '';
   renderLootColumns();
   $('log').innerHTML=state.log.map(x=>'<div>'+x+'</div>').join('');
   if(suggested){
