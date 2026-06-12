@@ -93,7 +93,6 @@
       const start = r * 4;
       const reverse = r % 2 === 1;
       const rowItems = state.tiles.slice(start, start + 4).map((t, off) => ({ t, i: start + off }));
-      if(reverse) rowItems.reverse();
       const cells = rowItems.map(({ t, i }) => {
         const visit = state.path.indexOf(i + 1);
         return tileHtml(t, i, {
