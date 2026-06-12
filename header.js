@@ -26,7 +26,7 @@
         </div>
       </div>
       <nav class="header-center">
-        <a href="/clockwork/clockwork_calculator.html" class="header-pill">
+        <a href="/clockwork/clockwork.html" class="header-pill">
           Clockwork
         </a>
         <a href="/arcana/arcana.html" class="header-pill">
