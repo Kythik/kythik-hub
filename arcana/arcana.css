@@ -3668,3 +3668,232 @@ body.arcana-page .board {
 @media (max-width:800px){
   .arcana-page.visual-fork .rulesGrid{grid-template-columns:1fr}
 }
+
+
+/* ═══════════════════════════════════════════
+   ARCANA VISUAL SITE V1.26 — Visual cleanup
+   Pull back v1.25 over-framing, restore route readability, improve chests/upgrades.
+   ═══════════════════════════════════════════ */
+
+/* Remove frame-inside-frame feel around the board. Keep one premium playfield frame. */
+.arcana-page.visual-fork .gamePanel{
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  overflow:visible !important;
+}
+.arcana-page.visual-fork .gamePanel::before{
+  display:none !important;
+}
+.arcana-page.visual-fork .boardFrame{
+  background:
+    radial-gradient(circle at 50% 50%, rgba(38,58,87,.16), transparent 62%),
+    linear-gradient(180deg, rgba(7,17,31,.72), rgba(4,8,15,.70)) !important;
+  border:1px solid rgba(230,199,122,.32) !important;
+  border-radius:22px !important;
+  box-shadow:
+    0 24px 70px rgba(0,0,0,.46),
+    inset 0 0 0 1px rgba(255,255,255,.028),
+    inset 0 0 38px rgba(200,164,93,.035) !important;
+  padding:14px 16px 20px !important;
+  position:relative;
+}
+.arcana-page.visual-fork .boardFrame::before{
+  content:"";
+  position:absolute;
+  inset:8px;
+  border:1px solid rgba(200,164,93,.16);
+  border-radius:16px;
+  pointer-events:none;
+}
+
+/* Board tiles: no card-like tiles. Use cleaner medallion/pedestal feel. */
+.arcana-page.visual-fork .tile{
+  border-radius:18px !important;
+  border:1px solid rgba(200,164,93,.34) !important;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(230,199,122,.045), transparent 50%),
+    linear-gradient(180deg, rgba(12,22,35,.92), rgba(5,9,16,.96)) !important;
+  box-shadow:
+    0 12px 22px rgba(0,0,0,.34),
+    inset 0 0 0 1px rgba(255,255,255,.025),
+    inset 0 -10px 22px rgba(0,0,0,.28) !important;
+  clip-path:none !important;
+}
+.arcana-page.visual-fork .tile::before{
+  inset:5px !important;
+  border-radius:14px !important;
+  border:1px solid rgba(230,199,122,.08) !important;
+}
+.arcana-page.visual-fork .tile .c{
+  font-size:clamp(15px,1.2vw,21px) !important;
+}
+
+/* Restore/strengthen the route gold links. */
+.arcana-page.visual-fork .link,
+.arcana-page.visual-fork .rowLink,
+.arcana-page.visual-fork .tile .link{
+  opacity:1 !important;
+  filter:drop-shadow(0 0 7px rgba(230,199,122,.45)) !important;
+  background:linear-gradient(90deg, rgba(200,164,93,.20), rgba(230,199,122,.90), rgba(200,164,93,.20)) !important;
+  border-color:rgba(230,199,122,.64) !important;
+}
+.arcana-page.visual-fork .rowLink::before,
+.arcana-page.visual-fork .rowLink::after{
+  background:rgba(230,199,122,.95) !important;
+  box-shadow:0 0 12px rgba(230,199,122,.48) !important;
+}
+.arcana-page.visual-fork .rowWrapDot,
+.arcana-page.visual-fork .linkIndex,
+.arcana-page.visual-fork .linkBadge,
+.arcana-page.visual-fork .rowLinkBadge,
+.arcana-page.visual-fork .tile .linkBadge,
+.arcana-page.visual-fork .tile .rowLinkBadge{
+  display:none !important;
+}
+
+/* Keep the improved question tile: clean gold question-marker medallion. */
+.arcana-page.visual-fork .tile.question{
+  border-color:rgba(230,199,122,.58) !important;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(242,138,46,.18), transparent 54%),
+    linear-gradient(180deg, rgba(37,25,10,.94), rgba(7,10,17,.96)) !important;
+}
+.arcana-page.visual-fork .tile.question .c{
+  color:#E6C77A !important;
+  text-shadow:0 0 16px rgba(230,199,122,.36);
+  font-weight:950;
+}
+
+/* Move-card tiles: one unified color; count changes only. */
+.arcana-page.visual-fork .tile.movement,
+.arcana-page.visual-fork .tile.move,
+.arcana-page.visual-fork .tile.kind-movement{
+  border-color:rgba(46,216,195,.58) !important;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(46,216,195,.18), transparent 55%),
+    linear-gradient(180deg, rgba(7,38,41,.94), rgba(5,11,18,.96)) !important;
+}
+.arcana-page.visual-fork .tile.movement .moveCount,
+.arcana-page.visual-fork .tile.move .moveCount{
+  right:4px !important;
+  bottom:4px !important;
+  min-width:26px !important;
+  height:20px !important;
+  font-size:12px !important;
+  background:rgba(4,8,15,.88) !important;
+}
+
+/* Chests: stronger polished chest-tile read without adding image assets. */
+.arcana-page.visual-fork .tile.chest{
+  border-color:rgba(230,199,122,.72) !important;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(230,199,122,.24), transparent 54%),
+    linear-gradient(180deg, rgba(42,27,9,.96), rgba(7,8,13,.98)) !important;
+}
+.arcana-page.visual-fork .tile.chest.green{border-color:rgba(114,190,91,.64) !important;}
+.arcana-page.visual-fork .tile.chest.blue{border-color:rgba(86,182,255,.68) !important;}
+.arcana-page.visual-fork .tile.chest.purple{border-color:rgba(168,97,255,.72) !important;}
+.arcana-page.visual-fork .tile.chest.orange{border-color:rgba(230,199,122,.78) !important;}
+.arcana-page.visual-fork .tile.chest.red{border-color:rgba(230,76,60,.78) !important;}
+.arcana-page.visual-fork .tile.chest.rainbow{
+  border-color:rgba(220,235,255,.82) !important;
+  box-shadow:
+    0 12px 22px rgba(0,0,0,.34),
+    0 0 18px rgba(168,97,255,.20),
+    0 0 24px rgba(86,182,255,.18),
+    inset 0 0 18px rgba(230,199,122,.08) !important;
+}
+.arcana-page.visual-fork .chestIcon{
+  display:inline-flex !important;
+  width:34px;
+  height:24px;
+  align-items:center;
+  justify-content:center;
+  border-radius:8px 8px 5px 5px;
+  background:
+    linear-gradient(180deg, rgba(230,199,122,.95), rgba(142,96,36,.96));
+  border:1px solid rgba(255,236,174,.55);
+  color:#1B1208 !important;
+  box-shadow:
+    0 0 14px rgba(230,199,122,.34),
+    inset 0 -8px 12px rgba(0,0,0,.20);
+  font-size:0 !important;
+}
+.arcana-page.visual-fork .chestIcon::before{
+  content:"";
+  width:18px;
+  height:12px;
+  border-radius:3px;
+  border:2px solid rgba(4,8,15,.75);
+  border-top-width:4px;
+  box-shadow:inset 0 0 0 2px rgba(230,199,122,.22);
+}
+.arcana-page.visual-fork .tile.chest.blue .chestIcon,
+.arcana-page.visual-fork .tile.chest.rare .chestIcon{
+  background:linear-gradient(180deg, #76B8EA, #244A78);
+}
+.arcana-page.visual-fork .tile.chest.green .chestIcon,
+.arcana-page.visual-fork .tile.chest.common .chestIcon{
+  background:linear-gradient(180deg, #78B86B, #244E2C);
+}
+.arcana-page.visual-fork .tile.chest.purple .chestIcon,
+.arcana-page.visual-fork .tile.chest.epic .chestIcon{
+  background:linear-gradient(180deg, #B072EA, #4B237B);
+}
+.arcana-page.visual-fork .tile.chest.red .chestIcon,
+.arcana-page.visual-fork .tile.chest.ultimate .chestIcon{
+  background:linear-gradient(180deg, #F56A4E, #7C1E18);
+}
+.arcana-page.visual-fork .tile.chest.rainbow .chestIcon{
+  background:linear-gradient(135deg, #7AD7FF, #E8DBFF 35%, #F2D27B 65%, #A57BFF);
+}
+
+/* Upgrade tiles/cards: explicitly colored and labeled. */
+.arcana-page.visual-fork .tile.upgrade{
+  border-color:rgba(255,90,168,.70) !important;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255,90,168,.22), transparent 55%),
+    linear-gradient(180deg, rgba(58,14,32,.95), rgba(7,9,16,.97)) !important;
+}
+.arcana-page.visual-fork .tile.upgrade .upgradeTileLabel{
+  position:absolute;
+  right:5px;
+  bottom:5px;
+  padding:1px 6px;
+  border-radius:999px;
+  border:1px solid rgba(255,90,168,.65);
+  background:rgba(4,8,15,.82);
+  color:#FFD8EB;
+  font-size:10px;
+  font-weight:950;
+  z-index:8;
+}
+.arcana-page.visual-fork .tile.upgrade .upgradeTileIcon{
+  color:#FF8FC4;
+  text-shadow:0 0 16px rgba(255,90,168,.42);
+}
+
+/* Hand upgrade cards need stronger color/read and label. */
+.arcana-page.visual-fork .floatingHandCards button.kind-upgrade,
+.arcana-page.visual-fork .arc-card.kind-upgrade{
+  border-color:rgba(255,90,168,.74) !important;
+  background:
+    radial-gradient(circle at 50% 28%, rgba(255,90,168,.25), transparent 58%),
+    linear-gradient(180deg, rgba(72,14,36,.96), rgba(9,9,16,.97)) !important;
+}
+.arcana-page.visual-fork .floatingHandCards button.kind-upgrade .floatingCardName,
+.arcana-page.visual-fork .floatingHandCards button.kind-upgrade .cardName,
+.arcana-page.visual-fork .arc-card.kind-upgrade .cardName{
+  color:#FFD8EB !important;
+}
+.arcana-page.visual-fork .floatingHandCards button.kind-upgrade .floatingCardName::before,
+.arcana-page.visual-fork .arc-card.kind-upgrade .cardName::before{
+  content:"UPGRADE ";
+  color:#FF8FC4;
+}
+
+/* Stop excessive heavy card shell look in board tiles, not in hand. */
+.arcana-page.visual-fork .tile .n{
+  opacity:.58 !important;
+}
