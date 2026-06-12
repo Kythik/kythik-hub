@@ -109,6 +109,22 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
     </div>
 
     <div class="stats" id="stats"></div>
+
+<div class="statusBoardActions">
+  <label class="boardSelectLabel">Board
+    <select id="boardTypeInputMirror" onchange="syncBoardTypeFromMirror()">
+      <option value="normal">Normal</option>
+      <option value="special1">Special 1</option>
+      <option value="special2">Special 2</option>
+      <option value="special3">Special 3</option>
+    </select>
+  </label>
+  <div class="statusActionBtns">
+    <button type="button" onclick="newGame(false)">New Board</button>
+    <button type="button" class="alt" onclick="resetSame()">Reset</button>
+  </div>
+</div>
+
     <div class="lootStage" id="lootStage">
       <div class="lootStageHead">
         <h3>Reward chest slots</h3>
@@ -148,7 +164,7 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
   <div class="panel gamePanel" style="display:flex;justify-content:center;align-items:flex-start;overflow-x:auto;">
     <div class="boardFrame" style="margin-left:auto;margin-right:auto;">
       <div class="boardHeader">
-        <div class="boardTitle">Arcana Board</div>
+        <div class="boardTitle">Arcana Board</div><button type="button" class="boardRulesBtn" onclick="openRulesModal()">Rules</button>
         <div class="boardLegend">
           <span class="legendPill"><span class="legendDot" style="background:#fff"></span>Current</span>
           <span class="legendPill"><span class="legendDot"></span>Preview</span>
@@ -184,6 +200,47 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
   </div>
 </div>
 
+    </div>
+  </div>
+</div>
+
+
+<div class="modalOverlay rulesModalOverlay" id="rulesModal" onclick="if(event.target.id==='rulesModal')closeRulesModal()">
+  <div class="modalBox rulesModalBox">
+    <div class="modalHeader"><h2>Arcana Rules</h2><button class="closeBtn" onclick="closeRulesModal()">Close</button></div>
+    <div class="rulesGrid">
+      <section class="rulesCard">
+        <h3>Board flow</h3>
+        <p>Pick the current Move card or one stored hand card. The board previews the landing tile, then Confirm Use spends that card and resolves the tile.</p>
+      </section>
+      <section class="rulesCard">
+        <h3>Movement tiles</h3>
+        <p>Movement-card tiles show how many cards they provide. The number is fixed by the tile, not randomly guessed by the helper.</p>
+      </section>
+      <section class="rulesCard">
+        <h3>Reward chests</h3>
+        <p>You can secure up to seven reward chests. Chest rarity matters, so the best line is not always the closest chest.</p>
+      </section>
+      <section class="rulesCard">
+        <h3>Upgrade cards</h3>
+        <p>Hand upgrade cards affect already-secured reward chests only. With no secured chest, the card has no effect and does not upgrade the board.</p>
+      </section>
+      <section class="rulesCard">
+        <h3>Recommend</h3>
+        <p>Recommend previews the selected strategy’s next move. You still confirm it manually.</p>
+      </section>
+      <section class="rulesCard">
+        <h3>Auto Play</h3>
+        <p>Auto Play executes moves using the selected strategy. Use it for testing or after you understand the board state.</p>
+      </section>
+      <section class="rulesCard">
+        <h3>Markers</h3>
+        <p>The diamond marks your current position. Small numbered markers show where you already landed. Passed-over tiles are not collected.</p>
+      </section>
+      <section class="rulesCard">
+        <h3>Special boards</h3>
+        <p>Special boards swap in their own strategy choices. The strategy dropdown changes recommendation logic, not the board rules.</p>
+      </section>
     </div>
   </div>
 </div>
@@ -369,6 +426,16 @@ function phase(){let t=state?.pos+1||1;if(t<=20)return'setup';if(t<=40)return'co
 function forceValueBacktracking(){
   const el=$('backtrackModeInput');
   if(el)el.value='value';
+}
+
+
+function syncBoardMirror(){
+  const real=$('boardTypeInput'), mirror=$('boardTypeInputMirror');
+  if(real&&mirror&&mirror.value!==real.value)mirror.value=real.value;
+}
+function syncBoardTypeFromMirror(){
+  const real=$('boardTypeInput'), mirror=$('boardTypeInputMirror');
+  if(real&&mirror){real.value=mirror.value;changeBoardType();}
 }
 
 function boardType(){return $('boardTypeInput')?.value||'normal'}
@@ -1607,7 +1674,7 @@ function targetRewardShort(i){
   const t=state.tiles[i]||{};
   if(t.type==='chest')return lootLevelLabel(t.rarity)+' '+lootPrettyName(t.rarity)+' chest';
   if(t.type==='trap')return 'Trap';
-  if(t.type==='movement')return t.fixedN?'Gain Move '+t.fixedN:'Gain mapping card';
+  if(t.type==='movement')return '<span class="moveTileIcon">▣</span><span class="moveCount">+'+(t.fixedN||1)+'</span>'; if(false)return t.fixedN?'Gain Move '+t.fixedN:'Gain mapping card';
   if(t.type==='upgrade')return 'Gain upgrade card';
   if(t.type==='life')return t.fixedN?('Gain +'+t.fixedN+' life'):'Gain life';
   if(t.type==='question')return 'Mystery tile';
@@ -1947,6 +2014,18 @@ function floatingCardMeta(card){
   return {kind:'utility', kicker:'Card'};
 }
 
+
+function cardCssKind(c){
+  if(!c)return 'empty';
+  if(c.type==='move'||c.type==='move_any'||c.type==='move_even'||c.type==='move_odd')return c.type;
+  if(c.type==='back'||c.type==='back_any')return c.type;
+  if(c.type==='upgrade')return 'upgrade';
+  if(c.type==='life')return 'life';
+  if(c.type==='question')return 'question';
+  if(c.type==='trap')return 'trap';
+  return c.type||'card';
+}
+
 function renderFloatingHandDock(){
   const dock=$('floatingHandDock');
   const moveBtn=$('floatingCurrentMoveBtn');
@@ -1963,7 +2042,7 @@ function renderFloatingHandDock(){
   moveBtn.className='floatingMoveCard randomCard current kind-move '+(selected&&selected.type==='current'?'selected':'');
   handRoot.innerHTML=state.hand.map((c,i)=>{
     const meta=floatingCardMeta(c);
-    return `<button class="floatingHandCard kind-${meta.kind} ${selected&&selected.type==='hand'&&selected.idx===i?'selected':''}" onclick="selectHand(${i})"><span class="floatingCardKicker">${meta.kicker}</span><span class="floatingCardName">${c.name}</span></button>`;
+    return `<button class="floatingHandCard kind-${cardCssKind(c)} ${selected&&selected.type==='hand'&&selected.idx===i?'selected':''}" onclick="selectHand(${i})"><span class="floatingCardKicker">${meta.kicker}</span><span class="floatingCardName">${c.name}</span></button>`;
   }).join('')||'<span class="floatingEmpty">No stored cards.</span>';
   if(confirmBtn){
     confirmBtn.disabled=!pendingMove;
@@ -1975,6 +2054,7 @@ function renderFloatingHandDock(){
 }
 
 function render(){
+  syncBoardMirror();
   forceValueBacktracking();
   if(!state)return;
   $('debugline').innerHTML='<b>Current landed tile:</b> '+(state.pos+1)+' / '+totalTiles+' &nbsp; <b>Current refill Move:</b> '+state.currentMove+' &nbsp; <b>Status:</b> '+(state.autoStatus||'—');
@@ -2026,6 +2106,10 @@ function render(){
   }else{
     $('routeNotes').innerHTML='Click <b>Recommend Next Move</b>. Recommendations use 2-card route logic by default; 3-card is safe; 4-card is survival-first.';
   }}
+
+function openRulesModal(){const el=$('rulesModal');if(el)el.classList.add('show')}
+function closeRulesModal(){const el=$('rulesModal');if(el)el.classList.remove('show')}
+
 function openInfoModal(){$('infoModal').classList.add('open')}
 function closeInfoModal(){$('infoModal').classList.remove('open')}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeInfoModal();cancelPendingMove();}});
