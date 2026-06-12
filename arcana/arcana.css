@@ -3816,3 +3816,163 @@ body.arcana-page .board {
     height:42px;
   }
 }
+
+
+/* ═══════════════════════════════════════════
+   ARCANA V1.33 — Board fit + node cleanup
+   Diagnosis: board-node HTML is okay; the remaining card look is CSS.
+   Fix: remove inner-frame feel, make board fill playfield, make nodes more token-like.
+   ═══════════════════════════════════════════ */
+
+/* Let the board occupy the board frame instead of floating small in the middle. */
+.arcana-page.visual-fork #board.board{
+  max-width:none !important;
+  width:100% !important;
+  margin:0 !important;
+}
+
+.arcana-page.visual-fork .boardFrame{
+  padding:8px 10px 12px !important;
+}
+
+/* Remove the boardV2 "panel within the panel" feeling. */
+.arcana-page.visual-fork .boardV2{
+  --cell-h:84px;
+  width:100% !important;
+  min-height:calc(var(--board-rows) * var(--cell-h)) !important;
+  padding:4px 6px 8px !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+.arcana-page.visual-fork .boardRouteSvg{
+  inset:4px 6px 8px !important;
+  width:calc(100% - 12px) !important;
+  height:calc(100% - 12px) !important;
+}
+
+/* Stronger gold route, since the route is the board, not the tile boxes. */
+.arcana-page.visual-fork .boardRouteLink{
+  stroke:rgba(230,199,122,.92) !important;
+  stroke-width:3.2 !important;
+  filter:
+    drop-shadow(0 0 5px rgba(230,199,122,.55))
+    drop-shadow(0 0 11px rgba(230,199,122,.20)) !important;
+}
+
+/* Board nodes should be tokens/medallions, not mini cards. */
+.arcana-page.visual-fork .boardNode{
+  width:62px !important;
+  height:56px !important;
+  border-radius:999px !important;
+  border:1px solid rgba(200,164,93,.34) !important;
+  background:
+    radial-gradient(ellipse at 50% 38%, rgba(230,199,122,.10), transparent 52%),
+    radial-gradient(ellipse at 50% 78%, rgba(0,0,0,.34), transparent 55%),
+    linear-gradient(180deg, rgba(10,19,31,.82), rgba(3,7,13,.90)) !important;
+  box-shadow:
+    0 10px 22px rgba(0,0,0,.30),
+    inset 0 0 18px rgba(0,0,0,.22) !important;
+  clip-path:none !important;
+}
+
+/* Kill any inherited rectangular/card-like overlays inside board nodes. */
+.arcana-page.visual-fork .boardNode::before,
+.arcana-page.visual-fork .boardNode::after,
+.arcana-page.visual-fork .boardNode .nodeBody::before,
+.arcana-page.visual-fork .boardNode .nodeBody::after{
+  display:none !important;
+  content:none !important;
+}
+
+/* Empty nodes: visible empty glyph, quiet medallion, no weird dark card/backplate. */
+.arcana-page.visual-fork .boardNode.node-empty,
+.arcana-page.visual-fork .boardNode.spentEmpty{
+  width:50px !important;
+  height:44px !important;
+  opacity:.70 !important;
+  border-color:rgba(200,164,93,.22) !important;
+  background:
+    radial-gradient(circle at 50% 44%, rgba(230,199,122,.13), transparent 45%),
+    linear-gradient(180deg, rgba(8,16,27,.54), rgba(3,7,13,.66)) !important;
+  box-shadow:
+    0 6px 14px rgba(0,0,0,.20),
+    inset 0 0 14px rgba(0,0,0,.16) !important;
+}
+
+.arcana-page.visual-fork .nodeGlyph-empty{
+  opacity:1 !important;
+  color:rgba(230,199,122,.62) !important;
+  font-size:17px !important;
+  text-shadow:0 0 8px rgba(230,199,122,.16) !important;
+}
+
+/* Meaningful tiles get more presence without becoming cards. */
+.arcana-page.visual-fork .boardNode:not(.node-empty):not(.spentEmpty){
+  opacity:1 !important;
+  box-shadow:
+    0 12px 25px rgba(0,0,0,.34),
+    0 0 16px rgba(230,199,122,.07),
+    inset 0 0 18px rgba(0,0,0,.20) !important;
+}
+
+/* One unified move-provider token color; number only changes. */
+.arcana-page.visual-fork .boardNode.node-movement{
+  border-color:rgba(46,216,195,.58) !important;
+  background:
+    radial-gradient(ellipse at 50% 38%, rgba(46,216,195,.24), transparent 56%),
+    radial-gradient(ellipse at 50% 78%, rgba(0,0,0,.34), transparent 55%),
+    linear-gradient(180deg, rgba(7,42,44,.78), rgba(3,8,14,.88)) !important;
+}
+
+/* Move icon should be visible as a tile function, not disappear. */
+.arcana-page.visual-fork .nodeGlyph-move{
+  color:#D9FFFA !important;
+  font-size:15px !important;
+  letter-spacing:.02em;
+  text-shadow:0 0 12px rgba(46,216,195,.45) !important;
+}
+
+/* Count badge remains the differentiator. */
+.arcana-page.visual-fork .nodeCount{
+  right:2px !important;
+  bottom:1px !important;
+  min-width:24px !important;
+  height:17px !important;
+  font-size:11px !important;
+  border-radius:999px !important;
+  background:rgba(3,7,13,.88) !important;
+  border:1px solid rgba(46,216,195,.72) !important;
+}
+
+/* The index exists for debugging/readability but should not look like a card cost. */
+.arcana-page.visual-fork .boardNode .nodeIndex{
+  left:7px !important;
+  top:5px !important;
+  font-size:9px !important;
+  opacity:.42 !important;
+  color:rgba(170,180,196,.52) !important;
+}
+
+/* Keep current-position diamond visually above the token. */
+.arcana-page.visual-fork .boardNode .playerMarker{
+  z-index:20 !important;
+}
+
+/* Route and nodes should use the full visual footprint on smaller pages too. */
+@media (max-width:900px){
+  .arcana-page.visual-fork .boardV2{
+    --cell-h:78px !important;
+    padding:4px !important;
+  }
+  .arcana-page.visual-fork .boardNode{
+    width:56px !important;
+    height:50px !important;
+  }
+  .arcana-page.visual-fork .boardNode.node-empty,
+  .arcana-page.visual-fork .boardNode.spentEmpty{
+    width:46px !important;
+    height:40px !important;
+  }
+}
