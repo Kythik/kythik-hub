@@ -11,9 +11,9 @@
     <header class="labHeader">
       <div>
         <h1>Arcana Board Dev Lab</h1>
-        <p>Isolated board sandbox using the uploaded board as the stable visual baseline. This sample renders 20 rows to stress-test tile types, rarities, labels, row links, and board states.</p>
+        <p>20-row deterministic board sample for stress-testing tile types, rarities, labels, row links, and board states.</p>
       </div>
-      <div class="labBadge">20-row visual QA</div>
+      <div class="labBadge">Board-only v5</div>
     </header>
 
     <div class="labGrid">
@@ -22,31 +22,27 @@
           <div class="boardHeader">
             <div class="boardTitle">Arcana Board</div>
             <div class="boardLegend">
-              <span class="legendPill"><span class="legendDot" style="background:#fff"></span>Current</span>
-              <span class="legendPill"><span class="legendDot"></span>Preview</span>
-              <span class="legendPill"><span class="legendDot" style="background:#E9EDF5"></span>Landing #</span>
-              <span class="legendPill"><span class="legendDot"></span>Row link</span>
+              <span class="legendPill"><span class="legendDot current"></span>Current</span>
+              <span class="legendPill"><span class="legendDot preview"></span>Preview</span>
+              <span class="legendPill"><span class="legendDot landing"></span>Landing #</span>
+              <span class="legendPill"><span class="legendDot path"></span>Row Link</span>
             </div>
           </div>
-
           <div class="board" id="board"></div>
         </div>
       </section>
 
       <aside class="panel labControls">
-        <h2>What this lab is for</h2>
-        <p>Use this to polish the board without risking the production helper.</p>
+        <h2>Visual direction for this pass</h2>
+        <p>This version pulls back from chunky card tiles and moves toward the old dev-lab board plus the fateful-contest mockup: dark node bases, gold path lines, icon-first tiles, compact 4-column rows, and the restored current-position diamond marker.</p>
         <ul>
-          <li>Review a fixed 20-row sample board with every major tile family represented.</li>
-          <li>Improve <code>.tile</code> visuals safely.</li>
-          <li>Try cleaner <code>.rowEndLink</code> / gold path ideas.</li>
-          <li>Improve chest visuals and upgrade tile labels.</li>
-          <li>Once approved, port only the board CSS back to production.</li>
+          <li>Board sandbox only.</li>
+          <li>20 rows for visual QA.</li>
+          <li>Production untouched.</li>
         </ul>
       </aside>
     </div>
   </main>
-
 <script src="arcana-board-lab.js"></script>
 </body>
 </html>
