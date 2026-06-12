@@ -37,8 +37,8 @@
 .arcana-page .boardRow::before{
   content:"";
   position:absolute;
-  left:34px;
-  right:34px;
+  left:20px;
+  right:20px;
   top:31px;
   height:4px;
   border-radius:99px;
@@ -49,8 +49,8 @@
 .arcana-page .boardRow::after{
   content:"";
   position:absolute;
-  left:48px;
-  right:48px;
+  left:26px;
+  right:26px;
   top:32px;
   height:1px;
   background:rgba(255,247,190,.44);
@@ -60,27 +60,27 @@
 .arcana-page .rowConnector{
   position:absolute;
   top:31px;
-  width:26px;
+  width:18px;
   height:82px;
   pointer-events:none;
   z-index:-1;
   filter:drop-shadow(0 0 5px rgba(242,214,138,.16)) drop-shadow(0 6px 12px rgba(0,0,0,.28));
 }
 .arcana-page .rowConnector.right{
-  right:-24px;
+  right:-10px;
   border-top:4px solid rgba(200,164,93,.52);
   border-right:4px solid rgba(200,164,93,.52);
   border-bottom:4px solid rgba(200,164,93,.52);
-  border-top-right-radius:18px;
-  border-bottom-right-radius:18px;
+  border-top-right-radius:16px;
+  border-bottom-right-radius:16px;
 }
 .arcana-page .rowConnector.left{
-  left:-24px;
+  left:-10px;
   border-top:4px solid rgba(200,164,93,.52);
   border-left:4px solid rgba(200,164,93,.52);
   border-bottom:4px solid rgba(200,164,93,.52);
-  border-top-left-radius:18px;
-  border-bottom-left-radius:18px;
+  border-top-left-radius:16px;
+  border-bottom-left-radius:16px;
 }
 .arcana-page .rowConnector::after{content:"";position:absolute;top:1px;bottom:1px;pointer-events:none}
 .arcana-page .rowConnector.right::after{
@@ -88,8 +88,8 @@
   border-top:1px solid rgba(255,247,190,.52);
   border-right:1px solid rgba(255,247,190,.52);
   border-bottom:1px solid rgba(255,247,190,.52);
-  border-top-right-radius:14px;
-  border-bottom-right-radius:14px;
+  border-top-right-radius:12px;
+  border-bottom-right-radius:12px;
   box-shadow:0 0 4px rgba(242,214,138,.24);
 }
 .arcana-page .rowConnector.left::after{
@@ -97,8 +97,8 @@
   border-top:1px solid rgba(255,247,190,.52);
   border-left:1px solid rgba(255,247,190,.52);
   border-bottom:1px solid rgba(255,247,190,.52);
-  border-top-left-radius:14px;
-  border-bottom-left-radius:14px;
+  border-top-left-radius:12px;
+  border-bottom-left-radius:12px;
   box-shadow:0 0 4px rgba(242,214,138,.24);
 }
 

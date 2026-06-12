@@ -14,10 +14,6 @@
 <title>Arcana Tarot Minigame — Visual Site v1</title>
 <style id="arcana-board-layout-guard">
   .arcana-page .gamePanel{display:flex!important;justify-content:center!important;align-items:flex-start!important;overflow-x:auto}
-  .arcana-page .boardFrame,.arcana-page .board{margin-left:auto!important;margin-right:auto!important}
-  .arcana-page .board{display:flex!important;flex-direction:column!important;align-items:center!important;width:max-content!important}
-  .arcana-page .boardRow{display:flex}
-  .arcana-page .boardRow.reverse{flex-direction:row-reverse}
   .arcana-page .tile{overflow:visible}
 </style>
 <link rel="stylesheet" href="arcana-board.css?v=board-v1" />
@@ -166,7 +162,7 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
   </div>
 
   <div class="panel gamePanel" style="display:flex;justify-content:center;align-items:flex-start;overflow-x:auto;">
-    <div class="boardFrame" style="margin-left:auto;margin-right:auto;">
+    <div class="boardFrame">
       <div class="boardHeader">
         <div class="boardTitle">Arcana Board</div>
         <div class="boardLegend">
@@ -175,7 +171,7 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
           <span class="legendPill"><span class="legendDot" style="background:#E9EDF5"></span>Landing #</span><span class="legendPill"><span class="legendDot path"></span>Row Path</span>
         </div>
       </div>
-      <div class="board" id="board" style="margin-left:auto;margin-right:auto;"></div>
+      <div class="board" id="board"></div>
 <div class="floatingHandDock" id="floatingHandDock" aria-live="polite">
   <div class="floatingChoiceTray" id="floatingChoiceTray" hidden>
     <div class="floatingChoiceHead">
