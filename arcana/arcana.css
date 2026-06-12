@@ -3904,3 +3904,102 @@ body.arcana-page .board {
 .arcana-page.visual-fork #boardTypeInputMirror{
   display:none !important;
 }
+
+
+/* ARCANA VISUAL SITE V1.28 — Collapsed sidebar sections */
+.arcana-page.visual-fork .sidebarDisclosure{
+  margin-top:12px;
+  border:1px solid rgba(230,199,122,.22);
+  border-radius:14px;
+  background:linear-gradient(180deg, rgba(11,21,36,.64), rgba(4,8,15,.70));
+  overflow:hidden;
+}
+.arcana-page.visual-fork .sidebarDisclosure > summary{
+  list-style:none;
+  cursor:pointer;
+  user-select:none;
+  display:grid;
+  grid-template-columns:auto 1fr auto auto;
+  gap:10px;
+  align-items:center;
+  min-height:44px;
+  padding:0 13px;
+  color:#E6C77A;
+  font-weight:900;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.arcana-page.visual-fork .sidebarDisclosure > summary::-webkit-details-marker{
+  display:none;
+}
+.arcana-page.visual-fork .sidebarDisclosure > summary::after{
+  content:"⌄";
+  color:#E6C77A;
+  font-size:18px;
+  line-height:1;
+  transform:translateY(-1px);
+  opacity:.9;
+}
+.arcana-page.visual-fork .sidebarDisclosure[open] > summary::after{
+  content:"⌃";
+}
+.arcana-page.visual-fork .summaryIcon{
+  width:22px;
+  height:22px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:8px;
+  border:1px solid rgba(230,199,122,.28);
+  background:rgba(4,8,15,.45);
+  color:#E6C77A;
+  font-size:13px;
+}
+.arcana-page.visual-fork .summaryHint{
+  color:rgba(233,237,245,.62);
+  text-transform:none;
+  letter-spacing:0;
+  font-weight:700;
+  font-size:11px;
+}
+.arcana-page.visual-fork .sidebarDisclosure[open]{
+  border-color:rgba(230,199,122,.38);
+  box-shadow:0 12px 28px rgba(0,0,0,.22), inset 0 0 22px rgba(230,199,122,.025);
+}
+.arcana-page.visual-fork .sidebarDisclosure[open] > summary{
+  border-bottom:1px solid rgba(230,199,122,.16);
+}
+.arcana-page.visual-fork .sidebarDisclosure .autoplaySetup{
+  margin:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  padding:14px !important;
+}
+.arcana-page.visual-fork .sidebarDisclosure .autoplaySetupHead{
+  margin-bottom:10px;
+}
+.arcana-page.visual-fork .sidebarDisclosure .autoplaySetupHead h3{
+  display:none !important;
+}
+.arcana-page.visual-fork .sidebarDisclosure .autoplaySetupHead p{
+  margin:0;
+  color:rgba(233,237,245,.72);
+  font-size:12px;
+}
+.arcana-page.visual-fork .sidebarDisclosure .routeNotes,
+.arcana-page.visual-fork .sidebarDisclosure .log{
+  margin:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:rgba(4,8,15,.34) !important;
+  min-height:0 !important;
+  max-height:260px;
+  overflow:auto;
+  padding:13px 14px !important;
+}
+.arcana-page.visual-fork .sidebarDisclosure:not([open]) .routeNotes,
+.arcana-page.visual-fork .sidebarDisclosure:not([open]) .log,
+.arcana-page.visual-fork .sidebarDisclosure:not([open]) .autoplaySetup{
+  display:none !important;
+}

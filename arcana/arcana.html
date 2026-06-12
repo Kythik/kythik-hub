@@ -130,21 +130,42 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
       <div class="hand" id="hand"></div>
     </div>
 
-    <div class="autoplaySetup">
-      <div class="autoplaySetupHead">
-        <h3>Autoplay Setup</h3>
-        <p>Autoplay assumes value recovery backtracking by default.</p>
-      </div>
-      <div class="autoplayControls">
-        <label>Strategy <select id="strategyInput" onchange="suggested=null;render()"><option value="Purple_Before_Q" selected>Purple Before ?</option></select></label>
+
+    <details class="sidebarDisclosure autoplayDisclosure">
+
+
+      <summary><span class="summaryIcon">⚙</span><span>Autoplay Setup</span><span class="summaryHint">Strategy + combo</span></summary>
+
+
+      <div class="autoplaySetup">
+
+
+        <div class="autoplaySetupHead">
+
+
+          <p>Autoplay assumes value recovery backtracking by default.</p>
+
+
+        </div>
+
+
+        <div class="autoplayControls"><label>Strategy <select id="strategyInput" onchange="suggested=null;render()"><option value="Purple_Before_Q" selected>Purple Before ?</option></select></label>
         <label>Combo <select id="comboDepthInput"><option value="2" selected>2-card</option><option value="3">3-card safe</option><option value="4">4-card survival</option></select></label>
-        <label class="backtrackModeControl">Backtrack <select id="backtrackModeInput"><option value="value" selected>value recovery</option><option value="tile80">final tile only</option></select></label>
+        <label class="backtrackModeControl">Backtrack <select id="backtrackModeInput"><option value="value" selected>value recovery</option><option value="tile80">final tile only</option></select></label></div>
+
+
       </div>
-    </div>
-<h3>Route Notes</h3>
-    <div class="routeNotes" id="routeNotes"></div>
-    <h3>Run log</h3>
-    <div class="log" id="log"></div>
+
+
+    </details>
+    <details class="sidebarDisclosure routeNotesDisclosure">
+      <summary><span class="summaryIcon">▣</span><span>Route Notes</span><span class="summaryHint">Recommendation details</span></summary>
+      <div class="routeNotes" id="routeNotes"></div>
+    </details>
+    <details class="sidebarDisclosure runLogDisclosure">
+      <summary><span class="summaryIcon">☰</span><span>Run Log</span><span class="summaryHint">History</span></summary>
+      <div class="log" id="log"></div>
+    </details>
   </div>
 
   <div class="panel gamePanel" style="display:flex;justify-content:center;align-items:flex-start;overflow-x:auto;">
