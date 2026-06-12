@@ -236,3 +236,4 @@ select:focus{border-color:var(--gold-muted)}
   .page-header{padding:24px 16px 20px}
   .svc-table th:nth-child(4),.svc-table td:nth-child(4){display:none}
 }
+.svc-effect-primary{font-size:13px;color:var(--text-primary);font-weight:500;line-height:1.4}

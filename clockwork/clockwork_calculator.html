@@ -949,8 +949,9 @@ function render(){
     const seasonBadge=nodeSeasonal&&s.id===11?'<span style="font-size:10px;color:var(--gold-bright);margin-left:4px">★ season</span>':'';
     const bw=s.pct||0;
     const th=s.tag?tagMap[s.tag]||'':'';
-    const nameHtml=(s.name?`<span class="svc-name">${s.name}</span>`:s.id?`<span class="svc-name" style="color:var(--text-faint)">ID ${s.id}</span>`:'')+seasonBadge;
-    const eff=`<div class="svc-effect">${(s.effect||s.desc||'').substring(0,100)}${(s.effect||s.desc||'').length>100?'…':''}${th}</div>`;
+    const nameHtml=(s.name?`<span class="svc-name">${s.name}</span>`:'')+seasonBadge;
+    const effClass=s.name?'svc-effect':'svc-effect svc-effect-primary';
+    const eff=`<div class="${effClass}">${(s.effect||s.desc||'').substring(0,100)}${(s.effect||s.desc||'').length>100?'…':''}${th}</div>`;
     const noteHtml=s.note?`<div class="svc-note">${s.note}</div>`:'';
     const inlineWarn=s.isRoulette?`<div class="svc-inline-warn">~1 per 100 maps · 43% wipe rate · ~500 maps to be reliably profitable</div>`:
                      s.isID23?`<div class="svc-inline-ok">~12.5% encounter rate · safe cashout · reliable every session</div>`:'';
