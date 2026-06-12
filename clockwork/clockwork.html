@@ -1021,27 +1021,26 @@ function render(){
     const nameHtml=(s.name?`<span class="svc-name">${s.name}</span>`:'')+seasonBadge;
     const effClass=s.name?'svc-effect':'svc-effect svc-effect-primary';
     const eff=`<div class="${effClass}">${(s.effect||s.desc||'').substring(0,100)}${(s.effect||s.desc||'').length>100?'…':''}${th}</div>`;
-    const noteHtml=s.note?`<div class="svc-note">${s.note}</div>`:'';
     const roulFailModel=document.getElementById('roulFail')?document.getElementById('roulFail').value:'flat';
     const inlineWarn=s.isRoulette?(roulFailModel==='escalating'
                        ?`<div class="svc-inline-warn">~1 per 100 maps · ~89% wipe to cog 6 · barely break-even even ignoring variance</div>`
                        :`<div class="svc-inline-warn">~1 per 100 maps · 43% wipe rate · ~500 maps to be reliably profitable</div>`):
                      s.isID23?`<div class="svc-inline-ok">~12.5% encounter rate · safe cashout · reliable every session</div>`:'';
     let extra='';
-    const lbBtn=(id,label)=>`<button onclick="document.getElementById('${id}-lightbox').style.display='flex';document.body.style.overflow='hidden'" style="background:transparent;border:none;color:var(--blue-light);font-size:10px;cursor:pointer;padding:0;margin-top:3px;display:block">${label} ↗</button>`;
+    const lbBtn=(id,label)=>`<button onclick="document.getElementById('${id}-lightbox').style.display='flex';document.body.style.overflow='hidden'" style="background:rgba(200,164,93,0.08);border:1px solid rgba(200,164,93,0.25);border-radius:var(--radius-sm);color:var(--gold-muted);font-size:10px;font-weight:600;cursor:pointer;padding:4px 10px;margin-top:6px;display:inline-flex;align-items:center;gap:4px;transition:background .15s,border-color .15s">📊 ${label} ↗</button>`;
     if(s.id===10)extra=lbBtn('id10','how this is calculated');
     if(s.id===11)extra=lbBtn('id11','why SSS matters here');
     if(s.id===29)extra=lbBtn('id29','how this is calculated');
     if(s.id===32)extra=lbBtn('id32','how this is calculated');
-    if(s.isRoulette)extra=`<button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="background:transparent;border:1px solid var(--border-blue);border-radius:var(--radius-sm);color:var(--text-faint);font-size:10px;cursor:pointer;padding:3px 8px;margin-top:6px">show cog-by-cog breakdown ▾</button><div style="display:none">`+roulBlock(gearsVal,rdist,base)+`</div>`;
-    if(s.isID23)extra=`<button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="background:transparent;border:1px solid var(--border-blue);border-radius:var(--radius-sm);color:var(--text-faint);font-size:10px;cursor:pointer;padding:3px 8px;margin-top:6px">show outcome breakdown ▾</button><div style="display:none">`+id23Block(gearsVal,base,nodeWasteful,nodeOstentatious,nodeCb59)+`</div>`;
+    if(s.isRoulette)extra=`<button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="background:rgba(200,164,93,0.08);border:1px solid rgba(200,164,93,0.25);border-radius:var(--radius-sm);color:var(--gold-muted);font-size:10px;font-weight:600;cursor:pointer;padding:4px 10px;margin-top:6px">📊 show cog-by-cog breakdown ▾</button><div style="display:none">`+roulBlock(gearsVal,rdist,base)+`</div>`;
+    if(s.isID23)extra=`<button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="background:rgba(200,164,93,0.08);border:1px solid rgba(200,164,93,0.25);border-radius:var(--radius-sm);color:var(--gold-muted);font-size:10px;font-weight:600;cursor:pointer;padding:4px 10px;margin-top:6px">📊 show outcome breakdown ▾</button><div style="display:none">`+id23Block(gearsVal,base,nodeWasteful,nodeOstentatious,nodeCb59)+`</div>`;
     if(s.id===35){const nt=NUT[parseInt(gearsVal)]||NUT[6];extra=`<div class="svc-info">P(0 proc): ${(nt.p0*100).toFixed(1)}% · P(1 proc): ${(nt.p1*100).toFixed(1)}% · P(2 procs): ${(nt.p2*100).toFixed(1)}%</div>`+lbBtn('id35','how this is calculated');}
     const tr=document.createElement('tr');
     if(s.isRoulette)tr.className='svc-row-roulette';
     if(s.isID23)tr.className='svc-row-id23';
     tr.innerHTML=`
       <td style="color:var(--text-faint);font-size:11px">${i+1}</td>
-      <td>${nameHtml}${eff}${inlineWarn}${noteHtml}${extra}</td>
+      <td>${nameHtml}${eff}${inlineWarn}${extra}</td>
       <td><span class="badge ${RCLS[s.rarity]||'badge-blue'}">${RLABEL[s.rarity]||s.rarity}</span></td>
       <td><span class="${t2.c} tier">${t2.l}${s.isRoulette?'*':''}</span></td>
       <td><div class="ev-bar-wrap"><div class="ev-bar" style="width:${Math.min(bw,100)}px;max-width:100px"></div><span style="font-size:10px;color:var(--text-faint);margin-left:4px">${bw}% of top${s.isRoulette?' *':''}</span></div></td>
