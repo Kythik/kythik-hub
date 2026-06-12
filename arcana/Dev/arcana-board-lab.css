@@ -79,8 +79,8 @@ body.arcana-page{
   top:31px;
   height:4px;
   border-radius:99px;
-  background:linear-gradient(90deg, transparent, rgba(200,164,93,.70) 10%, rgba(242,214,138,.95) 49%, rgba(200,164,93,.70) 90%, transparent);
-  box-shadow:0 0 12px rgba(230,199,122,.38), 0 0 2px rgba(255,247,190,.9);
+  background:linear-gradient(90deg, transparent, rgba(200,164,93,.34) 12%, rgba(242,214,138,.52) 49%, rgba(200,164,93,.34) 88%, transparent);
+  box-shadow:0 0 7px rgba(230,199,122,.18), 0 0 1px rgba(255,247,190,.42);
   z-index:-2;
 }
 .boardRow::after{
@@ -90,8 +90,8 @@ body.arcana-page{
   right:48px;
   top:32px;
   height:1px;
-  background:rgba(255,247,190,.82);
-  box-shadow:0 0 8px rgba(242,214,138,.75);
+  background:rgba(255,247,190,.44);
+  box-shadow:0 0 4px rgba(242,214,138,.30);
   z-index:-1;
 }
 
@@ -185,7 +185,7 @@ body.arcana-page{
   box-shadow:inset 0 1px 0 rgba(255,255,255,.16), inset 0 -8px 16px rgba(0,0,0,.28), 0 11px 18px rgba(0,0,0,.55),0 0 16px rgba(115,231,240,.14);
   color:#DDFDFF;
 }
-.cardGlyph{font-size:19px;line-height:1;font-weight:950}.cardStep{font-size:12px;line-height:1;font-weight:950;color:#fff;text-shadow:0 1px 5px rgba(0,0,0,.75)}
+.cardGlyph{font-size:22px;line-height:1;font-weight:950}.cardStep{font-size:18px;line-height:1;font-weight:950;color:#fff;text-shadow:0 1px 5px rgba(0,0,0,.75)}
 .type-upgrade .cardArt{background:linear-gradient(160deg, rgba(25,53,87,.98), rgba(11,39,74,.98) 62%, rgba(5,13,24,.98));border-color:rgba(107,161,232,.46);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 11px 18px rgba(0,0,0,.55),0 0 16px rgba(74,131,216,.20)}
 .tone-gold .cardArt{background:linear-gradient(160deg, rgba(132,89,30,.98), rgba(61,42,18,.98) 62%, rgba(8,11,19,.98));border-color:rgba(242,214,138,.58);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 11px 18px rgba(0,0,0,.55),0 0 17px rgba(242,214,138,.18)}
 .tone-purple .cardArt,.tone-violet .cardArt{background:linear-gradient(160deg, rgba(75,45,130,.98), rgba(33,26,75,.98) 62%, rgba(5,13,24,.98));border-color:rgba(160,120,238,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 11px 18px rgba(0,0,0,.55),0 0 17px rgba(143,99,232,.22)}
@@ -220,34 +220,12 @@ body.arcana-page{
 
 .is-plus .label::after{content:" +";color:var(--gold-bright)}
 .tile.done{opacity:.35;filter:saturate(.55)}
-.currentMarker{
-  position:absolute;
-  left:50%;
-  top:1px;
-  width:14px;
-  height:14px;
-  transform:translateX(-50%) rotate(45deg);
-  border-radius:3px;
-  background:linear-gradient(135deg,#ffffff,#F2D68A);
-  border:1px solid rgba(7,17,31,.78);
-  z-index:7;
-  box-shadow:0 0 0 2px rgba(4,8,15,.72), 0 0 14px rgba(242,214,138,.65), 0 5px 12px rgba(0,0,0,.45);
-}
-.currentMarker::after{
-  content:"";
-  position:absolute;
-  inset:3px;
-  border-radius:2px;
-  background:rgba(255,255,255,.45);
-}
-.tile.pos .startArt{
-  box-shadow:inset 0 0 0 2px rgba(4,8,15,.82), inset 0 0 18px rgba(200,164,93,.08), 0 8px 13px rgba(0,0,0,.48), 0 0 18px rgba(255,255,255,.18), 0 0 12px rgba(242,214,138,.18);
-}
+.tile.pos .label{color:#fff4c6;}
 .tile.reach .tileArt,.tile.suggest .tileArt{
   outline:2px solid rgba(255,255,255,.95);
   outline-offset:2px;
 }
-.tile.pos::before{box-shadow:0 10px 20px rgba(0,0,0,.55),0 0 16px rgba(230,199,122,.22)}
+.tile.pos::before{box-shadow:0 10px 20px rgba(0,0,0,.55),0 0 8px rgba(230,199,122,.14)}
 .tile.reach::before,.tile.suggest::before{box-shadow:0 0 0 2px rgba(255,255,255,.78),0 10px 20px rgba(0,0,0,.55),0 0 18px rgba(230,199,122,.28)}
 .tile.reach .tileArt{outline-color:var(--gold-bright)}
 .tile.suggest .tileArt{outline-color:#fff;box-shadow:0 0 22px rgba(242,214,138,.28),0 8px 15px rgba(0,0,0,.52)}
@@ -305,21 +283,21 @@ body.arcana-page{
   height:82px;
   pointer-events:none;
   z-index:-1;
-  filter:drop-shadow(0 0 8px rgba(242,214,138,.30)) drop-shadow(0 6px 12px rgba(0,0,0,.28));
+  filter:drop-shadow(0 0 5px rgba(242,214,138,.16)) drop-shadow(0 6px 12px rgba(0,0,0,.28));
 }
 .rowConnector.right{
   right:-24px;
-  border-top:4px solid rgba(200,164,93,.82);
-  border-right:4px solid rgba(200,164,93,.82);
-  border-bottom:4px solid rgba(200,164,93,.82);
+  border-top:4px solid rgba(200,164,93,.52);
+  border-right:4px solid rgba(200,164,93,.52);
+  border-bottom:4px solid rgba(200,164,93,.52);
   border-top-right-radius:18px;
   border-bottom-right-radius:18px;
 }
 .rowConnector.left{
   left:-24px;
-  border-top:4px solid rgba(200,164,93,.82);
-  border-left:4px solid rgba(200,164,93,.82);
-  border-bottom:4px solid rgba(200,164,93,.82);
+  border-top:4px solid rgba(200,164,93,.52);
+  border-left:4px solid rgba(200,164,93,.52);
+  border-bottom:4px solid rgba(200,164,93,.52);
   border-top-left-radius:18px;
   border-bottom-left-radius:18px;
 }
@@ -333,20 +311,32 @@ body.arcana-page{
 .rowConnector.right::after{
   left:1px;
   right:1px;
-  border-top:1px solid rgba(255,247,190,.96);
-  border-right:1px solid rgba(255,247,190,.96);
-  border-bottom:1px solid rgba(255,247,190,.96);
+  border-top:1px solid rgba(255,247,190,.52);
+  border-right:1px solid rgba(255,247,190,.52);
+  border-bottom:1px solid rgba(255,247,190,.52);
   border-top-right-radius:14px;
   border-bottom-right-radius:14px;
-  box-shadow:0 0 8px rgba(242,214,138,.55);
+  box-shadow:0 0 4px rgba(242,214,138,.24);
 }
 .rowConnector.left::after{
   left:1px;
   right:1px;
-  border-top:1px solid rgba(255,247,190,.96);
-  border-left:1px solid rgba(255,247,190,.96);
-  border-bottom:1px solid rgba(255,247,190,.96);
+  border-top:1px solid rgba(255,247,190,.52);
+  border-left:1px solid rgba(255,247,190,.52);
+  border-bottom:1px solid rgba(255,247,190,.52);
   border-top-left-radius:14px;
   border-bottom-left-radius:14px;
-  box-shadow:0 0 8px rgba(242,214,138,.55);
+  box-shadow:0 0 4px rgba(242,214,138,.24);
 }
+
+
+.moveArt{gap:0}
+.moveArt .cardStep{margin-top:12px;}
+.upgradeArt{gap:0}
+.upgradeArt .cardGlyph{margin-top:13px;}
+.type-upgrade .label{color:#E8F2FF;}
+.tone-purple.type-upgrade .label,.tone-violet.type-upgrade .label{color:#F0E6FF;}
+.tone-gold.type-upgrade .label{color:#F4E7C2;}
+.startArt{width:48px;height:48px;border-radius:50%;border:1px solid rgba(200,164,93,.45);background:radial-gradient(circle at 50% 42%, rgba(20,30,47,.92), rgba(4,8,15,.98) 72%);box-shadow:inset 0 0 0 2px rgba(4,8,15,.82), inset 0 0 18px rgba(200,164,93,.05), 0 8px 13px rgba(0,0,0,.48), 0 0 10px rgba(200,164,93,.08);}
+.currentPosArt{width:34px;height:34px;top:13px;border-radius:4px;transform:translateX(-50%) rotate(45deg);background:linear-gradient(135deg,#ffffff,#F2D68A);border:1px solid rgba(7,17,31,.76);box-shadow:0 0 0 3px rgba(7,17,31,.70),0 0 10px rgba(242,214,138,.30),0 8px 14px rgba(0,0,0,.42);}
+.currentPosArt::after{content:"";position:absolute;inset:6px;border-radius:3px;background:rgba(255,255,255,.36);}

@@ -2,9 +2,9 @@
 // Deterministic 20-row visual QA board. Board-only sandbox; no production code.
 
 const samplePattern = [
-  { type:'start', label:'Start', icon:'✦', cls:'pos' },
+  { type:'start', label:'Start', cls:'pos' },
   { type:'move', label:'Move +1', step:'+1', tone:'teal' },
-  { type:'question', label:'Unknown', icon:'?' },
+  { type:'question', label:'Mystery+', icon:'?', plus:true },
   { type:'life', label:'+1 Life', step:'+1', link:'4 ➜ 5' },
 
   { type:'move', label:'Move +2', step:'+2', tone:'teal' },
@@ -19,16 +19,16 @@ const samplePattern = [
 
   { type:'move', label:'Move +3', step:'+3', tone:'rose' },
   { type:'empty', label:'Quiet', icon:'✧' },
-  { type:'upgrade', label:'Up Blue', step:'Up', tone:'blue' },
+  { type:'upgrade', label:'Blue', tone:'blue' },
   { type:'chest', label:'Blue', rarity:'blue', chest:'blue', link:'16 ➜ 17' },
 
   { type:'chest', label:'Purple', rarity:'purple', chest:'purple' },
-  { type:'upgrade', label:'Up Purple', step:'Up', tone:'purple' },
+  { type:'upgrade', label:'Purple', tone:'purple' },
   { type:'trap', label:'Trap', icon:'◆', cls:'suggest' },
   { type:'chest', label:'Orange', rarity:'orange', chest:'orange', link:'20 ➜ 21' },
 
-  { type:'upgrade', label:'Up Blue', step:'Up', tone:'blue' },
-  { type:'upgrade', label:'Up Gold', step:'Up', tone:'gold' },
+  { type:'upgrade', label:'Blue', tone:'blue' },
+  { type:'upgrade', label:'Gold', tone:'gold' },
   { type:'chest', label:'Red', rarity:'red', chest:'red' },
   { type:'chest', label:'Rainbow', rarity:'rainbow', chest:'rainbow', link:'24 ➜ 25' },
 
@@ -40,7 +40,7 @@ const samplePattern = [
   { type:'empty', label:'Rune', icon:'✦' },
   { type:'life', label:'Life+', step:'+1', plus:true },
   { type:'move', label:'Move +1+', step:'+1', tone:'teal', plus:true },
-  { type:'question', label:'Mystery+', icon:'?', plus:true, link:'32 ➜ 33' }
+  { type:'question', label:'Mystery++', icon:'?', plus:true, link:'32 ➜ 33' }
 ];
 
 function buildRows(rowCount = 20, cols = 4){
@@ -73,13 +73,19 @@ function tileClass(t){
   return parts.join(' ');
 }
 
+function hasClass(t, name){
+  return !!(t.cls && String(t.cls).split(/\s+/).includes(name));
+}
+
 function iconHtml(t){
+  if(hasClass(t, 'pos')) return `<span class="tileArt currentPosArt" aria-hidden="true"></span>`;
   if(t.type === 'chest') return `<span class="tileArt chestArt"><span class="lid"></span><span class="body"></span><span class="lock"></span></span>`;
-  if(t.type === 'move' || t.type === 'upgrade') return `<span class="tileArt cardArt"><span class="cardGlyph">${t.type === 'upgrade' ? '⇧' : '↟'}</span><span class="cardStep">${t.step || ''}</span></span>`;
+  if(t.type === 'move') return `<span class="tileArt cardArt moveArt"><span class="cardStep">${t.step || ''}</span></span>`;
+  if(t.type === 'upgrade') return `<span class="tileArt cardArt upgradeArt"><span class="cardGlyph">⇧</span></span>`;
   if(t.type === 'life') return `<span class="tileArt lifeArt"><span>♥</span><em>${t.step || ''}</em></span>`;
   if(t.type === 'question') return `<span class="tileArt questionArt">?</span>`;
   if(t.type === 'trap') return `<span class="tileArt trapArt">◆</span>`;
-  if(t.type === 'start') return `<span class="tileArt startArt">✦</span>`;
+  if(t.type === 'start') return `<span class="tileArt startArt"></span>`;
   return `<span class="tileArt emptyArt">${t.icon || '✧'}</span>`;
 }
 
@@ -91,7 +97,6 @@ function render(){
     const cells = ordered.map((t) => `<button class="${tileClass(t)}" title="${t.num}: ${t.label}">
       <span class="n">${t.num}</span>
       ${iconHtml(t)}
-      ${t.cls && String(t.cls).split(/\s+/).includes('pos') ? `<span class="currentMarker" aria-label="Current position"></span>` : ''}
       <span class="label">${t.label}</span>
       ${t.land ? `<span class="land">${t.land}</span>` : ''}
     </button>`).join('');
