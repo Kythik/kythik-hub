@@ -95,9 +95,8 @@ function render(){
       <span class="label">${t.label}</span>
       ${t.land ? `<span class="land">${t.land}</span>` : ''}
     </button>`).join('');
-    const linkTile = reverse ? row[0] : row[row.length - 1];
-    const linkHtml = linkTile?.link ? `<span class="rowEndLink ${reverse ? 'left' : ''}">${linkTile.link}</span>` : '';
-    return `<div class="boardRow ${reverse ? 'reverse' : ''}">${cells}${linkHtml}</div>`;
+    const connectorHtml = rowIndex < rows.length - 1 ? `<span class="rowConnector ${reverse ? 'left' : 'right'}" aria-hidden="true"></span>` : '';
+    return `<div class="boardRow ${reverse ? 'reverse' : ''}">${cells}${connectorHtml}</div>`;
   }).join('');
 }
 

@@ -296,3 +296,57 @@ body.arcana-page{
 .labControls h2{color:var(--gold-bright);margin:0 0 8px;font-size:18px}
 .labControls p,.labControls li{color:var(--muted);line-height:1.45;font-size:13px}.labControls ul{margin:8px 0 0;padding-left:18px}.labControls code{color:var(--gold-bright)}
 @media(max-width:1000px){.labGrid{grid-template-columns:1fr}.labControls{display:none}}
+
+
+.rowConnector{
+  position:absolute;
+  top:31px;
+  width:26px;
+  height:82px;
+  pointer-events:none;
+  z-index:-1;
+  filter:drop-shadow(0 0 8px rgba(242,214,138,.30)) drop-shadow(0 6px 12px rgba(0,0,0,.28));
+}
+.rowConnector.right{
+  right:-24px;
+  border-top:4px solid rgba(200,164,93,.82);
+  border-right:4px solid rgba(200,164,93,.82);
+  border-bottom:4px solid rgba(200,164,93,.82);
+  border-top-right-radius:18px;
+  border-bottom-right-radius:18px;
+}
+.rowConnector.left{
+  left:-24px;
+  border-top:4px solid rgba(200,164,93,.82);
+  border-left:4px solid rgba(200,164,93,.82);
+  border-bottom:4px solid rgba(200,164,93,.82);
+  border-top-left-radius:18px;
+  border-bottom-left-radius:18px;
+}
+.rowConnector::after{
+  content:"";
+  position:absolute;
+  top:1px;
+  bottom:1px;
+  pointer-events:none;
+}
+.rowConnector.right::after{
+  left:1px;
+  right:1px;
+  border-top:1px solid rgba(255,247,190,.96);
+  border-right:1px solid rgba(255,247,190,.96);
+  border-bottom:1px solid rgba(255,247,190,.96);
+  border-top-right-radius:14px;
+  border-bottom-right-radius:14px;
+  box-shadow:0 0 8px rgba(242,214,138,.55);
+}
+.rowConnector.left::after{
+  left:1px;
+  right:1px;
+  border-top:1px solid rgba(255,247,190,.96);
+  border-left:1px solid rgba(255,247,190,.96);
+  border-bottom:1px solid rgba(255,247,190,.96);
+  border-top-left-radius:14px;
+  border-bottom-left-radius:14px;
+  box-shadow:0 0 8px rgba(242,214,138,.55);
+}
