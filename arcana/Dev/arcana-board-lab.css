@@ -218,7 +218,7 @@ body.arcana-page{
 .trapArt{width:50px;height:46px;color:#FF5AAB;font-size:32px;text-shadow:0 0 16px rgba(255,82,165,.76)}
 .type-trap::after{background:rgba(255,82,165,.26);box-shadow:0 0 14px rgba(255,82,165,.45)}
 
-.is-plus .label::after{content:" +";color:var(--gold-bright)}
+.is-plus .label::after{content:"";}
 .tile.done{opacity:.35;filter:saturate(.55)}
 .tile.pos .label{color:#fff4c6;}
 .tile.reach .tileArt,.tile.suggest .tileArt{

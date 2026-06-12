@@ -4,21 +4,21 @@
 const samplePattern = [
   { type:'start', label:'Start', cls:'pos' },
   { type:'move', label:'Move +1', step:'+1', tone:'teal' },
-  { type:'question', label:'Mystery+', icon:'?', plus:true },
+  { type:'question', label:'Mystery', icon:'?' },
   { type:'life', label:'+1 Life', step:'+1', link:'4 ➜ 5' },
 
   { type:'move', label:'Move +2', step:'+2', tone:'teal' },
-  { type:'empty', label:'Quiet', icon:'✧' },
+  { type:'empty', label:'Empty', icon:'✧' },
   { type:'trap', label:'Trap', icon:'◆' },
   { type:'chest', label:'Green', rarity:'green', chest:'green', link:'8 ➜ 9' },
 
   { type:'question', label:'Mystery', icon:'?' },
-  { type:'empty', label:'Quiet', icon:'✧' },
+  { type:'empty', label:'Empty', icon:'✧' },
   { type:'life', label:'+1 Life', step:'+1' },
-  { type:'empty', label:'Quiet', icon:'✧', cls:'done', link:'12 ➜ 13' },
+  { type:'empty', label:'Empty', icon:'✧', cls:'done', link:'12 ➜ 13' },
 
   { type:'move', label:'Move +3', step:'+3', tone:'rose' },
-  { type:'empty', label:'Quiet', icon:'✧' },
+  { type:'empty', label:'Empty', icon:'✧' },
   { type:'upgrade', label:'Blue', tone:'blue' },
   { type:'chest', label:'Blue', rarity:'blue', chest:'blue', link:'16 ➜ 17' },
 
@@ -37,10 +37,10 @@ const samplePattern = [
   { type:'move', label:'Back +2', step:'+2', tone:'violet', variant:'back', cls:'reach', land:2 },
   { type:'move', label:'Back +3', step:'+3', tone:'violet', variant:'back', land:5, link:'28 ➜ 29' },
 
-  { type:'empty', label:'Rune', icon:'✦' },
-  { type:'life', label:'Life+', step:'+1', plus:true },
-  { type:'move', label:'Move +1+', step:'+1', tone:'teal', plus:true },
-  { type:'question', label:'Mystery++', icon:'?', plus:true, link:'32 ➜ 33' }
+  { type:'empty', label:'Empty', icon:'✧' },
+  { type:'life', label:'+1 Life', step:'+1' },
+  { type:'move', label:'Move +1', step:'+1', tone:'teal' },
+  { type:'question', label:'Mystery', icon:'?', link:'32 ➜ 33' }
 ];
 
 function buildRows(rowCount = 20, cols = 4){
@@ -51,7 +51,7 @@ function buildRows(rowCount = 20, cols = 4){
       const idx = (r * cols + c) % samplePattern.length;
       const tile = {...samplePattern[idx]};
       tile.num = r * cols + c + 1;
-      if(r > 0 && idx === 0) tile.type = 'empty', tile.label = 'Quiet', tile.icon = '✧', tile.cls = '';
+      if(r > 0 && idx === 0) tile.type = 'empty', tile.label = 'Empty', tile.icon = '✧', tile.cls = '';
       if(c === cols - 1) tile.link = tile.link || `${tile.num} ➜ ${tile.num + 1}`;
       row.push(tile);
     }
