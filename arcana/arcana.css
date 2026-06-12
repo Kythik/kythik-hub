@@ -3897,3 +3897,10 @@ body.arcana-page .board {
 .arcana-page.visual-fork .tile .n{
   opacity:.58 !important;
 }
+
+
+/* ARCANA VISUAL SITE V1.27 — Remove duplicate board controls */
+.arcana-page.visual-fork .statusBoardActions,
+.arcana-page.visual-fork #boardTypeInputMirror{
+  display:none !important;
+}

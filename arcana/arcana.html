@@ -110,20 +110,6 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
 
     <div class="stats" id="stats"></div>
 
-<div class="statusBoardActions">
-  <label class="boardSelectLabel">Board
-    <select id="boardTypeInputMirror" onchange="syncBoardTypeFromMirror()">
-      <option value="normal">Normal</option>
-      <option value="special1">Special 1</option>
-      <option value="special2">Special 2</option>
-      <option value="special3">Special 3</option>
-    </select>
-  </label>
-  <div class="statusActionBtns">
-    <button type="button" onclick="newGame(false)">New Board</button>
-    <button type="button" class="alt" onclick="resetSame()">Reset</button>
-  </div>
-</div>
 
     <div class="lootStage" id="lootStage">
       <div class="lootStageHead">
@@ -429,14 +415,6 @@ function forceValueBacktracking(){
 }
 
 
-function syncBoardMirror(){
-  const real=$('boardTypeInput'), mirror=$('boardTypeInputMirror');
-  if(real&&mirror&&mirror.value!==real.value)mirror.value=real.value;
-}
-function syncBoardTypeFromMirror(){
-  const real=$('boardTypeInput'), mirror=$('boardTypeInputMirror');
-  if(real&&mirror){real.value=mirror.value;changeBoardType();}
-}
 
 function boardType(){return $('boardTypeInput')?.value||'normal'}
 function strategyId(){return $('strategyInput')?.value||(STRATEGY_DATA?.defaultStrategy||'Kythiks')}
@@ -2054,7 +2032,6 @@ function renderFloatingHandDock(){
 }
 
 function render(){
-  syncBoardMirror();
   forceValueBacktracking();
   if(!state)return;
   $('debugline').innerHTML='<b>Current landed tile:</b> '+(state.pos+1)+' / '+totalTiles+' &nbsp; <b>Current refill Move:</b> '+state.currentMove+' &nbsp; <b>Status:</b> '+(state.autoStatus||'—');
