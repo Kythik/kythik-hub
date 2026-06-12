@@ -4003,3 +4003,151 @@ body.arcana-page .board {
 .arcana-page.visual-fork .sidebarDisclosure:not([open]) .autoplaySetup{
   display:none !important;
 }
+
+
+/* ARCANA VISUAL SITE V1.29 — Board tiles de-carded
+   Board tiles should read as board nodes, not mini cards. Hand cards remain cards. */
+
+/* Kill the inner card-frame/border treatment only inside the board. */
+.arcana-page.visual-fork .boardFrame .tile,
+.arcana-page.visual-fork .board .tile,
+.arcana-page.visual-fork #board .tile{
+  border-radius:18px !important;
+  clip-path:none !important;
+  background-image:
+    radial-gradient(circle at 50% 45%, rgba(230,199,122,.075), transparent 52%),
+    linear-gradient(180deg, rgba(10,19,31,.88), rgba(3,7,13,.94)) !important;
+  border:1px solid rgba(200,164,93,.30) !important;
+  box-shadow:
+    0 10px 22px rgba(0,0,0,.32),
+    inset 0 0 22px rgba(0,0,0,.26) !important;
+  overflow:visible !important;
+}
+
+/* Remove rectangular inner frame overlays that make tiles look like cards. */
+.arcana-page.visual-fork .boardFrame .tile::before,
+.arcana-page.visual-fork .boardFrame .tile::after,
+.arcana-page.visual-fork .board .tile::before,
+.arcana-page.visual-fork .board .tile::after,
+.arcana-page.visual-fork #board .tile::before,
+.arcana-page.visual-fork #board .tile::after{
+  display:none !important;
+  content:none !important;
+}
+
+/* Remove any card-like art plate/backdrop inside board tiles. */
+.arcana-page.visual-fork .boardFrame .tile .c,
+.arcana-page.visual-fork .board .tile .c,
+.arcana-page.visual-fork #board .tile .c{
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  border-radius:0 !important;
+  text-shadow:0 0 14px currentColor !important;
+}
+
+/* Make default/empty board nodes feel like neutral pedestals, not empty card slots. */
+.arcana-page.visual-fork .boardFrame .tile.empty,
+.arcana-page.visual-fork .boardFrame .tile.spentEmpty,
+.arcana-page.visual-fork .board .tile.empty,
+.arcana-page.visual-fork .board .tile.spentEmpty,
+.arcana-page.visual-fork #board .tile.empty,
+.arcana-page.visual-fork #board .tile.spentEmpty{
+  background:
+    radial-gradient(circle at 50% 48%, rgba(38,58,87,.20), transparent 48%),
+    linear-gradient(180deg, rgba(8,16,27,.82), rgba(3,7,13,.92)) !important;
+  border-color:rgba(200,164,93,.22) !important;
+}
+
+/* Keep question marker improvement, but make it tile-like not card-like. */
+.arcana-page.visual-fork .boardFrame .tile.question,
+.arcana-page.visual-fork .board .tile.question,
+.arcana-page.visual-fork #board .tile.question{
+  background:
+    radial-gradient(circle at 50% 45%, rgba(242,138,46,.22), transparent 54%),
+    linear-gradient(180deg, rgba(34,23,9,.90), rgba(4,7,13,.94)) !important;
+  border-color:rgba(230,199,122,.54) !important;
+}
+
+/* Move provider tiles: unified color, number only changes. No mini-card frame. */
+.arcana-page.visual-fork .boardFrame .tile.movement,
+.arcana-page.visual-fork .boardFrame .tile.move,
+.arcana-page.visual-fork .board .tile.movement,
+.arcana-page.visual-fork .board .tile.move,
+.arcana-page.visual-fork #board .tile.movement,
+.arcana-page.visual-fork #board .tile.move{
+  background:
+    radial-gradient(circle at 50% 45%, rgba(46,216,195,.20), transparent 54%),
+    linear-gradient(180deg, rgba(7,38,41,.88), rgba(3,8,14,.94)) !important;
+  border-color:rgba(46,216,195,.50) !important;
+}
+.arcana-page.visual-fork .boardFrame .tile.movement .moveCount,
+.arcana-page.visual-fork .boardFrame .tile.move .moveCount,
+.arcana-page.visual-fork .board .tile.movement .moveCount,
+.arcana-page.visual-fork .board .tile.move .moveCount,
+.arcana-page.visual-fork #board .tile.movement .moveCount,
+.arcana-page.visual-fork #board .tile.move .moveCount{
+  position:absolute !important;
+  right:4px !important;
+  bottom:4px !important;
+  min-width:24px !important;
+  height:18px !important;
+  padding:0 5px !important;
+  border-radius:999px !important;
+  border:1px solid rgba(46,216,195,.66) !important;
+  background:rgba(3,7,13,.86) !important;
+  color:#D9FFFA !important;
+  font-size:11px !important;
+  font-weight:950 !important;
+  box-shadow:0 0 12px rgba(46,216,195,.24) !important;
+}
+
+/* Upgrade tiles stay colored/labeled but not card-framed. */
+.arcana-page.visual-fork .boardFrame .tile.upgrade,
+.arcana-page.visual-fork .board .tile.upgrade,
+.arcana-page.visual-fork #board .tile.upgrade{
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255,90,168,.22), transparent 54%),
+    linear-gradient(180deg, rgba(55,13,31,.90), rgba(4,7,13,.94)) !important;
+  border-color:rgba(255,90,168,.56) !important;
+}
+
+/* Trap/life/chest also use node surfaces rather than card panels. */
+.arcana-page.visual-fork .boardFrame .tile.trap,
+.arcana-page.visual-fork .board .tile.trap,
+.arcana-page.visual-fork #board .tile.trap{
+  background:
+    radial-gradient(circle at 50% 45%, rgba(168,97,255,.24), transparent 54%),
+    linear-gradient(180deg, rgba(35,16,58,.90), rgba(4,7,13,.94)) !important;
+  border-color:rgba(168,97,255,.55) !important;
+}
+.arcana-page.visual-fork .boardFrame .tile.life,
+.arcana-page.visual-fork .board .tile.life,
+.arcana-page.visual-fork #board .tile.life{
+  background:
+    radial-gradient(circle at 50% 45%, rgba(86,182,255,.22), transparent 54%),
+    linear-gradient(180deg, rgba(7,36,62,.90), rgba(4,7,13,.94)) !important;
+  border-color:rgba(86,182,255,.56) !important;
+}
+.arcana-page.visual-fork .boardFrame .tile.chest,
+.arcana-page.visual-fork .board .tile.chest,
+.arcana-page.visual-fork #board .tile.chest{
+  background:
+    radial-gradient(circle at 50% 45%, rgba(230,199,122,.24), transparent 54%),
+    linear-gradient(180deg, rgba(42,27,9,.90), rgba(4,7,13,.94)) !important;
+  border-color:rgba(230,199,122,.58) !important;
+}
+
+/* Remove obvious top-left 'card number' feeling on board tile index. Keep tile numbers subdued. */
+.arcana-page.visual-fork .boardFrame .tile .n,
+.arcana-page.visual-fork .board .tile .n,
+.arcana-page.visual-fork #board .tile .n{
+  opacity:.36 !important;
+  color:rgba(233,237,245,.58) !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  font-size:10px !important;
+}
+
+/* Hand cards are allowed to remain card-like. This rule intentionally does not target .floatingHandDock. */
