@@ -173,7 +173,7 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
         <div class="boardLegend">
           <span class="legendPill"><span class="legendDot" style="background:#fff"></span>Current</span>
           <span class="legendPill"><span class="legendDot"></span>Preview</span>
-          <span class="legendPill"><span class="legendDot" style="background:#E9EDF5"></span>Landing #</span>
+          <span class="legendPill"><span class="legendDot" style="background:#E9EDF5"></span>Landing #</span><span class="legendPill"><span class="legendDot rowWrapDot"></span>Row link</span>
         </div>
       </div>
       <div class="board" id="board" style="margin-left:auto;margin-right:auto;"></div>
@@ -1995,73 +1995,6 @@ function renderFloatingHandDock(){
   }
 }
 
-
-function boardVisualPosition(i){
-  const row=Math.floor(i/4);
-  const off=i%4;
-  const col=(row%2===0)?off:(3-off);
-  return {row,col,x:(col+0.5)*100,y:(row+0.5)*100};
-}
-function boardNodeLabel(t){
-  if(!t)return '';
-  if(t.type==='start')return 'Start';
-  if(t.type==='question')return '?';
-  if(t.type==='life')return '+'+(t.fixedN||1)+' Life';
-  if(t.type==='movement')return 'Card';
-  if(t.type==='upgrade')return 'Up '+rarityLabel(t.fixedFrom||'');
-  if(t.type==='trap')return 'Trap';
-  if(t.type==='chest')return rarityLabel(t.rarity);
-  return '';
-}
-function boardNodeInner(t,spent=false){
-  if(spent)return '<span class="nodeGlyph nodeGlyph-empty">✦</span>';
-  if(!t)return '<span class="nodeGlyph nodeGlyph-empty">✦</span>';
-  if(t.type==='start')return '<span class="nodeGlyph nodeGlyph-start">◆</span><span class="nodeLabel">Start</span>';
-  if(t.type==='empty')return '<span class="nodeGlyph nodeGlyph-empty">✦</span>';
-  if(t.type==='question')return '<span class="nodeGlyph nodeGlyph-question">?</span>';
-  if(t.type==='trap')return '<span class="nodeGlyph nodeGlyph-trap">◆</span><span class="nodeLabel">Trap</span>';
-  if(t.type==='life')return '<span class="nodeGlyph nodeGlyph-life">♥</span><span class="nodeLabel">+'+(t.fixedN||1)+' Life</span>';
-  if(t.type==='movement')return '<span class="nodeGlyph nodeGlyph-move">Card</span><span class="nodeCount">+'+(t.fixedN||1)+'</span>';
-  if(t.type==='upgrade')return '<span class="nodeGlyph nodeGlyph-upgrade">⇧</span><span class="nodeLabel">Up '+rarityLabel(t.fixedFrom||'')+'</span>';
-  if(t.type==='chest'){
-    const r=t.rarity||'green';
-    return '<span class="nodeChest '+r+'"><span class="nodeChestBand"></span><span class="nodeChestLock"></span></span><span class="nodeLabel">'+rarityLabel(r)+'</span>';
-  }
-  return '<span class="nodeGlyph nodeGlyph-empty">✦</span>';
-}
-function renderBoardV2(targets=[]){
-  const rows=Math.ceil(state.tiles.length/4);
-  const links=[];
-  for(let i=0;i<state.tiles.length-1;i++){
-    const a=boardVisualPosition(i),b=boardVisualPosition(i+1);
-    links.push('<path class="boardRouteLink" d="M '+a.x+' '+a.y+' L '+b.x+' '+b.y+'" />');
-  }
-  const svg='<svg class="boardRouteSvg" viewBox="0 0 400 '+(rows*100)+'" preserveAspectRatio="none" aria-hidden="true"><defs><marker id="arcanaArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" class="boardRouteArrow"/></marker></defs>'+links.join('')+'</svg>';
-  const nodes=state.tiles.map((t,i)=>{
-    const p=boardVisualPosition(i);
-    const visit=state.path.indexOf(i+1);
-    const spent=visit>=0;
-    const vt=spent?'empty':t.type;
-    const vr=spent?'':(t.rarity||'');
-    const classes=[
-      'boardNode',
-      'node-'+vt,
-      vt==='chest'?'node-chest-'+vr:'',
-      vr?'rarity-'+vr:'',
-      visit>=0?'landed':'',
-      spent?'spentEmpty':'',
-      i===state.pos?'pos':'',
-      targets.includes(i)?'reach':'',
-      pendingMove&&i===pendingMove.idx?'pendingPreview':'',
-      suggested&&i===suggested.idx?'suggest':''
-    ].filter(Boolean).join(' ');
-    const land=visit>=0?'<span class="nodeLand">'+(visit+1)+'</span>':'';
-    const player=i===state.pos?'<span class="playerMarker" aria-label="Current position"></span>':'';
-    return '<button class="'+classes+'" style="grid-column:'+(p.col+1)+';grid-row:'+(p.row+1)+'" onclick="clickTile('+i+')" title="Tile '+(i+1)+' · '+escapeHtml(boardNodeLabel(t))+'"><span class="nodeIndex">'+(i+1)+'</span><span class="nodeBody">'+boardNodeInner(t,spent)+'</span>'+land+player+'</button>';
-  }).join('');
-  return '<div class="boardV2" style="--board-rows:'+rows+'">'+svg+nodes+'</div>';
-}
-
 function render(){
   forceValueBacktracking();
   if(!state)return;
@@ -2076,8 +2009,29 @@ function render(){
   $('currentMoveBtn').className='arc-card '+(selected&&selected.type==='current'?'selected':'');
   $('hand').innerHTML=state.hand.map((c,i)=>`<button class="arc-card ${selected&&selected.type==='hand'&&selected.idx===i?'selected':''}" onclick="selectHand(${i})">${c.name}</button>`).join('')||'<span class="small">No stored cards.</span>';
   renderFloatingHandDock();
-  let targets=targetOptionsFor(selected);
-  $('board').innerHTML=renderBoardV2(targets);
+    let targets=targetOptionsFor(selected);
+  let rows=[];
+  for(let r=0;r<Math.ceil(state.tiles.length/4);r++){
+    let start=r*4;
+    let rowEnd=Math.min(start+3,state.tiles.length-1);
+    let items=state.tiles.slice(start,start+4);
+    let tileHtml=items.map((t,off)=>{
+      let i=start+off;
+      let visit=state.path.indexOf(i+1),land=visit>=0?`<span class="land">${visit+1}</span>`:'',player=i===state.pos?'<span class="playerMarker" aria-label="Current position"></span>':'';
+      let link='';
+      if(rowEnd<state.tiles.length-1){
+        if(r%2===0 && i===rowEnd)link=`<span class="rowEndLink" title="Continues to tile ${rowEnd+2}">${rowEnd+1} ↴ ${rowEnd+2}</span>`;
+        if(r%2===1 && i===rowEnd)link=`<span class="rowEndLink left" title="Continues to tile ${rowEnd+2}">${rowEnd+1} ↵ ${rowEnd+2}</span>`;
+      }
+      let spent=visit>=0;
+      let vt=spent?'empty':t.type;
+      let vr=spent?'':(t.rarity||'');
+      let displayIcon=spent?'':icon(t);
+      return `<button class="tile ${vt} ${spent?'spentEmpty':''} ${vt==='chest'?'chest chest-'+vr:''} ${vr} ${visit>=0?'landed':''} ${i===state.pos?'pos':''} ${targets.includes(i)?'reach':''} ${pendingMove&&i===pendingMove.idx?'pendingPreview':''} ${suggested&&i===suggested.idx?'suggest':''}" onclick="clickTile(${i})"><span class="n">${i+1}</span><span class="c">${displayIcon}</span>${land}${player}${link}</button>`;
+    }).join('');
+    rows.push(`<div class="boardRow ${r%2?'reverse':'forward'}">${tileHtml}</div>`);
+  }
+  $('board').innerHTML=rows.join('');
   renderLootColumns();
   $('log').innerHTML=state.log.map(x=>'<div>'+x+'</div>').join('');
   if(suggested){
