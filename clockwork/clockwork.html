@@ -1014,9 +1014,23 @@ function render(){
   const tbody=document.getElementById('tbody');
   tbody.innerHTML='';
   svcs.forEach((s,i)=>{
-    const t2={l:s.tier,c:'tier-'+s.tier.toLowerCase().replace('+','p')};
+    let t2={l:s.tier,c:'tier-'+s.tier.toLowerCase().replace('+','p')};
     const seasonBadge=nodeSeasonal&&s.id===11?'<span style="font-size:10px;color:var(--gold-bright);margin-left:4px">★ season</span>':'';
-    const bw=s.pct||0;
+    let bw=s.pct||0;
+    if(s.isRoulette){
+      const roulFailModel=document.getElementById('roulFail')?document.getElementById('roulFail').value:'flat';
+      if(roulFailModel==='escalating'){
+        // Recompute Roulette's EV under escalating model, relative to theorBase
+        const gearsValRoul=document.getElementById('gears').value;
+        const maxCogR=gearsValRoul==='avg'?6:parseInt(gearsValRoul);
+        const evEsc=roulEV(maxCogR,maxCogR===6?6:parseInt(gearsValRoul),rdist,base,'escalating');
+        const theorBaseR=bge()*maxCogR*MULT[maxCogR];
+        const pctEsc=Math.max(0,evEsc/theorBaseR*100);
+        // Use same tier thresholds as getTier but force F since Roulette is special-cased
+        bw=Math.min(Math.round(pctEsc/3),100); // rough relative scale matching other %-of-top values
+        t2={l:'F',c:'tier-f'};
+      }
+    }
     const th=s.tag?tagMap[s.tag]||'':'';
     const nameHtml=(s.name?`<span class="svc-name">${s.name}</span>`:'')+seasonBadge;
     const effClass=s.name?'svc-effect':'svc-effect svc-effect-primary';
@@ -1056,6 +1070,14 @@ function render(){
       tbody.insertBefore(sepRow,tr);
     }
   });
+
+  const roulFailModelFoot=document.getElementById('roulFail')?document.getElementById('roulFail').value:'flat';
+  const roulFootEl=document.getElementById('roul-footnote');
+  if(roulFootEl){
+    roulFootEl.innerHTML=roulFailModelFoot==='escalating'
+      ? `* Under the escalating fail model, Roulette's EV at max cogs is barely break-even — pushing to max cogs is a mistake, not just high-variance. Sorted last regardless of tier — see breakdown for the optimal cashout point.`
+      : `* Roulette's per-encounter EV is mathematically correct, but at ~1 encounter per 100 maps the tier is misleading within a single season. Sorted last regardless of tier — see breakdown for the full picture.`;
+  }
 
   // ── Reroll recommendation ──────────────────────────────────────────────
 
