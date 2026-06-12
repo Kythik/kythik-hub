@@ -165,6 +165,9 @@ function renderStrategies(list) {
     const dateStr  = ( s.PostedAt || s.Created) ? new Date(s.PostedAt || s.Created).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
     const zone     = s.Tags ? s.Tags.split(',')[0].trim() : (s.Channel || '');
     const eyebrow  = [zone, dateStr].filter(Boolean).join(' · ');
+    const hasImg   = s.ImageURLs && s.ImageURLs.trim();
+    const thumbSrc = hasImg ? s.ImageURLs.split(',')[0].trim() : getPlaceholder(s.id);
+    const imgThumb = `<div class="card-thumb${hasImg ? '' : ' card-thumb--placeholder'}"><img src="${thumbSrc}" alt="Strategy screenshot" loading="lazy" /></div>`;
 
     return `<article class="card" data-id="${s.id}" onclick="openModal('${s.id}')">
       ${imgThumb}
