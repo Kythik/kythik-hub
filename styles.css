@@ -115,7 +115,6 @@ button { cursor: pointer; font-family: var(--font-body); }
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-soft);
   height: var(--header-h);
-  position: relative;
 }
 .site-header::after {
   content: '';
@@ -1004,3 +1003,20 @@ button { cursor: pointer; font-family: var(--font-body); }
 }
 
 .brand-link { text-decoration: none; }
+
+/* ── STRATEGY GRID FRAME ────────────────── */
+.grid-frame {
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  position: relative;
+  background: rgba(11,21,36,0.3);
+}
+.grid-frame::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-glow) 50%, transparent);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
