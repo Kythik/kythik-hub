@@ -58,24 +58,21 @@ function unmutePlayer() {
 }
 
 function updateLiveUI() {
-  const label  = document.getElementById('headerLiveLabel');
   const fpState = document.getElementById('fpState');
   const epState = document.getElementById('epState');
   const fpDot   = document.getElementById('fpDot');
   const epDot   = document.getElementById('epDot');
 
   if (isLiveStream) {
-    if (label)   label.textContent    = 'Live';
-    if (fpState) fpState.textContent  = 'Live';
-    if (epState) epState.textContent  = 'Live';
+    if (fpState) fpState.textContent = 'Live';
+    if (epState) epState.textContent = 'Live';
   } else {
-    if (label)   label.textContent    = 'Latest VOD';
-    if (fpState) fpState.textContent  = 'Latest VOD';
-    if (epState) epState.textContent  = 'Latest VOD';
+    if (fpState) fpState.textContent = 'Latest VOD';
+    if (epState) epState.textContent = 'Latest VOD';
     [fpDot, epDot].forEach(d => { if (d) d.style.background = '#7a7a9a'; });
-    const hl = document.getElementById('headerLive');
-    if (hl) hl.style.opacity = '0.5';
   }
+
+  if (window.kythikUpdateLiveBadge) window.kythikUpdateLiveBadge(isLiveStream);
 }
 
 
