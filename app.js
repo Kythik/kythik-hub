@@ -163,33 +163,17 @@ function renderStrategies(list) {
   grid.innerHTML = list.map(s => {
     const initial  = (s.Author || '?')[0].toUpperCase();
     const dateStr  = ( s.PostedAt || s.Created) ? new Date(s.PostedAt || s.Created).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
-    const tags     = s.Tags ? s.Tags.split(',').map(t => t.trim()).filter(Boolean).map(t => `<span class="tag">${t}</span>`).join('') : '';
-    const hasImg   = s.ImageURLs && s.ImageURLs.trim();
-    const thumbSrc = hasImg ? s.ImageURLs.split(',')[0].trim() : getPlaceholder(s.id);
-    const imgThumb = `<div class="card-thumb${hasImg ? '' : ' card-thumb--placeholder'}"><img src="${thumbSrc}" alt="Strategy screenshot" loading="lazy" /></div>`;
+    const zone     = s.Tags ? s.Tags.split(',')[0].trim() : (s.Channel || '');
+    const eyebrow  = [zone, dateStr].filter(Boolean).join(' · ');
 
     return `<article class="card" data-id="${s.id}" onclick="openModal('${s.id}')">
       ${imgThumb}
       <div class="card-inner">
-        <div class="card-top">
-          <div class="card-tags">
-            
-            ${tags}
-          </div>
-          <span class="card-date">${dateStr}</span>
-        </div>
+        ${eyebrow ? `<div class="card-eyebrow">${eyebrow}</div>` : ''}
         <h2 class="card-title">${s.Title || 'Untitled'}</h2>
-        ${dateStr ? `<div class="card-created">${dateStr}</div>` : ''}
-        <p class="card-body">${s.Body || ''}</p>
-        <div class="card-foot">
-          <div class="author">
-            <div class="avatar" aria-hidden="true">${initial}</div>
-            ${s.Author || 'Anonymous'}
-          </div>
-          <div class="card-foot-right">
-            ${s.CommentCount ? `<a class="comment-count" href="${s.DiscordMessageURL}" target="_blank" rel="noopener" onclick="event.stopPropagation()">💬 ${s.CommentCount}</a>` : ''}
-            ${voteHTML(s.id, true)}
-          </div>
+        <div class="card-pills">
+          <div class="pill pill--author">${s.Author || 'Anonymous'}</div>
+          ${s.CommentCount ? `<a class="pill pill--muted" href="${s.DiscordMessageURL}" target="_blank" rel="noopener" onclick="event.stopPropagation()">💬 ${s.CommentCount}</a>` : ''}
         </div>
       </div>
     </article>`;
