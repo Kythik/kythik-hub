@@ -109,8 +109,6 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
     </div>
 
     <div class="stats" id="stats"></div>
-
-
     <div class="lootStage" id="lootStage">
       <div class="lootStageHead">
         <h3>Reward chest slots</h3>
@@ -171,7 +169,7 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
   <div class="panel gamePanel" style="display:flex;justify-content:center;align-items:flex-start;overflow-x:auto;">
     <div class="boardFrame" style="margin-left:auto;margin-right:auto;">
       <div class="boardHeader">
-        <div class="boardTitle">Arcana Board</div><button type="button" class="boardRulesBtn" onclick="openRulesModal()">Rules</button>
+        <div class="boardTitle">Arcana Board</div>
         <div class="boardLegend">
           <span class="legendPill"><span class="legendDot" style="background:#fff"></span>Current</span>
           <span class="legendPill"><span class="legendDot"></span>Preview</span>
@@ -207,47 +205,6 @@ Expected rarity value = Σ rarity_weight × loot_value(rarity)</pre>
   </div>
 </div>
 
-    </div>
-  </div>
-</div>
-
-
-<div class="modalOverlay rulesModalOverlay" id="rulesModal" onclick="if(event.target.id==='rulesModal')closeRulesModal()">
-  <div class="modalBox rulesModalBox">
-    <div class="modalHeader"><h2>Arcana Rules</h2><button class="closeBtn" onclick="closeRulesModal()">Close</button></div>
-    <div class="rulesGrid">
-      <section class="rulesCard">
-        <h3>Board flow</h3>
-        <p>Pick the current Move card or one stored hand card. The board previews the landing tile, then Confirm Use spends that card and resolves the tile.</p>
-      </section>
-      <section class="rulesCard">
-        <h3>Movement tiles</h3>
-        <p>Movement-card tiles show how many cards they provide. The number is fixed by the tile, not randomly guessed by the helper.</p>
-      </section>
-      <section class="rulesCard">
-        <h3>Reward chests</h3>
-        <p>You can secure up to seven reward chests. Chest rarity matters, so the best line is not always the closest chest.</p>
-      </section>
-      <section class="rulesCard">
-        <h3>Upgrade cards</h3>
-        <p>Hand upgrade cards affect already-secured reward chests only. With no secured chest, the card has no effect and does not upgrade the board.</p>
-      </section>
-      <section class="rulesCard">
-        <h3>Recommend</h3>
-        <p>Recommend previews the selected strategy’s next move. You still confirm it manually.</p>
-      </section>
-      <section class="rulesCard">
-        <h3>Auto Play</h3>
-        <p>Auto Play executes moves using the selected strategy. Use it for testing or after you understand the board state.</p>
-      </section>
-      <section class="rulesCard">
-        <h3>Markers</h3>
-        <p>The diamond marks your current position. Small numbered markers show where you already landed. Passed-over tiles are not collected.</p>
-      </section>
-      <section class="rulesCard">
-        <h3>Special boards</h3>
-        <p>Special boards swap in their own strategy choices. The strategy dropdown changes recommendation logic, not the board rules.</p>
-      </section>
     </div>
   </div>
 </div>
@@ -434,8 +391,6 @@ function forceValueBacktracking(){
   const el=$('backtrackModeInput');
   if(el)el.value='value';
 }
-
-
 
 function boardType(){return $('boardTypeInput')?.value||'normal'}
 function strategyId(){return $('strategyInput')?.value||(STRATEGY_DATA?.defaultStrategy||'Kythiks')}
@@ -1673,7 +1628,7 @@ function targetRewardShort(i){
   const t=state.tiles[i]||{};
   if(t.type==='chest')return lootLevelLabel(t.rarity)+' '+lootPrettyName(t.rarity)+' chest';
   if(t.type==='trap')return 'Trap';
-  if(t.type==='movement')return '<span class="moveTileIcon">▣</span><span class="moveCount">+'+(t.fixedN||1)+'</span>'; if(false)return t.fixedN?'Gain Move '+t.fixedN:'Gain mapping card';
+  if(t.type==='movement')return t.fixedN?'Gain Move '+t.fixedN:'Gain mapping card';
   if(t.type==='upgrade')return 'Gain upgrade card';
   if(t.type==='life')return t.fixedN?('Gain +'+t.fixedN+' life'):'Gain life';
   if(t.type==='question')return 'Mystery tile';
@@ -2013,18 +1968,6 @@ function floatingCardMeta(card){
   return {kind:'utility', kicker:'Card'};
 }
 
-
-function cardCssKind(c){
-  if(!c)return 'empty';
-  if(c.type==='move'||c.type==='move_any'||c.type==='move_even'||c.type==='move_odd')return c.type;
-  if(c.type==='back'||c.type==='back_any')return c.type;
-  if(c.type==='upgrade')return 'upgrade';
-  if(c.type==='life')return 'life';
-  if(c.type==='question')return 'question';
-  if(c.type==='trap')return 'trap';
-  return c.type||'card';
-}
-
 function renderFloatingHandDock(){
   const dock=$('floatingHandDock');
   const moveBtn=$('floatingCurrentMoveBtn');
@@ -2041,7 +1984,7 @@ function renderFloatingHandDock(){
   moveBtn.className='floatingMoveCard randomCard current kind-move '+(selected&&selected.type==='current'?'selected':'');
   handRoot.innerHTML=state.hand.map((c,i)=>{
     const meta=floatingCardMeta(c);
-    return `<button class="floatingHandCard kind-${cardCssKind(c)} ${selected&&selected.type==='hand'&&selected.idx===i?'selected':''}" onclick="selectHand(${i})"><span class="floatingCardKicker">${meta.kicker}</span><span class="floatingCardName">${c.name}</span></button>`;
+    return `<button class="floatingHandCard kind-${meta.kind} ${selected&&selected.type==='hand'&&selected.idx===i?'selected':''}" onclick="selectHand(${i})"><span class="floatingCardKicker">${meta.kicker}</span><span class="floatingCardName">${c.name}</span></button>`;
   }).join('')||'<span class="floatingEmpty">No stored cards.</span>';
   if(confirmBtn){
     confirmBtn.disabled=!pendingMove;
@@ -2050,6 +1993,73 @@ function renderFloatingHandDock(){
   if(confirmText){
     confirmText.textContent=pendingMove?(choiceActionShort(pendingMove.sel,pendingMove.idx)+' → Tile '+(pendingMove.idx+1)+' · '+targetRewardShort(pendingMove.idx)):'Select a card to preview the landing tile, then confirm use.';
   }
+}
+
+
+function boardVisualPosition(i){
+  const row=Math.floor(i/4);
+  const off=i%4;
+  const col=(row%2===0)?off:(3-off);
+  return {row,col,x:(col+0.5)*100,y:(row+0.5)*100};
+}
+function boardNodeLabel(t){
+  if(!t)return '';
+  if(t.type==='start')return 'Start';
+  if(t.type==='question')return '?';
+  if(t.type==='life')return '+'+(t.fixedN||1)+' Life';
+  if(t.type==='movement')return 'Card';
+  if(t.type==='upgrade')return 'Up '+rarityLabel(t.fixedFrom||'');
+  if(t.type==='trap')return 'Trap';
+  if(t.type==='chest')return rarityLabel(t.rarity);
+  return '';
+}
+function boardNodeInner(t,spent=false){
+  if(spent)return '<span class="nodeGlyph nodeGlyph-empty">✦</span>';
+  if(!t)return '<span class="nodeGlyph nodeGlyph-empty">✦</span>';
+  if(t.type==='start')return '<span class="nodeGlyph nodeGlyph-start">◆</span><span class="nodeLabel">Start</span>';
+  if(t.type==='empty')return '<span class="nodeGlyph nodeGlyph-empty">✦</span>';
+  if(t.type==='question')return '<span class="nodeGlyph nodeGlyph-question">?</span>';
+  if(t.type==='trap')return '<span class="nodeGlyph nodeGlyph-trap">◆</span><span class="nodeLabel">Trap</span>';
+  if(t.type==='life')return '<span class="nodeGlyph nodeGlyph-life">♥</span><span class="nodeLabel">+'+(t.fixedN||1)+' Life</span>';
+  if(t.type==='movement')return '<span class="nodeGlyph nodeGlyph-move">Card</span><span class="nodeCount">+'+(t.fixedN||1)+'</span>';
+  if(t.type==='upgrade')return '<span class="nodeGlyph nodeGlyph-upgrade">⇧</span><span class="nodeLabel">Up '+rarityLabel(t.fixedFrom||'')+'</span>';
+  if(t.type==='chest'){
+    const r=t.rarity||'green';
+    return '<span class="nodeChest '+r+'"><span class="nodeChestBand"></span><span class="nodeChestLock"></span></span><span class="nodeLabel">'+rarityLabel(r)+'</span>';
+  }
+  return '<span class="nodeGlyph nodeGlyph-empty">✦</span>';
+}
+function renderBoardV2(targets=[]){
+  const rows=Math.ceil(state.tiles.length/4);
+  const links=[];
+  for(let i=0;i<state.tiles.length-1;i++){
+    const a=boardVisualPosition(i),b=boardVisualPosition(i+1);
+    links.push('<path class="boardRouteLink" d="M '+a.x+' '+a.y+' L '+b.x+' '+b.y+'" />');
+  }
+  const svg='<svg class="boardRouteSvg" viewBox="0 0 400 '+(rows*100)+'" preserveAspectRatio="none" aria-hidden="true"><defs><marker id="arcanaArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" class="boardRouteArrow"/></marker></defs>'+links.join('')+'</svg>';
+  const nodes=state.tiles.map((t,i)=>{
+    const p=boardVisualPosition(i);
+    const visit=state.path.indexOf(i+1);
+    const spent=visit>=0;
+    const vt=spent?'empty':t.type;
+    const vr=spent?'':(t.rarity||'');
+    const classes=[
+      'boardNode',
+      'node-'+vt,
+      vt==='chest'?'node-chest-'+vr:'',
+      vr?'rarity-'+vr:'',
+      visit>=0?'landed':'',
+      spent?'spentEmpty':'',
+      i===state.pos?'pos':'',
+      targets.includes(i)?'reach':'',
+      pendingMove&&i===pendingMove.idx?'pendingPreview':'',
+      suggested&&i===suggested.idx?'suggest':''
+    ].filter(Boolean).join(' ');
+    const land=visit>=0?'<span class="nodeLand">'+(visit+1)+'</span>':'';
+    const player=i===state.pos?'<span class="playerMarker" aria-label="Current position"></span>':'';
+    return '<button class="'+classes+'" style="grid-column:'+(p.col+1)+';grid-row:'+(p.row+1)+'" onclick="clickTile('+i+')" title="Tile '+(i+1)+' · '+escapeHtml(boardNodeLabel(t))+'"><span class="nodeIndex">'+(i+1)+'</span><span class="nodeBody">'+boardNodeInner(t,spent)+'</span>'+land+player+'</button>';
+  }).join('');
+  return '<div class="boardV2" style="--board-rows:'+rows+'">'+svg+nodes+'</div>';
 }
 
 function render(){
@@ -2066,29 +2076,8 @@ function render(){
   $('currentMoveBtn').className='arc-card '+(selected&&selected.type==='current'?'selected':'');
   $('hand').innerHTML=state.hand.map((c,i)=>`<button class="arc-card ${selected&&selected.type==='hand'&&selected.idx===i?'selected':''}" onclick="selectHand(${i})">${c.name}</button>`).join('')||'<span class="small">No stored cards.</span>';
   renderFloatingHandDock();
-    let targets=targetOptionsFor(selected);
-  let rows=[];
-  for(let r=0;r<Math.ceil(state.tiles.length/4);r++){
-    let start=r*4;
-    let rowEnd=Math.min(start+3,state.tiles.length-1);
-    let items=state.tiles.slice(start,start+4);
-    let tileHtml=items.map((t,off)=>{
-      let i=start+off;
-      let visit=state.path.indexOf(i+1),land=visit>=0?`<span class="land">${visit+1}</span>`:'',player=i===state.pos?'<span class="playerMarker" aria-label="Current position"></span>':'';
-      let link='';
-      if(rowEnd<state.tiles.length-1){
-        if(r%2===0 && i===rowEnd)link=`<span class="rowEndLink" title="Continues to tile ${rowEnd+2}">${rowEnd+1} ↴ ${rowEnd+2}</span>`;
-        if(r%2===1 && i===rowEnd)link=`<span class="rowEndLink left" title="Continues to tile ${rowEnd+2}">${rowEnd+1} ↵ ${rowEnd+2}</span>`;
-      }
-      let spent=visit>=0;
-      let vt=spent?'empty':t.type;
-      let vr=spent?'':(t.rarity||'');
-      let displayIcon=spent?'':icon(t);
-      return `<button class="tile ${vt} ${spent?'spentEmpty':''} ${vt==='chest'?'chest chest-'+vr:''} ${vr} ${visit>=0?'landed':''} ${i===state.pos?'pos':''} ${targets.includes(i)?'reach':''} ${pendingMove&&i===pendingMove.idx?'pendingPreview':''} ${suggested&&i===suggested.idx?'suggest':''}" onclick="clickTile(${i})"><span class="n">${i+1}</span><span class="c">${displayIcon}</span>${land}${player}${link}</button>`;
-    }).join('');
-    rows.push(`<div class="boardRow ${r%2?'reverse':'forward'}">${tileHtml}</div>`);
-  }
-  $('board').innerHTML=rows.join('');
+  let targets=targetOptionsFor(selected);
+  $('board').innerHTML=renderBoardV2(targets);
   renderLootColumns();
   $('log').innerHTML=state.log.map(x=>'<div>'+x+'</div>').join('');
   if(suggested){
@@ -2104,10 +2093,6 @@ function render(){
   }else{
     $('routeNotes').innerHTML='Click <b>Recommend Next Move</b>. Recommendations use 2-card route logic by default; 3-card is safe; 4-card is survival-first.';
   }}
-
-function openRulesModal(){const el=$('rulesModal');if(el)el.classList.add('show')}
-function closeRulesModal(){const el=$('rulesModal');if(el)el.classList.remove('show')}
-
 function openInfoModal(){$('infoModal').classList.add('open')}
 function closeInfoModal(){$('infoModal').classList.remove('open')}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeInfoModal();cancelPendingMove();}});

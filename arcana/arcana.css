@@ -3357,556 +3357,8 @@ body.arcana-page .board {
 }
 
 
-/* ═══════════════════════════════════════════
-   ARCANA VISUAL SITE V1.25 — CSS-first visual system
-   Component polish: board frame, tiles, cards, loot, status actions, rules modal.
-   ═══════════════════════════════════════════ */
-.arcana-page.visual-fork{
-  --arc-bg:#04080F;
-  --arc-panel:#07111F;
-  --arc-panel2:#0B1524;
-  --arc-line:#263A57;
-  --arc-gold:#C8A45D;
-  --arc-gold2:#E6C77A;
-  --arc-amber:#F28A2E;
-  --arc-text:#E9EDF5;
-  --arc-muted:#AAB4C4;
-  --arc-blue:#56B6FF;
-  --arc-teal:#2ED8C3;
-  --arc-purple:#A861FF;
-  --arc-magenta:#FF5AA8;
-  --arc-red:#E64C3C;
-}
-
-/* Board frame: make the playfield feel intentionally contained. */
-.arcana-page.visual-fork .gamePanel{
-  background:
-    radial-gradient(circle at 50% 20%, rgba(90,66,30,.12), transparent 30%),
-    linear-gradient(180deg, rgba(11,21,36,.96), rgba(4,8,15,.96)) !important;
-  border:1px solid rgba(230,199,122,.36) !important;
-  border-radius:22px !important;
-  box-shadow:
-    0 22px 70px rgba(0,0,0,.45),
-    inset 0 0 0 1px rgba(255,255,255,.035),
-    inset 0 0 44px rgba(200,164,93,.045) !important;
-  position:relative;
-}
-.arcana-page.visual-fork .gamePanel::before{
-  content:"";
-  position:absolute;
-  inset:10px;
-  pointer-events:none;
-  border-radius:16px;
-  border:1px solid rgba(200,164,93,.18);
-  box-shadow:inset 0 0 28px rgba(230,199,122,.06);
-}
-.arcana-page.visual-fork .boardFrame{
-  padding:14px 16px 20px !important;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(38,58,87,.20), transparent 58%),
-    linear-gradient(180deg, rgba(7,17,31,.38), rgba(4,8,15,.22));
-  border-radius:18px;
-}
-.arcana-page.visual-fork .boardHeader{
-  min-height:38px;
-  padding:0 4px 10px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-}
-.arcana-page.visual-fork .boardTitle{
-  color:var(--arc-gold2) !important;
-  text-transform:uppercase;
-  letter-spacing:.08em;
-  font-weight:900;
-}
-.arcana-page.visual-fork .boardRulesBtn{
-  border:1px solid rgba(230,199,122,.34);
-  background:linear-gradient(180deg, rgba(11,21,36,.98), rgba(7,17,31,.98));
-  color:var(--arc-gold2);
-  border-radius:10px;
-  padding:7px 12px;
-  font-weight:800;
-  cursor:pointer;
-}
-.arcana-page.visual-fork .boardRulesBtn:hover{
-  border-color:rgba(230,199,122,.70);
-  box-shadow:0 0 18px rgba(230,199,122,.13);
-}
-
-/* Tile visual system */
-.arcana-page.visual-fork .tile{
-  border-radius:22px !important;
-  background:
-    radial-gradient(circle at 50% 34%, rgba(230,199,122,.055), transparent 48%),
-    linear-gradient(180deg, rgba(11,21,36,.96), rgba(4,8,15,.96)) !important;
-  border:1px solid rgba(200,164,93,.42) !important;
-  box-shadow:
-    0 13px 26px rgba(0,0,0,.36),
-    inset 0 0 0 1px rgba(255,255,255,.035),
-    inset 0 -14px 26px rgba(0,0,0,.24) !important;
-  overflow:visible !important;
-}
-.arcana-page.visual-fork .tile::before{
-  content:"";
-  position:absolute;
-  inset:6px;
-  border-radius:17px;
-  border:1px solid rgba(230,199,122,.12);
-  pointer-events:none;
-}
-.arcana-page.visual-fork .tile .c{
-  z-index:3;
-  filter:drop-shadow(0 0 10px rgba(230,199,122,.12));
-}
-.arcana-page.visual-fork .tile.empty .c,
-.arcana-page.visual-fork .tile.spentEmpty .c{
-  color:rgba(230,199,122,.36) !important;
-}
-.arcana-page.visual-fork .tile.movement,
-.arcana-page.visual-fork .tile.move,
-.arcana-page.visual-fork .tile.kind-movement{
-  border-color:rgba(46,216,195,.58) !important;
-  background:
-    radial-gradient(circle at 50% 38%, rgba(46,216,195,.20), transparent 52%),
-    linear-gradient(180deg, rgba(8,40,45,.98), rgba(4,13,22,.98)) !important;
-}
-.arcana-page.visual-fork .tile.movement .c,
-.arcana-page.visual-fork .tile.move .c{
-  color:#BFFCF5 !important;
-}
-.arcana-page.visual-fork .tile.trap{
-  border-color:rgba(168,97,255,.58) !important;
-  background:
-    radial-gradient(circle at 50% 34%, rgba(168,97,255,.24), transparent 52%),
-    linear-gradient(180deg, rgba(37,18,58,.98), rgba(11,8,22,.98)) !important;
-}
-.arcana-page.visual-fork .tile.question{
-  border-color:rgba(230,199,122,.62) !important;
-  background:
-    radial-gradient(circle at 50% 34%, rgba(242,138,46,.18), transparent 52%),
-    linear-gradient(180deg, rgba(42,27,9,.96), rgba(11,12,18,.96)) !important;
-}
-.arcana-page.visual-fork .tile.life{
-  border-color:rgba(86,182,255,.62) !important;
-  background:
-    radial-gradient(circle at 50% 34%, rgba(86,182,255,.22), transparent 52%),
-    linear-gradient(180deg, rgba(7,39,66,.96), rgba(4,12,24,.96)) !important;
-}
-.arcana-page.visual-fork .tile.upgrade{
-  border-color:rgba(255,90,168,.58) !important;
-  background:
-    radial-gradient(circle at 50% 34%, rgba(255,90,168,.20), transparent 52%),
-    linear-gradient(180deg, rgba(58,13,34,.96), rgba(16,8,20,.96)) !important;
-}
-.arcana-page.visual-fork .tile.chest{
-  border-color:rgba(230,199,122,.68) !important;
-  background:
-    radial-gradient(circle at 50% 34%, rgba(230,199,122,.18), transparent 52%),
-    linear-gradient(180deg, rgba(36,25,10,.98), rgba(10,10,14,.98)) !important;
-}
-
-/* Movement-card tile count badges: one unified move-tile color, number changes only. */
-.arcana-page.visual-fork .tile.movement .moveCount,
-.arcana-page.visual-fork .tile.move .moveCount{
-  position:absolute;
-  right:5px;
-  bottom:5px;
-  min-width:28px;
-  height:22px;
-  padding:0 6px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:999px;
-  background:rgba(4,8,15,.86);
-  border:1px solid rgba(46,216,195,.70);
-  color:#D9FFFA;
-  font-size:12px;
-  font-weight:950;
-  z-index:8;
-  box-shadow:0 0 16px rgba(46,216,195,.24);
-}
-
-/* Current-position diamond stays visually clear. */
-.arcana-page.visual-fork .tile .playerMarker{
-  width:18px !important;
-  height:18px !important;
-  border:2px solid rgba(255,255,255,.96) !important;
-  background:linear-gradient(145deg,#FFFFFF,var(--arc-gold2)) !important;
-  box-shadow:
-    0 0 0 2px rgba(4,8,15,.82),
-    0 0 22px rgba(230,199,122,.82),
-    0 8px 20px rgba(0,0,0,.46) !important;
-}
-
-/* Card visual system */
-.arcana-page.visual-fork .floatingHandDock,
-.arcana-page.visual-fork .floatingHandRows{
-  background:
-    linear-gradient(180deg, rgba(11,21,36,.98), rgba(4,8,15,.98)) !important;
-  border-color:rgba(230,199,122,.32) !important;
-}
-.arcana-page.visual-fork .floatingHandCards button,
-.arcana-page.visual-fork .floatingMoveCard,
-.arcana-page.visual-fork .arc-card{
-  border-radius:12px !important;
-  border:1px solid rgba(230,199,122,.30) !important;
-  background:
-    radial-gradient(circle at 50% 30%, rgba(230,199,122,.08), transparent 52%),
-    linear-gradient(180deg, rgba(11,21,36,.96), rgba(4,8,15,.96)) !important;
-  box-shadow:
-    0 12px 28px rgba(0,0,0,.35),
-    inset 0 0 0 1px rgba(255,255,255,.035) !important;
-}
-.arcana-page.visual-fork .floatingHandCards button.kind-move,
-.arcana-page.visual-fork .floatingHandCards button.kind-move_any,
-.arcana-page.visual-fork .floatingHandCards button.kind-move_even,
-.arcana-page.visual-fork .floatingHandCards button.kind-move_odd,
-.arcana-page.visual-fork .floatingMoveCard.current{
-  border-color:rgba(200,164,93,.70) !important;
-  background:
-    radial-gradient(circle at 50% 30%, rgba(230,199,122,.20), transparent 56%),
-    linear-gradient(180deg, rgba(51,34,10,.96), rgba(9,10,17,.96)) !important;
-}
-.arcana-page.visual-fork .floatingHandCards button.kind-back,
-.arcana-page.visual-fork .floatingHandCards button.kind-back_any{
-  border-color:rgba(230,76,60,.66) !important;
-  background:
-    radial-gradient(circle at 50% 30%, rgba(230,76,60,.20), transparent 56%),
-    linear-gradient(180deg, rgba(58,16,12,.96), rgba(9,9,16,.96)) !important;
-}
-.arcana-page.visual-fork .floatingHandCards button.kind-upgrade{
-  border-color:rgba(255,90,168,.66) !important;
-  background:
-    radial-gradient(circle at 50% 30%, rgba(255,90,168,.20), transparent 56%),
-    linear-gradient(180deg, rgba(58,14,32,.96), rgba(9,9,16,.96)) !important;
-}
-.arcana-page.visual-fork .floatingHandCards button.kind-life{
-  border-color:rgba(86,182,255,.66) !important;
-  background:
-    radial-gradient(circle at 50% 30%, rgba(86,182,255,.20), transparent 56%),
-    linear-gradient(180deg, rgba(7,37,64,.96), rgba(6,10,18,.96)) !important;
-}
-.arcana-page.visual-fork .floatingHandCards button.kind-question,
-.arcana-page.visual-fork .floatingHandCards button.kind-trap{
-  border-color:rgba(168,97,255,.66) !important;
-  background:
-    radial-gradient(circle at 50% 30%, rgba(168,97,255,.22), transparent 56%),
-    linear-gradient(180deg, rgba(33,16,58,.96), rgba(7,9,18,.96)) !important;
-}
-.arcana-page.visual-fork .floatingMoveCard.randomCard{
-  border-color:rgba(46,216,195,.70) !important;
-  background:
-    radial-gradient(circle at 50% 30%, rgba(46,216,195,.20), transparent 56%),
-    linear-gradient(180deg, rgba(6,42,44,.96), rgba(4,10,18,.96)) !important;
-}
-.arcana-page.visual-fork .floatingMoveCard.randomCard .floatingCardKicker::after{
-  content:" · Move 1–6";
-  color:rgba(217,255,250,.78);
-  font-weight:800;
-}
-
-/* Status: compact board controls live with status, advanced content stays collapsed. */
-.arcana-page.visual-fork .statusBoardActions{
-  margin-top:14px;
-  padding:12px;
-  border:1px solid rgba(230,199,122,.20);
-  border-radius:14px;
-  background:rgba(4,8,15,.28);
-}
-.arcana-page.visual-fork .boardSelectLabel{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  color:var(--arc-gold2);
-  font-weight:850;
-  font-size:12px;
-  text-transform:uppercase;
-  letter-spacing:.06em;
-}
-.arcana-page.visual-fork .statusActionBtns{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-top:10px;
-}
-.arcana-page.visual-fork .statusActionBtns button{
-  min-height:36px;
-  border-radius:10px;
-  border:1px solid rgba(230,199,122,.28);
-  background:linear-gradient(180deg, rgba(16,29,49,.95), rgba(7,17,31,.95));
-  color:var(--arc-gold2);
-  font-weight:850;
-}
-
-/* Rules modal */
-.arcana-page.visual-fork .rulesModalBox{
-  max-width:980px;
-}
-.arcana-page.visual-fork .rulesGrid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:12px;
-}
-.arcana-page.visual-fork .rulesCard{
-  border:1px solid rgba(230,199,122,.18);
-  border-radius:14px;
-  padding:14px;
-  background:linear-gradient(180deg, rgba(11,21,36,.82), rgba(4,8,15,.82));
-}
-.arcana-page.visual-fork .rulesCard h3{
-  margin:0 0 8px;
-  color:var(--arc-gold2);
-}
-.arcana-page.visual-fork .rulesCard p{
-  margin:0;
-  color:var(--arc-text);
-  line-height:1.48;
-}
-@media (max-width:800px){
-  .arcana-page.visual-fork .rulesGrid{grid-template-columns:1fr}
-}
-
-
-/* ═══════════════════════════════════════════
-   ARCANA VISUAL SITE V1.26 — Visual cleanup
-   Pull back v1.25 over-framing, restore route readability, improve chests/upgrades.
-   ═══════════════════════════════════════════ */
-
-/* Remove frame-inside-frame feel around the board. Keep one premium playfield frame. */
-.arcana-page.visual-fork .gamePanel{
-  background:transparent !important;
-  border:0 !important;
-  box-shadow:none !important;
-  overflow:visible !important;
-}
-.arcana-page.visual-fork .gamePanel::before{
-  display:none !important;
-}
-.arcana-page.visual-fork .boardFrame{
-  background:
-    radial-gradient(circle at 50% 50%, rgba(38,58,87,.16), transparent 62%),
-    linear-gradient(180deg, rgba(7,17,31,.72), rgba(4,8,15,.70)) !important;
-  border:1px solid rgba(230,199,122,.32) !important;
-  border-radius:22px !important;
-  box-shadow:
-    0 24px 70px rgba(0,0,0,.46),
-    inset 0 0 0 1px rgba(255,255,255,.028),
-    inset 0 0 38px rgba(200,164,93,.035) !important;
-  padding:14px 16px 20px !important;
-  position:relative;
-}
-.arcana-page.visual-fork .boardFrame::before{
-  content:"";
-  position:absolute;
-  inset:8px;
-  border:1px solid rgba(200,164,93,.16);
-  border-radius:16px;
-  pointer-events:none;
-}
-
-/* Board tiles: no card-like tiles. Use cleaner medallion/pedestal feel. */
-.arcana-page.visual-fork .tile{
-  border-radius:18px !important;
-  border:1px solid rgba(200,164,93,.34) !important;
-  background:
-    radial-gradient(circle at 50% 38%, rgba(230,199,122,.045), transparent 50%),
-    linear-gradient(180deg, rgba(12,22,35,.92), rgba(5,9,16,.96)) !important;
-  box-shadow:
-    0 12px 22px rgba(0,0,0,.34),
-    inset 0 0 0 1px rgba(255,255,255,.025),
-    inset 0 -10px 22px rgba(0,0,0,.28) !important;
-  clip-path:none !important;
-}
-.arcana-page.visual-fork .tile::before{
-  inset:5px !important;
-  border-radius:14px !important;
-  border:1px solid rgba(230,199,122,.08) !important;
-}
-.arcana-page.visual-fork .tile .c{
-  font-size:clamp(15px,1.2vw,21px) !important;
-}
-
-/* Restore/strengthen the route gold links. */
-.arcana-page.visual-fork .link,
-.arcana-page.visual-fork .rowLink,
-.arcana-page.visual-fork .tile .link{
-  opacity:1 !important;
-  filter:drop-shadow(0 0 7px rgba(230,199,122,.45)) !important;
-  background:linear-gradient(90deg, rgba(200,164,93,.20), rgba(230,199,122,.90), rgba(200,164,93,.20)) !important;
-  border-color:rgba(230,199,122,.64) !important;
-}
-.arcana-page.visual-fork .rowLink::before,
-.arcana-page.visual-fork .rowLink::after{
-  background:rgba(230,199,122,.95) !important;
-  box-shadow:0 0 12px rgba(230,199,122,.48) !important;
-}
-.arcana-page.visual-fork .rowWrapDot,
-.arcana-page.visual-fork .linkIndex,
-.arcana-page.visual-fork .linkBadge,
-.arcana-page.visual-fork .rowLinkBadge,
-.arcana-page.visual-fork .tile .linkBadge,
-.arcana-page.visual-fork .tile .rowLinkBadge{
-  display:none !important;
-}
-
-/* Keep the improved question tile: clean gold question-marker medallion. */
-.arcana-page.visual-fork .tile.question{
-  border-color:rgba(230,199,122,.58) !important;
-  background:
-    radial-gradient(circle at 50% 40%, rgba(242,138,46,.18), transparent 54%),
-    linear-gradient(180deg, rgba(37,25,10,.94), rgba(7,10,17,.96)) !important;
-}
-.arcana-page.visual-fork .tile.question .c{
-  color:#E6C77A !important;
-  text-shadow:0 0 16px rgba(230,199,122,.36);
-  font-weight:950;
-}
-
-/* Move-card tiles: one unified color; count changes only. */
-.arcana-page.visual-fork .tile.movement,
-.arcana-page.visual-fork .tile.move,
-.arcana-page.visual-fork .tile.kind-movement{
-  border-color:rgba(46,216,195,.58) !important;
-  background:
-    radial-gradient(circle at 50% 40%, rgba(46,216,195,.18), transparent 55%),
-    linear-gradient(180deg, rgba(7,38,41,.94), rgba(5,11,18,.96)) !important;
-}
-.arcana-page.visual-fork .tile.movement .moveCount,
-.arcana-page.visual-fork .tile.move .moveCount{
-  right:4px !important;
-  bottom:4px !important;
-  min-width:26px !important;
-  height:20px !important;
-  font-size:12px !important;
-  background:rgba(4,8,15,.88) !important;
-}
-
-/* Chests: stronger polished chest-tile read without adding image assets. */
-.arcana-page.visual-fork .tile.chest{
-  border-color:rgba(230,199,122,.72) !important;
-  background:
-    radial-gradient(circle at 50% 38%, rgba(230,199,122,.24), transparent 54%),
-    linear-gradient(180deg, rgba(42,27,9,.96), rgba(7,8,13,.98)) !important;
-}
-.arcana-page.visual-fork .tile.chest.green{border-color:rgba(114,190,91,.64) !important;}
-.arcana-page.visual-fork .tile.chest.blue{border-color:rgba(86,182,255,.68) !important;}
-.arcana-page.visual-fork .tile.chest.purple{border-color:rgba(168,97,255,.72) !important;}
-.arcana-page.visual-fork .tile.chest.orange{border-color:rgba(230,199,122,.78) !important;}
-.arcana-page.visual-fork .tile.chest.red{border-color:rgba(230,76,60,.78) !important;}
-.arcana-page.visual-fork .tile.chest.rainbow{
-  border-color:rgba(220,235,255,.82) !important;
-  box-shadow:
-    0 12px 22px rgba(0,0,0,.34),
-    0 0 18px rgba(168,97,255,.20),
-    0 0 24px rgba(86,182,255,.18),
-    inset 0 0 18px rgba(230,199,122,.08) !important;
-}
-.arcana-page.visual-fork .chestIcon{
-  display:inline-flex !important;
-  width:34px;
-  height:24px;
-  align-items:center;
-  justify-content:center;
-  border-radius:8px 8px 5px 5px;
-  background:
-    linear-gradient(180deg, rgba(230,199,122,.95), rgba(142,96,36,.96));
-  border:1px solid rgba(255,236,174,.55);
-  color:#1B1208 !important;
-  box-shadow:
-    0 0 14px rgba(230,199,122,.34),
-    inset 0 -8px 12px rgba(0,0,0,.20);
-  font-size:0 !important;
-}
-.arcana-page.visual-fork .chestIcon::before{
-  content:"";
-  width:18px;
-  height:12px;
-  border-radius:3px;
-  border:2px solid rgba(4,8,15,.75);
-  border-top-width:4px;
-  box-shadow:inset 0 0 0 2px rgba(230,199,122,.22);
-}
-.arcana-page.visual-fork .tile.chest.blue .chestIcon,
-.arcana-page.visual-fork .tile.chest.rare .chestIcon{
-  background:linear-gradient(180deg, #76B8EA, #244A78);
-}
-.arcana-page.visual-fork .tile.chest.green .chestIcon,
-.arcana-page.visual-fork .tile.chest.common .chestIcon{
-  background:linear-gradient(180deg, #78B86B, #244E2C);
-}
-.arcana-page.visual-fork .tile.chest.purple .chestIcon,
-.arcana-page.visual-fork .tile.chest.epic .chestIcon{
-  background:linear-gradient(180deg, #B072EA, #4B237B);
-}
-.arcana-page.visual-fork .tile.chest.red .chestIcon,
-.arcana-page.visual-fork .tile.chest.ultimate .chestIcon{
-  background:linear-gradient(180deg, #F56A4E, #7C1E18);
-}
-.arcana-page.visual-fork .tile.chest.rainbow .chestIcon{
-  background:linear-gradient(135deg, #7AD7FF, #E8DBFF 35%, #F2D27B 65%, #A57BFF);
-}
-
-/* Upgrade tiles/cards: explicitly colored and labeled. */
-.arcana-page.visual-fork .tile.upgrade{
-  border-color:rgba(255,90,168,.70) !important;
-  background:
-    radial-gradient(circle at 50% 40%, rgba(255,90,168,.22), transparent 55%),
-    linear-gradient(180deg, rgba(58,14,32,.95), rgba(7,9,16,.97)) !important;
-}
-.arcana-page.visual-fork .tile.upgrade .upgradeTileLabel{
-  position:absolute;
-  right:5px;
-  bottom:5px;
-  padding:1px 6px;
-  border-radius:999px;
-  border:1px solid rgba(255,90,168,.65);
-  background:rgba(4,8,15,.82);
-  color:#FFD8EB;
-  font-size:10px;
-  font-weight:950;
-  z-index:8;
-}
-.arcana-page.visual-fork .tile.upgrade .upgradeTileIcon{
-  color:#FF8FC4;
-  text-shadow:0 0 16px rgba(255,90,168,.42);
-}
-
-/* Hand upgrade cards need stronger color/read and label. */
-.arcana-page.visual-fork .floatingHandCards button.kind-upgrade,
-.arcana-page.visual-fork .arc-card.kind-upgrade{
-  border-color:rgba(255,90,168,.74) !important;
-  background:
-    radial-gradient(circle at 50% 28%, rgba(255,90,168,.25), transparent 58%),
-    linear-gradient(180deg, rgba(72,14,36,.96), rgba(9,9,16,.97)) !important;
-}
-.arcana-page.visual-fork .floatingHandCards button.kind-upgrade .floatingCardName,
-.arcana-page.visual-fork .floatingHandCards button.kind-upgrade .cardName,
-.arcana-page.visual-fork .arc-card.kind-upgrade .cardName{
-  color:#FFD8EB !important;
-}
-.arcana-page.visual-fork .floatingHandCards button.kind-upgrade .floatingCardName::before,
-.arcana-page.visual-fork .arc-card.kind-upgrade .cardName::before{
-  content:"UPGRADE ";
-  color:#FF8FC4;
-}
-
-/* Stop excessive heavy card shell look in board tiles, not in hand. */
-.arcana-page.visual-fork .tile .n{
-  opacity:.58 !important;
-}
-
-
-/* ARCANA VISUAL SITE V1.27 — Remove duplicate board controls */
-.arcana-page.visual-fork .statusBoardActions,
-.arcana-page.visual-fork #boardTypeInputMirror{
-  display:none !important;
-}
-
-
-/* ARCANA VISUAL SITE V1.28 — Collapsed sidebar sections */
+/* ARCANA V1.31 — rollback board visuals, keep collapsed sidebar sections only.
+   No board/tile/card visual-system overrides in this pass. */
 .arcana-page.visual-fork .sidebarDisclosure{
   margin-top:12px;
   border:1px solid rgba(230,199,122,.22);
@@ -4005,290 +3457,362 @@ body.arcana-page .board {
 }
 
 
-/* ARCANA VISUAL SITE V1.29 — Board tiles de-carded
-   Board tiles should read as board nodes, not mini cards. Hand cards remain cards. */
+/* ═══════════════════════════════════════════
+   ARCANA V1.32 — Rebuilt board component
+   Fresh board renderer: no old tile/card frames, gold route, quiet empty nodes.
+   ═══════════════════════════════════════════ */
 
-/* Kill the inner card-frame/border treatment only inside the board. */
-.arcana-page.visual-fork .boardFrame .tile,
-.arcana-page.visual-fork .board .tile,
-.arcana-page.visual-fork #board .tile{
-  border-radius:18px !important;
-  clip-path:none !important;
-  background-image:
-    radial-gradient(circle at 50% 45%, rgba(230,199,122,.075), transparent 52%),
-    linear-gradient(180deg, rgba(10,19,31,.88), rgba(3,7,13,.94)) !important;
-  border:1px solid rgba(200,164,93,.30) !important;
-  box-shadow:
-    0 10px 22px rgba(0,0,0,.32),
-    inset 0 0 22px rgba(0,0,0,.26) !important;
-  overflow:visible !important;
-}
-
-/* Remove rectangular inner frame overlays that make tiles look like cards. */
-.arcana-page.visual-fork .boardFrame .tile::before,
-.arcana-page.visual-fork .boardFrame .tile::after,
-.arcana-page.visual-fork .board .tile::before,
-.arcana-page.visual-fork .board .tile::after,
-.arcana-page.visual-fork #board .tile::before,
-.arcana-page.visual-fork #board .tile::after{
-  display:none !important;
-  content:none !important;
-}
-
-/* Remove any card-like art plate/backdrop inside board tiles. */
-.arcana-page.visual-fork .boardFrame .tile .c,
-.arcana-page.visual-fork .board .tile .c,
-.arcana-page.visual-fork #board .tile .c{
+.arcana-page.visual-fork #board.board{
+  display:block !important;
+  width:100%;
+  max-width:820px;
+  margin:0 auto !important;
+  padding:0 !important;
   background:transparent !important;
-  border:0 !important;
-  box-shadow:none !important;
-  border-radius:0 !important;
-  text-shadow:0 0 14px currentColor !important;
 }
 
-/* Make default/empty board nodes feel like neutral pedestals, not empty card slots. */
-.arcana-page.visual-fork .boardFrame .tile.empty,
-.arcana-page.visual-fork .boardFrame .tile.spentEmpty,
-.arcana-page.visual-fork .board .tile.empty,
-.arcana-page.visual-fork .board .tile.spentEmpty,
-.arcana-page.visual-fork #board .tile.empty,
-.arcana-page.visual-fork #board .tile.spentEmpty{
+.arcana-page.visual-fork .boardV2{
+  --cell-h:78px;
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(66px,1fr));
+  grid-auto-rows:var(--cell-h);
+  min-height:calc(var(--board-rows) * var(--cell-h));
+  padding:18px 18px 24px;
+  isolation:isolate;
+}
+
+.arcana-page.visual-fork .boardRouteSvg{
+  position:absolute;
+  inset:18px;
+  width:calc(100% - 36px);
+  height:calc(100% - 42px);
+  pointer-events:none;
+  z-index:0;
+  overflow:visible;
+}
+
+.arcana-page.visual-fork .boardRouteLink{
+  fill:none;
+  stroke:rgba(230,199,122,.86);
+  stroke-width:2.6;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  marker-end:url(#arcanaArrow);
+  filter:drop-shadow(0 0 5px rgba(230,199,122,.42));
+}
+
+.arcana-page.visual-fork .boardRouteArrow{
+  fill:rgba(230,199,122,.95);
+}
+
+.arcana-page.visual-fork .boardNode{
+  position:relative;
+  z-index:2;
+  align-self:center;
+  justify-self:center;
+  width:58px;
+  height:58px;
+  border:1px solid rgba(200,164,93,.32);
+  border-radius:18px;
   background:
-    radial-gradient(circle at 50% 48%, rgba(38,58,87,.20), transparent 48%),
-    linear-gradient(180deg, rgba(8,16,27,.82), rgba(3,7,13,.92)) !important;
-  border-color:rgba(200,164,93,.22) !important;
-}
-
-/* Keep question marker improvement, but make it tile-like not card-like. */
-.arcana-page.visual-fork .boardFrame .tile.question,
-.arcana-page.visual-fork .board .tile.question,
-.arcana-page.visual-fork #board .tile.question{
-  background:
-    radial-gradient(circle at 50% 45%, rgba(242,138,46,.22), transparent 54%),
-    linear-gradient(180deg, rgba(34,23,9,.90), rgba(4,7,13,.94)) !important;
-  border-color:rgba(230,199,122,.54) !important;
-}
-
-/* Move provider tiles: unified color, number only changes. No mini-card frame. */
-.arcana-page.visual-fork .boardFrame .tile.movement,
-.arcana-page.visual-fork .boardFrame .tile.move,
-.arcana-page.visual-fork .board .tile.movement,
-.arcana-page.visual-fork .board .tile.move,
-.arcana-page.visual-fork #board .tile.movement,
-.arcana-page.visual-fork #board .tile.move{
-  background:
-    radial-gradient(circle at 50% 45%, rgba(46,216,195,.20), transparent 54%),
-    linear-gradient(180deg, rgba(7,38,41,.88), rgba(3,8,14,.94)) !important;
-  border-color:rgba(46,216,195,.50) !important;
-}
-.arcana-page.visual-fork .boardFrame .tile.movement .moveCount,
-.arcana-page.visual-fork .boardFrame .tile.move .moveCount,
-.arcana-page.visual-fork .board .tile.movement .moveCount,
-.arcana-page.visual-fork .board .tile.move .moveCount,
-.arcana-page.visual-fork #board .tile.movement .moveCount,
-.arcana-page.visual-fork #board .tile.move .moveCount{
-  position:absolute !important;
-  right:4px !important;
-  bottom:4px !important;
-  min-width:24px !important;
-  height:18px !important;
-  padding:0 5px !important;
-  border-radius:999px !important;
-  border:1px solid rgba(46,216,195,.66) !important;
-  background:rgba(3,7,13,.86) !important;
-  color:#D9FFFA !important;
-  font-size:11px !important;
-  font-weight:950 !important;
-  box-shadow:0 0 12px rgba(46,216,195,.24) !important;
-}
-
-/* Upgrade tiles stay colored/labeled but not card-framed. */
-.arcana-page.visual-fork .boardFrame .tile.upgrade,
-.arcana-page.visual-fork .board .tile.upgrade,
-.arcana-page.visual-fork #board .tile.upgrade{
-  background:
-    radial-gradient(circle at 50% 45%, rgba(255,90,168,.22), transparent 54%),
-    linear-gradient(180deg, rgba(55,13,31,.90), rgba(4,7,13,.94)) !important;
-  border-color:rgba(255,90,168,.56) !important;
-}
-
-/* Trap/life/chest also use node surfaces rather than card panels. */
-.arcana-page.visual-fork .boardFrame .tile.trap,
-.arcana-page.visual-fork .board .tile.trap,
-.arcana-page.visual-fork #board .tile.trap{
-  background:
-    radial-gradient(circle at 50% 45%, rgba(168,97,255,.24), transparent 54%),
-    linear-gradient(180deg, rgba(35,16,58,.90), rgba(4,7,13,.94)) !important;
-  border-color:rgba(168,97,255,.55) !important;
-}
-.arcana-page.visual-fork .boardFrame .tile.life,
-.arcana-page.visual-fork .board .tile.life,
-.arcana-page.visual-fork #board .tile.life{
-  background:
-    radial-gradient(circle at 50% 45%, rgba(86,182,255,.22), transparent 54%),
-    linear-gradient(180deg, rgba(7,36,62,.90), rgba(4,7,13,.94)) !important;
-  border-color:rgba(86,182,255,.56) !important;
-}
-.arcana-page.visual-fork .boardFrame .tile.chest,
-.arcana-page.visual-fork .board .tile.chest,
-.arcana-page.visual-fork #board .tile.chest{
-  background:
-    radial-gradient(circle at 50% 45%, rgba(230,199,122,.24), transparent 54%),
-    linear-gradient(180deg, rgba(42,27,9,.90), rgba(4,7,13,.94)) !important;
-  border-color:rgba(230,199,122,.58) !important;
-}
-
-/* Remove obvious top-left 'card number' feeling on board tile index. Keep tile numbers subdued. */
-.arcana-page.visual-fork .boardFrame .tile .n,
-.arcana-page.visual-fork .board .tile .n,
-.arcana-page.visual-fork #board .tile .n{
-  opacity:.36 !important;
-  color:rgba(233,237,245,.58) !important;
-  background:transparent !important;
-  border:0 !important;
-  box-shadow:none !important;
-  font-size:10px !important;
-}
-
-/* Hand cards are allowed to remain card-like. This rule intentionally does not target .floatingHandDock. */
-
-
-/* ARCANA VISUAL SITE V1.30 — Quiet empty nodes, visible route
-   Goal: stop the board from reading as a wall of tiles/cards. */
-
-/* Hide row-link number pills everywhere. They looked like bad tile labels. */
-.arcana-page.visual-fork .rowWrapDot,
-.arcana-page.visual-fork .rowLinkBadge,
-.arcana-page.visual-fork .linkBadge,
-.arcana-page.visual-fork .linkIndex,
-.arcana-page.visual-fork .edgeLabel,
-.arcana-page.visual-fork .rowLink .badge,
-.arcana-page.visual-fork [class*="rowLink"][class*="Badge"],
-.arcana-page.visual-fork [class*="link"][class*="Badge"]{
-  display:none !important;
-  opacity:0 !important;
-  visibility:hidden !important;
-}
-
-/* Make route links more present than empty tiles. */
-.arcana-page.visual-fork .boardFrame .link,
-.arcana-page.visual-fork .boardFrame .rowLink,
-.arcana-page.visual-fork .board .link,
-.arcana-page.visual-fork .board .rowLink,
-.arcana-page.visual-fork #board .link,
-.arcana-page.visual-fork #board .rowLink{
-  opacity:1 !important;
-  height:3px !important;
-  background:linear-gradient(90deg,
-    rgba(200,164,93,.12),
-    rgba(230,199,122,.92),
-    rgba(200,164,93,.12)) !important;
-  border:0 !important;
+    radial-gradient(circle at 50% 44%, rgba(230,199,122,.08), transparent 54%),
+    linear-gradient(180deg, rgba(9,18,30,.92), rgba(3,7,13,.96));
+  color:#E9EDF5;
+  cursor:pointer;
+  padding:0;
   box-shadow:
-    0 0 10px rgba(230,199,122,.34),
-    0 0 18px rgba(86,182,255,.10) !important;
+    0 10px 22px rgba(0,0,0,.34),
+    inset 0 0 20px rgba(0,0,0,.28);
+  transition:transform .12s ease, border-color .12s ease, box-shadow .12s ease, opacity .12s ease;
 }
 
-/* Empty/spent/pass-through nodes should be quiet anchors, not full tiles. */
-.arcana-page.visual-fork .boardFrame .tile.empty,
-.arcana-page.visual-fork .boardFrame .tile.spentEmpty,
-.arcana-page.visual-fork .board .tile.empty,
-.arcana-page.visual-fork .board .tile.spentEmpty,
-.arcana-page.visual-fork #board .tile.empty,
-.arcana-page.visual-fork #board .tile.spentEmpty{
+.arcana-page.visual-fork .boardNode:hover{
+  transform:translateY(-1px);
+  border-color:rgba(230,199,122,.58);
+  box-shadow:0 12px 28px rgba(0,0,0,.42), 0 0 18px rgba(230,199,122,.14), inset 0 0 18px rgba(0,0,0,.22);
+}
+
+.arcana-page.visual-fork .boardNode .nodeIndex{
+  position:absolute;
+  left:6px;
+  top:5px;
+  font-size:9px;
+  color:rgba(170,180,196,.52);
+  font-weight:800;
+  z-index:5;
+}
+
+.arcana-page.visual-fork .nodeBody{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  text-align:center;
+  line-height:1.05;
+}
+
+.arcana-page.visual-fork .nodeGlyph{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:950;
+  font-size:22px;
+  text-shadow:0 0 14px currentColor;
+}
+
+.arcana-page.visual-fork .nodeLabel{
+  display:block;
+  max-width:50px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:9px;
+  font-weight:950;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  color:rgba(233,237,245,.86);
+}
+
+/* Empty nodes: present, but quiet. Restore empty icon without making a card tile. */
+.arcana-page.visual-fork .boardNode.node-empty,
+.arcana-page.visual-fork .boardNode.spentEmpty{
+  width:48px;
+  height:48px;
+  opacity:.62;
+  border-color:rgba(200,164,93,.22);
   background:
-    radial-gradient(circle at 50% 50%, rgba(230,199,122,.18) 0 4px, transparent 5px),
-    radial-gradient(circle at 50% 50%, rgba(38,58,87,.10), transparent 42%) !important;
-  border-color:rgba(200,164,93,.12) !important;
-  box-shadow:none !important;
-  opacity:.62 !important;
+    radial-gradient(circle at 50% 50%, rgba(230,199,122,.12), transparent 42%),
+    linear-gradient(180deg, rgba(8,16,27,.62), rgba(3,7,13,.74));
+  box-shadow:0 6px 16px rgba(0,0,0,.22), inset 0 0 14px rgba(0,0,0,.20);
 }
-.arcana-page.visual-fork .boardFrame .tile.empty:hover,
-.arcana-page.visual-fork .boardFrame .tile.spentEmpty:hover,
-.arcana-page.visual-fork .board .tile.empty:hover,
-.arcana-page.visual-fork .board .tile.spentEmpty:hover,
-.arcana-page.visual-fork #board .tile.empty:hover,
-.arcana-page.visual-fork #board .tile.spentEmpty:hover{
-  opacity:.86 !important;
-  border-color:rgba(230,199,122,.28) !important;
-  box-shadow:0 0 14px rgba(230,199,122,.12) !important;
+.arcana-page.visual-fork .nodeGlyph-empty{
+  color:rgba(230,199,122,.58);
+  font-size:18px;
+  text-shadow:0 0 10px rgba(230,199,122,.16);
 }
 
-/* Empty tile icon should be nearly gone; its dot/anchor is enough. */
-.arcana-page.visual-fork .boardFrame .tile.empty .c,
-.arcana-page.visual-fork .boardFrame .tile.spentEmpty .c,
-.arcana-page.visual-fork .board .tile.empty .c,
-.arcana-page.visual-fork .board .tile.spentEmpty .c,
-.arcana-page.visual-fork #board .tile.empty .c,
-.arcana-page.visual-fork #board .tile.spentEmpty .c{
-  opacity:.18 !important;
-  filter:none !important;
-  text-shadow:none !important;
+.arcana-page.visual-fork .boardNode.node-start{
+  border-color:rgba(230,199,122,.78);
+  background:
+    radial-gradient(circle at 50% 42%, rgba(230,199,122,.30), transparent 56%),
+    linear-gradient(180deg, rgba(42,30,12,.94), rgba(5,8,13,.96));
+  box-shadow:0 0 20px rgba(230,199,122,.24), inset 0 0 20px rgba(0,0,0,.22);
+}
+.arcana-page.visual-fork .nodeGlyph-start{
+  color:#FFF0B8;
 }
 
-/* Tile numbers should not visually compete with rewards. */
-.arcana-page.visual-fork .boardFrame .tile .n,
-.arcana-page.visual-fork .board .tile .n,
-.arcana-page.visual-fork #board .tile .n{
-  opacity:.28 !important;
-  color:rgba(170,180,196,.48) !important;
-  font-size:9px !important;
+/* One unified movement-provider tile color; only number changes. */
+.arcana-page.visual-fork .boardNode.node-movement{
+  border-color:rgba(46,216,195,.62);
+  background:
+    radial-gradient(circle at 50% 42%, rgba(46,216,195,.24), transparent 58%),
+    linear-gradient(180deg, rgba(7,42,44,.94), rgba(3,8,14,.96));
+}
+.arcana-page.visual-fork .nodeGlyph-move{
+  color:#D9FFFA;
+  font-size:17px;
+  letter-spacing:.02em;
+}
+.arcana-page.visual-fork .nodeCount{
+  position:absolute;
+  right:4px;
+  bottom:4px;
+  min-width:24px;
+  height:18px;
+  padding:0 5px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  border:1px solid rgba(46,216,195,.70);
+  background:rgba(3,7,13,.86);
+  color:#D9FFFA;
+  font-size:11px;
+  font-weight:950;
+  box-shadow:0 0 12px rgba(46,216,195,.24);
 }
 
-/* Meaningful tile types should pop above the quiet route anchors. */
-.arcana-page.visual-fork .boardFrame .tile:not(.empty):not(.spentEmpty),
-.arcana-page.visual-fork .board .tile:not(.empty):not(.spentEmpty),
-.arcana-page.visual-fork #board .tile:not(.empty):not(.spentEmpty){
-  opacity:1 !important;
-  box-shadow:
-    0 12px 26px rgba(0,0,0,.34),
-    0 0 18px rgba(230,199,122,.07),
-    inset 0 0 20px rgba(0,0,0,.22) !important;
+.arcana-page.visual-fork .boardNode.node-question{
+  border-color:rgba(230,199,122,.64);
+  background:
+    radial-gradient(circle at 50% 42%, rgba(242,138,46,.20), transparent 58%),
+    linear-gradient(180deg, rgba(38,25,9,.94), rgba(4,8,14,.96));
+}
+.arcana-page.visual-fork .nodeGlyph-question{
+  color:#E6C77A;
+  font-size:28px;
 }
 
-/* Meaningful tiles get small medallion feel, not card boxes. */
-.arcana-page.visual-fork .boardFrame .tile.question,
-.arcana-page.visual-fork .boardFrame .tile.life,
-.arcana-page.visual-fork .boardFrame .tile.movement,
-.arcana-page.visual-fork .boardFrame .tile.move,
-.arcana-page.visual-fork .boardFrame .tile.trap,
-.arcana-page.visual-fork .boardFrame .tile.upgrade,
-.arcana-page.visual-fork .boardFrame .tile.chest,
-.arcana-page.visual-fork .board .tile.question,
-.arcana-page.visual-fork .board .tile.life,
-.arcana-page.visual-fork .board .tile.movement,
-.arcana-page.visual-fork .board .tile.move,
-.arcana-page.visual-fork .board .tile.trap,
-.arcana-page.visual-fork .board .tile.upgrade,
-.arcana-page.visual-fork .board .tile.chest,
-.arcana-page.visual-fork #board .tile.question,
-.arcana-page.visual-fork #board .tile.life,
-.arcana-page.visual-fork #board .tile.movement,
-.arcana-page.visual-fork #board .tile.move,
-.arcana-page.visual-fork #board .tile.trap,
-.arcana-page.visual-fork #board .tile.upgrade,
-.arcana-page.visual-fork #board .tile.chest{
-  border-radius:20px !important;
-  transform:scale(.96);
+.arcana-page.visual-fork .boardNode.node-life{
+  border-color:rgba(86,182,255,.66);
+  background:
+    radial-gradient(circle at 50% 42%, rgba(86,182,255,.24), transparent 58%),
+    linear-gradient(180deg, rgba(7,38,66,.94), rgba(3,8,15,.96));
+}
+.arcana-page.visual-fork .nodeGlyph-life{
+  color:#BEE9FF;
+  font-size:23px;
 }
 
-/* Restore selected/current/preview visibility over quiet tiles. */
-.arcana-page.visual-fork .boardFrame .tile.pos,
-.arcana-page.visual-fork .board .tile.pos,
-.arcana-page.visual-fork #board .tile.pos{
-  opacity:1 !important;
-  border-color:rgba(255,255,255,.62) !important;
+.arcana-page.visual-fork .boardNode.node-trap{
+  border-color:rgba(168,97,255,.70);
+  background:
+    radial-gradient(circle at 50% 42%, rgba(168,97,255,.24), transparent 58%),
+    linear-gradient(180deg, rgba(37,16,58,.94), rgba(4,8,14,.96));
 }
-.arcana-page.visual-fork .boardFrame .tile.reach,
-.arcana-page.visual-fork .boardFrame .tile.pendingPreview,
-.arcana-page.visual-fork .board .tile.reach,
-.arcana-page.visual-fork .board .tile.pendingPreview,
-.arcana-page.visual-fork #board .tile.reach,
-.arcana-page.visual-fork #board .tile.pendingPreview{
-  opacity:1 !important;
+.arcana-page.visual-fork .nodeGlyph-trap{
+  color:#FF5AA8;
+  font-size:23px;
 }
 
-/* The legend should no longer advertise row links. */
-.arcana-page.visual-fork .legendPill:has(.rowWrapDot){
-  display:none !important;
+.arcana-page.visual-fork .boardNode.node-upgrade{
+  border-color:rgba(255,90,168,.70);
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255,90,168,.23), transparent 58%),
+    linear-gradient(180deg, rgba(58,14,32,.94), rgba(4,8,14,.96));
+}
+.arcana-page.visual-fork .nodeGlyph-upgrade{
+  color:#FFD8EB;
+  font-size:22px;
+}
+
+/* CSS chest nodes: simple, original, rarity-colored, no images. */
+.arcana-page.visual-fork .boardNode.node-chest{
+  border-color:rgba(230,199,122,.72);
+  background:
+    radial-gradient(circle at 50% 42%, rgba(230,199,122,.22), transparent 58%),
+    linear-gradient(180deg, rgba(42,27,9,.94), rgba(4,8,14,.96));
+}
+
+.arcana-page.visual-fork .nodeChest{
+  position:relative;
+  width:34px;
+  height:23px;
+  border-radius:7px 7px 5px 5px;
+  border:1px solid rgba(255,236,174,.55);
+  background:linear-gradient(180deg,#E6C77A,#8B5F22);
+  box-shadow:0 0 14px rgba(230,199,122,.28), inset 0 -7px 10px rgba(0,0,0,.22);
+}
+.arcana-page.visual-fork .nodeChest::before{
+  content:"";
+  position:absolute;
+  left:4px;
+  right:4px;
+  top:3px;
+  height:7px;
+  border-radius:8px 8px 2px 2px;
+  border-bottom:1px solid rgba(4,8,15,.55);
+  background:rgba(255,255,255,.10);
+}
+.arcana-page.visual-fork .nodeChestBand{
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:50%;
+  width:5px;
+  transform:translateX(-50%);
+  background:rgba(255,238,180,.70);
+  box-shadow:0 0 9px rgba(230,199,122,.28);
+}
+.arcana-page.visual-fork .nodeChestLock{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:8px;
+  height:8px;
+  transform:translate(-50%,-20%);
+  border-radius:2px;
+  background:rgba(4,8,15,.72);
+  border:1px solid rgba(255,238,180,.55);
+}
+.arcana-page.visual-fork .nodeChest.green{background:linear-gradient(180deg,#7AC06B,#244E2C)}
+.arcana-page.visual-fork .nodeChest.blue{background:linear-gradient(180deg,#76B8EA,#244A78)}
+.arcana-page.visual-fork .nodeChest.purple{background:linear-gradient(180deg,#B072EA,#4B237B)}
+.arcana-page.visual-fork .nodeChest.orange{background:linear-gradient(180deg,#E6C77A,#8B5F22)}
+.arcana-page.visual-fork .nodeChest.red{background:linear-gradient(180deg,#F56A4E,#7C1E18)}
+.arcana-page.visual-fork .nodeChest.rainbow{
+  background:linear-gradient(135deg,#7AD7FF,#E8DBFF 35%,#F2D27B 65%,#A57BFF);
+}
+
+/* Current position diamond only. */
+.arcana-page.visual-fork .boardNode .playerMarker{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:18px;
+  height:18px;
+  transform:translate(-50%,-50%) rotate(45deg);
+  border:2px solid rgba(255,255,255,.96);
+  background:linear-gradient(145deg,#FFFFFF,#E6C77A);
+  box-shadow:0 0 0 2px rgba(4,8,15,.82),0 0 22px rgba(230,199,122,.82),0 8px 20px rgba(0,0,0,.46);
+  z-index:14;
+  pointer-events:none;
+}
+.arcana-page.visual-fork .boardNode .playerMarker::after{
+  content:"";
+  position:absolute;
+  inset:4px;
+  border-radius:999px;
+  background:#07111F;
+}
+
+/* Landing history: quiet numbered markers. */
+.arcana-page.visual-fork .nodeLand{
+  position:absolute;
+  right:4px;
+  top:4px;
+  min-width:18px;
+  height:18px;
+  padding:0 4px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  border:1px solid rgba(230,199,122,.62);
+  background:rgba(4,8,15,.84);
+  color:#E6C77A;
+  font-size:10px;
+  font-weight:950;
+  z-index:10;
+}
+
+/* Interaction states */
+.arcana-page.visual-fork .boardNode.reach{
+  border-color:rgba(86,182,255,.70);
+  box-shadow:0 0 0 2px rgba(86,182,255,.20),0 0 20px rgba(86,182,255,.20), inset 0 0 16px rgba(0,0,0,.20);
+}
+.arcana-page.visual-fork .boardNode.pendingPreview{
+  border-color:rgba(230,199,122,.92);
+  box-shadow:0 0 0 3px rgba(230,199,122,.62),0 0 28px rgba(230,199,122,.32), inset 0 0 16px rgba(0,0,0,.20);
+  transform:translateY(-1px) scale(1.03);
+}
+.arcana-page.visual-fork .boardNode.suggest:not(.pendingPreview){
+  border-color:rgba(242,138,46,.82);
+  box-shadow:0 0 0 2px rgba(242,138,46,.22),0 0 24px rgba(242,138,46,.24);
+}
+
+@media (max-width:900px){
+  .arcana-page.visual-fork .boardV2{
+    --cell-h:68px;
+    padding:12px;
+  }
+  .arcana-page.visual-fork .boardRouteSvg{
+    inset:12px;
+    width:calc(100% - 24px);
+    height:calc(100% - 24px);
+  }
+  .arcana-page.visual-fork .boardNode{
+    width:52px;
+    height:52px;
+  }
+  .arcana-page.visual-fork .boardNode.node-empty,
+  .arcana-page.visual-fork .boardNode.spentEmpty{
+    width:42px;
+    height:42px;
+  }
 }
